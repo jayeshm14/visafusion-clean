@@ -36,3 +36,25 @@ Generated: 2026-08-06 | Source: SPEC-0001, ADR-0001, knowledge-graph/kg.json
 
 This matrix MUST be updated after every completed task, in the same change as the
 Knowledge Graph update, per constitution principle IV and `library/04` sync rules.
+
+---
+
+## SPEC-0001-AIENV — AI Environment Validation (governance/validation feature)
+
+Generated: 2026-08-06 | Source: `specs/001-ai-environment-validation/spec.md`, ADR-0002
+
+| Requirement | Architecture | Domain | Database | API | UI | Test | Migration |
+|-------------|--------------|--------|----------|-----|----|------|-----------|
+| FR-001 Check 12 integrations | ADR-0002, `library/04,05,06,07,08,11` | Integration registry | — | summary.json (v1) | report.md | Pester: registry/detection | — |
+| FR-002 Traceability matrix | ADR-0002 | Integration | — | summary.json | report.md | Pester: matrix render | — |
+| FR-003 Flag gaps | ADR-0002 | Status classifier | — | summary.json | Gap Report | Pester: partial/missing/contradictory | — |
+| FR-004 Provenance | ADR-0002 | Integration | — | summary.json | report.md | Pester: provenance | — |
+| FR-005 Repeatable dated result | ADR-0002 | ValidationResult | — | summary.json | report.md | Pester: determinism/exit code | — |
+| FR-006 CI + on-demand | ADR-0002, `.github/workflows/ai-environment-validation.yml` | — | — | — | — | Pester: equivalence/ReportOnly | — |
+| FR-007 Report artifacts | ADR-0002 | — | — | summary.json | report.md | Pester: contract | — |
+| FR-008 CI trigger | `.github/workflows/ai-environment-validation.yml` | — | — | — | — | Pester: workflow | — |
+
+### Module → Legacy Mapping (this feature)
+
+This is a cross-cutting governance feature with no legacy page mapping (spec §8);
+it does not alter legacy business behavior (Constitution Principle II).

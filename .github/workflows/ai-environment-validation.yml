@@ -1,0 +1,39 @@
+name: AI Environment Validation
+
+on:
+  push:
+    paths:
+      - 'findings/**'
+      - 'library/**'
+  pull_request:
+    paths:
+      - 'findings/**'
+      - 'library/**'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Validate AI Environment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run AI Environment Validation
+        shell: pwsh
+        run: |
+          & ./scripts/ai-environment-validation/validate-ai-environment.ps1 `
+            -SourceDirs @('findings', 'library') `
+            -OutputDir 'reports/ai-environment-validation'
+        # The script exits non-zero when the validation result is not "passed",
+        # which fails this step and blocks the merge (FR-008, AC-007).
+
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-environment-validation-report
+          path: |
+            reports/ai-environment-validation/report.md
+            reports/ai-environment-validation/summary.json
+          if-no-files-found: error

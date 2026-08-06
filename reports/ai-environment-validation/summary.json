@@ -1,0 +1,217 @@
+﻿{
+    "$schema":  "contracts/validation-summary.v1.schema.json",
+    "version":  1,
+    "runDate":  "2026-08-06T17:18:32.7636423Z",
+    "sourceDirs":  [
+                       "findings",
+                       "library"
+                   ],
+    "passed":  true,
+    "summary":  {
+                    "contradictory":  0,
+                    "validated":  12,
+                    "missing":  0,
+                    "partial":  0
+                },
+    "integrations":  [
+                         {
+                             "id":  "graphrag",
+                             "name":  "GraphRAG",
+                             "governingDoc":  "library/05_GraphRAG_and_MCP.md",
+                             "workflowDirective":  true,
+                             "constitutionPrinciple":  "IV",
+                             "status":  "validated",
+                             "provenance":  [
+                                                "library/05_GraphRAG_and_MCP.md:1",
+                                                "library/05_GraphRAG_and_MCP.md:5",
+                                                "library/05_GraphRAG_and_MCP.md:7"
+                                            ]
+                         },
+                         {
+                             "id":  "mcp",
+                             "name":  "Model Context Protocol (MCP)",
+                             "governingDoc":  "library/05_GraphRAG_and_MCP.md",
+                             "workflowDirective":  true,
+                             "constitutionPrinciple":  "IV",
+                             "status":  "validated",
+                             "provenance":  [
+                                                "library/05_GraphRAG_and_MCP.md:1",
+                                                "library/05_GraphRAG_and_MCP.md:24",
+                                                "library/05_GraphRAG_and_MCP.md:26",
+                                                "library/05_GraphRAG_and_MCP.md:5"
+                                            ]
+                         },
+                         {
+                             "id":  "adr",
+                             "name":  "Architecture Decision Records (ADRs)",
+                             "governingDoc":  "library/07_DDD_CleanArchitecture_C4_ADR.md",
+                             "workflowDirective":  true,
+                             "constitutionPrinciple":  "IV",
+                             "status":  "validated",
+                             "provenance":  [
+                                                "library/00_Constitution.md:34",
+                                                "library/00_Constitution.md:53",
+                                                "library/00_Constitution.md:73",
+                                                "library/00_Constitution.md:80",
+                                                "library/02_OpenCode_Operating_System.md:79",
+                                                "library/03_SpecKit_SDD_Framework.md:165",
+                                                "library/03_SpecKit_SDD_Framework.md:65",
+                                                "library/03_SpecKit_SDD_Framework.md:71",
+                                                "library/04_AI_Native_Knowledge_Graph.md:19",
+                                                "library/05_GraphRAG_and_MCP.md:15",
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:1",
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:120",
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:122",
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:136",
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:191",
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:205",
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:7",
+                                                "library/09_SQLServer_Data_Engineering.md:49",
+                                                "library/13_AI_Agent_Orchestration.md:163",
+                                                "library/13_AI_Agent_Orchestration.md:41",
+                                                "library/13_AI_Agent_Orchestration.md:75",
+                                                "library/13_AI_Agent_Orchestration.md:90",
+                                                "library/14_Quality_Gates_Checklists.md:157",
+                                                "library/14_Quality_Gates_Checklists.md:59",
+                                                "library/15_Templates_Prompt_Library_Command_Catalog.md:126",
+                                                "library/15_Templates_Prompt_Library_Command_Catalog.md:142",
+                                                "library/15_Templates_Prompt_Library_Command_Catalog.md:16",
+                                                "library/15_Templates_Prompt_Library_Command_Catalog.md:74"
+                                            ]
+                         },
+                         {
+                             "id":  "c4",
+                             "name":  "C4 Model Diagrams",
+                             "governingDoc":  "library/07_DDD_CleanArchitecture_C4_ADR.md",
+                             "workflowDirective":  true,
+                             "constitutionPrinciple":  "IV",
+                             "status":  "validated",
+                             "provenance":  [
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:1",
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:192",
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:204",
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:6",
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:96",
+                                                "library/13_AI_Agent_Orchestration.md:41",
+                                                "library/14_Quality_Gates_Checklists.md:58"
+                                            ]
+                         },
+                         {
+                             "id":  "ddd",
+                             "name":  "Domain-Driven Design (DDD)",
+                             "governingDoc":  "library/07_DDD_CleanArchitecture_C4_ADR.md",
+                             "workflowDirective":  true,
+                             "constitutionPrinciple":  "IV",
+                             "status":  "validated",
+                             "provenance":  [
+                                                "findings/modernization_plan.md:461",
+                                                "findings/modernization_plan.md:562",
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:1",
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:43",
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:6",
+                                                "library/13_AI_Agent_Orchestration.md:41",
+                                                "library/14_Quality_Gates_Checklists.md:57"
+                                            ]
+                         },
+                         {
+                             "id":  "event-storming",
+                             "name":  "Event Storming",
+                             "governingDoc":  "library/07_DDD_CleanArchitecture_C4_ADR.md",
+                             "workflowDirective":  true,
+                             "constitutionPrinciple":  "IV",
+                             "status":  "validated",
+                             "provenance":  [
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:71",
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:73",
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:87",
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:89",
+                                                "library/15_Templates_Prompt_Library_Command_Catalog.md:81"
+                                            ]
+                         },
+                         {
+                             "id":  "docs-as-code",
+                             "name":  "Docs-as-Code",
+                             "governingDoc":  "library/06_GitHub_Engineering_Standards.md",
+                             "workflowDirective":  true,
+                             "constitutionPrinciple":  "V",
+                             "status":  "validated",
+                             "provenance":  [
+                                                "library/06_GitHub_Engineering_Standards.md:49",
+                                                "library/13_AI_Agent_Orchestration.md:76",
+                                                "library/15_Templates_Prompt_Library_Command_Catalog.md:115"
+                                            ]
+                         },
+                         {
+                             "id":  "backstage",
+                             "name":  "Backstage Software Catalog",
+                             "governingDoc":  "library/04_AI_Native_Knowledge_Graph.md",
+                             "workflowDirective":  true,
+                             "constitutionPrinciple":  "IV",
+                             "status":  "validated",
+                             "provenance":  [
+                                                "library/04_AI_Native_Knowledge_Graph.md:20",
+                                                "library/08_ASPNETCore_Enterprise_Standards.md:171",
+                                                "library/13_AI_Agent_Orchestration.md:82",
+                                                "library/15_Templates_Prompt_Library_Command_Catalog.md:82"
+                                            ]
+                         },
+                         {
+                             "id":  "opentelemetry",
+                             "name":  "OpenTelemetry",
+                             "governingDoc":  "library/11_Testing_Observability_DevSecOps.md",
+                             "workflowDirective":  true,
+                             "constitutionPrinciple":  "V",
+                             "status":  "validated",
+                             "provenance":  [
+                                                "library/04_AI_Native_Knowledge_Graph.md:20",
+                                                "library/08_ASPNETCore_Enterprise_Standards.md:121",
+                                                "library/11_Testing_Observability_DevSecOps.md:66",
+                                                "library/15_Templates_Prompt_Library_Command_Catalog.md:86"
+                                            ]
+                         },
+                         {
+                             "id":  "codeql",
+                             "name":  "CodeQL",
+                             "governingDoc":  "library/06_GitHub_Engineering_Standards.md",
+                             "workflowDirective":  true,
+                             "constitutionPrinciple":  "V",
+                             "status":  "validated",
+                             "provenance":  [
+                                                "library/04_AI_Native_Knowledge_Graph.md:20",
+                                                "library/06_GitHub_Engineering_Standards.md:42",
+                                                "library/06_GitHub_Engineering_Standards.md:46",
+                                                "library/11_Testing_Observability_DevSecOps.md:94",
+                                                "library/15_Templates_Prompt_Library_Command_Catalog.md:83"
+                                            ]
+                         },
+                         {
+                             "id":  "dependabot",
+                             "name":  "Dependabot",
+                             "governingDoc":  "library/06_GitHub_Engineering_Standards.md",
+                             "workflowDirective":  true,
+                             "constitutionPrinciple":  "V",
+                             "status":  "validated",
+                             "provenance":  [
+                                                "library/04_AI_Native_Knowledge_Graph.md:21",
+                                                "library/06_GitHub_Engineering_Standards.md:44",
+                                                "library/06_GitHub_Engineering_Standards.md:46",
+                                                "library/11_Testing_Observability_DevSecOps.md:95",
+                                                "library/15_Templates_Prompt_Library_Command_Catalog.md:84"
+                                            ]
+                         },
+                         {
+                             "id":  "ndepend",
+                             "name":  "NDepend",
+                             "governingDoc":  "library/07_DDD_CleanArchitecture_C4_ADR.md",
+                             "workflowDirective":  true,
+                             "constitutionPrinciple":  "IV",
+                             "status":  "validated",
+                             "provenance":  [
+                                                "library/04_AI_Native_Knowledge_Graph.md:21",
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:15",
+                                                "library/07_DDD_CleanArchitecture_C4_ADR.md:194",
+                                                "library/15_Templates_Prompt_Library_Command_Catalog.md:85"
+                                            ]
+                         }
+                     ]
+}
