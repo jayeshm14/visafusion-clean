@@ -6,7 +6,7 @@
 
 This document is the supreme operating agreement. All other library
 documents (`01_System_Role_and_Principles` … `15_Templates`,
-`complete_migration_plan`) and all `findings/` snapshots are subordinate
+`complete_migration_plan`) are subordinate
 and must be interpreted consistently with this constitution.
 
 ---

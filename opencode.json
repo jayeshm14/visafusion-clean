@@ -5,16 +5,12 @@
     "library": {
       "path": "library",
       "description": "VisaFusion spec-kit and reference docs. 01 System Role/Principles, 02 OpenCode Operating System, 03 SpecKit SDD, 04 AI-Native Knowledge Graph, 05 GraphRAG and MCP, 06 GitHub Engineering Standards, 07 DDD/CleanArch/C4/ADR, 08 ASP.NET Core Enterprise Standards, 09 SQL Server Data Engineering, 10 API/UI Standards, 11 Testing/Observability/DevSecOps, 12 Legacy Modernization Playbook, 13 AI Agent Orchestration, 14 Quality Gates/Checklists, 15 Templates/Prompt Library/Commands, complete_migration_plan. Use as the source of truth for every engineering activity."
-    },
-    "findings": {
-      "path": "findings",
-      "description": "Live-analysis reports of the legacy Classic ASP VisaEntry app: exiting_architecture.md, deepanalysis.md, modernization_plan.md. Read before implementing any module."
     }
   },
   "agent": {
     "visafusion": {
       "mode": "primary",
-      "description": "Drives the VisaFusion legacy-modernization program (Classic ASP VisaEntry to ASP.NET Core). Executes the deterministic pipeline from library/ and reads live findings from findings/.",
+      "description": "Drives the VisaFusion legacy-modernization program (Classic ASP VisaEntry to ASP.NET Core). Executes the deterministic pipeline from library/.",
       "model": "opencode/deepseek-v4-flash-free",
       "temperature": 0
     }

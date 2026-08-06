@@ -3,7 +3,7 @@
 
 **Document status:** Live-analysis snapshot. All facts below were verified by executing the actual Classic ASP app and querying the live production SQL Server. **No code changes were made to the application.**
 **Analysis date:** 2026-08-06
-**Audience:** AI-assisted migration engineer. This document is intended to be fully self-contained — read the companion files `findings/exiting_architecture.md` and `findings/deepanalysis.md` for the raw evidence this plan is derived from.
+**Audience:** AI-assisted migration engineer. This document is intended to be fully self-contained — all facts below were verified by executing the actual Classic ASP app and querying the live production SQL Server.
 
 ---
 
@@ -60,7 +60,6 @@ The modernization target is **ASP.NET Core (EF Core + Razor Pages + ASP.NET Core
 | `images\` | 1.4 | Site images |
 | `.vs\` | 17.5 | Visual Studio workspace (ignore) |
 | `ActiveX\` | 0.2 | `OSSMTP.dll` COM component for email |
-| `findings\` | ~0 | Analysis reports (this document lives here) |
 
 ---
 
@@ -74,7 +73,7 @@ The modernization target is **ASP.NET Core (EF Core + Razor Pages + ASP.NET Core
 5. Server-side processing pages (e.g. `insertEntry.asp`, `collectionSubmit.asp`, `invoicesubmit.asp`) read `request("param")`, build **string-concatenated SQL**, and `con.execute`.
 
 ### 3.2 `connection.asp` (the de-facto "framework")
-Key facts (see `findings/deepanalysis.md` for full detail):
+Key facts:
 - Line 5: `con.open "provider=sqloledb...uid=sa;pwd=sa123;database=visaentry"` — plaintext superuser.
 - Wrapped in `on error resume next` — **all subsequent script errors are silently swallowed**.
 - Defines shared functions used across the app:
@@ -610,7 +609,6 @@ Full machine-readable dump: `%TEMP%\opencode\schema_dump.txt` (also reproduced i
 
 - Full alphabetical list of all 585 root `.asp` files: `%TEMP%\opencode\root_asp_list.txt`.
 - The 200+ top-value workflow files are catalogued in §3.6 and §6.
-- See also `findings/exiting_architecture.md` and `findings/deepanalysis.md`.
 
 ---
 

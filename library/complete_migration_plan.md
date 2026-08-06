@@ -20,11 +20,11 @@ The three source documents were cross-checked against each other:
 
 | # | Gap | Where it showed up | Resolution in this document |
 |---|---|---|---|
-| G1 | 15 of 52 tables never appear in the module migration map | `modernization_plan.md` §10.6 vs Appendix A | §3 — full 52-table disposition |
+| G1 | 15 of 52 tables never appear in the module migration map | legacy schema (52 tables) vs §3 | §3 — full 52-table disposition |
 | G2 | No API layer — plan is Razor-Pages-only | §10.1–10.6 | §5 — Web API surface, one controller set per module, reusing the same authorization policies |
-| G3 | RBAC remediation stated as a principle ("Role claims + `[Authorize(Roles=...)]`") but never mapped per legacy file/endpoint | §10.4, §10.7 | §4 — full endpoint × role matrix, derived directly from `deepanalysis.md` §3 "Role → Module Access Matrix" and §2.3/§2.4 findings |
-| G4 | The 13 anonymous write endpoints are named but not individually re-specified with their target route + required role | `deepanalysis.md` §2.4, `modernization_plan.md` §3.8 | §4.3 — one row per endpoint |
-| G5 | Data-quality issues listed but not turned into an executable cleansing checklist with order-of-operations | `deepanalysis.md` §4.5/§9.4, `modernization_plan.md` §4.5/§9.4 | §6 — ordered remediation script list |
+| G3 | RBAC remediation stated as a principle ("Role claims + `[Authorize(Roles=...)]`") but never mapped per legacy file/endpoint | §10.4, §10.7 | §4 — full endpoint × role matrix, derived directly from the legacy "Role → Module Access Matrix" and the RBAC findings |
+| G4 | The 13 anonymous write endpoints are named but not individually re-specified with their target route + required role | legacy anonymous-write endpoints | §4.3 — one row per endpoint |
+| G5 | Data-quality issues listed but not turned into an executable cleansing checklist with order-of-operations | legacy data-quality issues | §6 — ordered remediation script list |
 | G6 | Identity consolidation (`Udaan_users` + `agents` + `registration` → one Identity store) described in one line, no key-mapping design | §10.4 | §7 — explicit external-id mapping |
 | G7 | No test matrix tied to the specific documented business rules (Canada DOB, holiday/weeklyoff/Sunday block, statusID 508 duplicate, junk dates) | §10.10 (generic) | §8 — one test case per documented rule |
 | G8 | No explicit decommission checklist (which of the 7,314 files get deleted vs archived vs migrated) | §3.7, §9.5 (scattered) | §9 |
@@ -85,7 +85,7 @@ Legend: **M** = migrate as live/writable entity · **M-RO** = migrate as read-on
 | `agents` | 4,218 | **M** | `Agent` entity | §6.4 |
 | `newagents` | low | **M-RO**, fold workflow into `Agent` staging status | §9.4 "registration staging" — verify with owner whether staging flow is still used before building new UI |
 | `Results` | low | **DROP** | none — documented as a temp copy of `agents` | §9.4 |
-| `Udaan_users` | 2,365 | **M** | `AspNetUsers` + `AspNetUserRoles` (see §7) | §5.1/§5.2 auth findings |
+| `Udaan_users` | 2,365 | **M** | `AspNetUsers` + `AspNetUserRoles` (see §7) | legacy auth model |
 | `registration` | 43 | **M** | `AspNetUsers` (guest role) — **hash password on migration, never re-store plaintext** | §5.4.4 plaintext finding |
 | `security` | 1,461 | **M** | `SecurityDay` (day open/close gate) | §6.10 |
 | `masterbalance` | 1,416 | **M**, pending owner confirmation it's still used (documented "sparsely used") | §4.4 | 
@@ -198,7 +198,7 @@ One `/api/v1/{area}` controller group per module from `modernization_plan.md` §
 | Notifications | `NotificationsController` | `POST /notifications/sms`, `POST /notifications/email`, `GET /notifications/sms-history`, `GET /notifications/email-history` | `SendSMS*`, `emailAgent`, `composeEmail` |
 | Public | `PublicController` | `GET /public/embassies`, `GET /public/countries`, `GET /public/visa-info`, `GET /public/forms`, `POST /public/queries`, `POST /public/subscribe` | `embassyhome`, `CountryInfo.asp`, `VisaInfo.asp`, `forms.asp`, `queries.asp`, `subscribe.asp` |
 
-**Cross-cutting API rules (fix findings from §5.4/§10.7 of the original plan, applied uniformly across every controller above):**
+**Cross-cutting API rules (security remediations from the legacy analysis, applied uniformly across every controller above):**
 - Every write endpoint requires authentication except the two explicitly public-by-design ones (`register`, `public/queries`, `public/subscribe`) — matches legacy intent (public site *is* meant to be anonymous; back-office is not).
 - Every endpoint that reads/writes agent-scoped data resolves the agent id from the authenticated user's claims, **never** from a route/query parameter supplied by the caller — this is the direct fix for the `jn=` tampering vulnerability (§2.3).
 - All EF Core queries are parameterized by default (LINQ) — no string-built SQL survives the migration, closing §2.6.

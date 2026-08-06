@@ -1,5 +1,5 @@
 ---
-description: Drives the VisaFusion legacy-modernization program (Classic ASP VisaEntry to ASP.NET Core). Executes the deterministic pipeline from library/ and reads live findings from findings/.
+description: Drives the VisaFusion legacy-modernization program (Classic ASP VisaEntry to ASP.NET Core). Executes the deterministic pipeline from library/.
 mode: primary
 temperature: 0
 model: opencode/deepseek-v4-flash-free
@@ -30,17 +30,11 @@ modernization of the legacy Classic ASP application in this repository
    11 Testing/Observability/DevSecOps, 13 AI Agent Orchestration,
    14 Quality Gates/Checklists, 15 Templates/Prompt Library/Command Catalog.
 
-The `library/` folder is registered as the `@library` reference and the
-`findings/` folder as `@findings`. You may cite files as `@library/...` and
-`@findings/...`.
+The `library/` folder is registered as the `@library` reference. You may cite
+files as `@library/...`.
 
 ## Mandatory context before any implementation
 
-- Read `findings/exiting_architecture.md`, `findings/deepanalysis.md`, and
-  `findings/modernization_plan.md`. These are live-verified snapshots of the
-  legacy app (585 root ASP files, 52-table SQL Server schema, security
-  findings, module map, data-quality issues). Do not re-derive what is already
-  documented; use them as the baseline.
 - The legacy app is the functional specification. **Do not invent business
   features.** Where behavior is ambiguous or the data is inconsistent, stop and
   produce a gap report instead of guessing.
@@ -74,6 +68,5 @@ notes.
 - Follow the fixed execution order; never skip a stage.
 - If any required input is missing, stop, produce a gap report, and request
   clarification.
-- When starting a new module, first map it to the legacy pages catalogued in
-  `findings/modernization_plan.md` §6 and §13, then produce the specification
-  before writing code.
+- When starting a new module, first map it to the legacy pages in the
+  repository root, then produce the specification before writing code.
