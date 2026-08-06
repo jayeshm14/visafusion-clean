@@ -58,3 +58,29 @@ Generated: 2026-08-06 | Source: `specs/001-ai-environment-validation/spec.md`, A
 
 This is a cross-cutting governance feature with no legacy page mapping (spec §8);
 it does not alter legacy business behavior (Constitution Principle II).
+
+---
+
+## SPEC-0002 — Repository Inventory (governance/analysis feature)
+
+Generated: 2026-08-06 | Source: `specs/002-repository-inventory/spec.md`
+
+| Requirement | Architecture | Domain | Database | API | UI | Test | Migration |
+|-------------|--------------|--------|----------|-----|----|------|-----------|
+| FR-001 Directory + root file inventory | spec §4/§18 | repo structure | — | — | `reports/repository-inventory/01-repository-inventory.md` | TS-001 (10/10 files) | — |
+| FR-002 Technology inventory | spec §6 | tech registry | — | — | `reports/repository-inventory/02-technology-inventory.md` | C-001/C-002 | — |
+| FR-003 Dependency graph | spec §7 | dep edges | — | — | `reports/repository-inventory/03-dependency-graph.md` | C-002 | — |
+| FR-004 Project structure | spec §8 | structure registry | — | — | `reports/repository-inventory/04-project-structure.md` | TS-001 | — |
+| FR-005 Legacy module map | spec §9 | legacy modules (MOD-001..006) | — | — | `reports/repository-inventory/05-legacy-inventory.md` | TS-004 (findings §3.5/§3.6) | — |
+| FR-006 External dependencies | spec §10 | external registry | — | — | `reports/repository-inventory/06-external-dependencies.md` | TS-005 (no secrets) | — |
+| FR-007 COM dependencies | spec §11 | COM registry | — | — | `reports/repository-inventory/07-com-dependencies.md` | C-002 | — |
+| FR-008 Config + security flags | spec §12 | config registry | — | — | `reports/repository-inventory/08-configuration-inventory.md` | TS-005 (no secret values) | — |
+| FR-009 README + discrepancies | spec §5 | — | — | — | `reports/repository-inventory/README.md`, `discrepancies.md` | TS-001, C-003 (0 TODO) | — |
+| FR-010 Deterministic, reviewable | NFR-001 | — | — | — | all category docs | TS-002/TS-003, T037 | — |
+
+### Module → Legacy Mapping (this feature)
+
+Documentation-only feature: `INV-Legacy` documents legacy modules MOD-001..MOD-006;
+`INV-Config` documents the SEC-Backdoor finding. No legacy business behavior
+changes (Constitution Principle II). Deliverable location fixed by spec §5 as
+`reports/repository-inventory/` (CHK004 remediation).

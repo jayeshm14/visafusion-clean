@@ -66,6 +66,9 @@ such as `library/`, `findings/`, `specs/`, `scripts/`, and `adr/`):
   settings.
 
 All output is markdown documentation. No source code is written or modified.
+The deliverable documents are written to `reports/repository-inventory/`, with
+one markdown document per inventory category, a `README.md` index, and a
+`discrepancies.md` for recorded discrepancies.
 
 ## 6. Out of Scope
 
@@ -153,9 +156,10 @@ discrepancy is recorded in the inventory rather than silently resolved.
 
 ## 13. Performance
 
-- The analysis MUST complete within a reasonable time for a repository of this
-  size (585 root ASP files, 52-table schema). No specific latency target is
-  imposed; the deliverable is documentation, not a runtime service.
+- The analysis MUST complete within one working session (8 person-hours) for a
+  repository of this size (585 root ASP files, 52-table schema). No runtime
+  latency target is imposed; the deliverable is documentation, not a runtime
+  service.
 
 ## 14. UI Requirements
 

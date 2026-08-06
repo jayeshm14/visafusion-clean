@@ -40,7 +40,17 @@
     { "id": "ADR-0002", "type": "ADR", "label": "AI Environment Validation Gate Architecture", "status": "Accepted" },
     { "id": "TOOL-Validation", "type": "Job", "label": "validate-ai-environment.ps1 (12-integration gate)" },
     { "id": "ART-Report", "type": "Page", "label": "reports/ai-environment-validation/report.md" },
-    { "id": "ART-Summary", "type": "API", "label": "reports/ai-environment-validation/summary.json (schema v1)" }
+    { "id": "ART-Summary", "type": "API", "label": "reports/ai-environment-validation/summary.json (schema v1)" },
+    { "id": "SPEC-0002", "type": "Requirement", "label": "Repository Inventory", "status": "Approved" },
+    { "id": "INV-Repo", "type": "Page", "label": "reports/repository-inventory/01-repository-inventory.md" },
+    { "id": "INV-Tech", "type": "Page", "label": "reports/repository-inventory/02-technology-inventory.md" },
+    { "id": "INV-Dep", "type": "Page", "label": "reports/repository-inventory/03-dependency-graph.md" },
+    { "id": "INV-Struct", "type": "Page", "label": "reports/repository-inventory/04-project-structure.md" },
+    { "id": "INV-Legacy", "type": "Page", "label": "reports/repository-inventory/05-legacy-inventory.md" },
+    { "id": "INV-ExtDep", "type": "Page", "label": "reports/repository-inventory/06-external-dependencies.md" },
+    { "id": "INV-Com", "type": "Page", "label": "reports/repository-inventory/07-com-dependencies.md" },
+    { "id": "INV-Config", "type": "Page", "label": "reports/repository-inventory/08-configuration-inventory.md" },
+    { "id": "INV-Disc", "type": "Page", "label": "reports/repository-inventory/discrepancies.md" }
   ],
   "edges": [
     { "from": "SPEC-0001", "to": "ADR-0001", "type": "references" },
@@ -83,6 +93,22 @@
     { "from": "TOOL-Validation", "to": "TOOL-Dependabot", "type": "validates" },
     { "from": "TOOL-Validation", "to": "TOOL-NDepend", "type": "validates" },
     { "from": "TOOL-Validation", "to": "TOOL-OTel", "type": "validates" },
-    { "from": "TOOL-Validation", "to": "CAT-Backstage", "type": "validates" }
+    { "from": "TOOL-Validation", "to": "CAT-Backstage", "type": "validates" },
+    { "from": "SPEC-0002", "to": "INV-Repo", "type": "generates" },
+    { "from": "SPEC-0002", "to": "INV-Tech", "type": "generates" },
+    { "from": "SPEC-0002", "to": "INV-Dep", "type": "generates" },
+    { "from": "SPEC-0002", "to": "INV-Struct", "type": "generates" },
+    { "from": "SPEC-0002", "to": "INV-Legacy", "type": "generates" },
+    { "from": "SPEC-0002", "to": "INV-ExtDep", "type": "generates" },
+    { "from": "SPEC-0002", "to": "INV-Com", "type": "generates" },
+    { "from": "SPEC-0002", "to": "INV-Config", "type": "generates" },
+    { "from": "SPEC-0002", "to": "INV-Disc", "type": "generates" },
+    { "from": "INV-Legacy", "to": "MOD-001", "type": "documents" },
+    { "from": "INV-Legacy", "to": "MOD-002", "type": "documents" },
+    { "from": "INV-Legacy", "to": "MOD-003", "type": "documents" },
+    { "from": "INV-Legacy", "to": "MOD-004", "type": "documents" },
+    { "from": "INV-Legacy", "to": "MOD-005", "type": "documents" },
+    { "from": "INV-Legacy", "to": "MOD-006", "type": "documents" },
+    { "from": "INV-Config", "to": "SEC-Backdoor", "type": "documents" }
   ]
 }

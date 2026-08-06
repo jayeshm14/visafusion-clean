@@ -1,4 +1,4 @@
----
+﻿---
 
 description: "Task list for SPEC-0002 Repository Inventory implementation"
 ---
@@ -30,9 +30,9 @@ description: "Task list for SPEC-0002 Repository Inventory implementation"
 
 **Purpose**: Create the deliverable directory structure and index
 
-- [ ] T001 Create the deliverable directory `reports/repository-inventory/`
-- [ ] T002 [P] Create `reports/repository-inventory/README.md` index with metadata (date, repository state) and a Categories table mapping each category to its document path
-- [ ] T003 [P] Create `reports/repository-inventory/discrepancies.md` with the discrepancy table contract (Artifact, Repository State, Finding State, Discrepancy, Resolution) per `contracts/inventory-document-format.md`
+- [x] T001 Create the deliverable directory `reports/repository-inventory/`
+- [x] T002 [P] Create `reports/repository-inventory/README.md` index with metadata (date, repository state) and a Categories table mapping each category to its document path
+- [x] T003 [P] Create `reports/repository-inventory/discrepancies.md` with the discrepancy table contract (Artifact, Repository State, Finding State, Discrepancy, Resolution) per `contracts/inventory-document-format.md`
 
 ---
 
@@ -40,11 +40,11 @@ description: "Task list for SPEC-0002 Repository Inventory implementation"
 
 **Purpose**: Establish the shared inventory conventions that all category documents must follow
 
-**âš ï¸ CRITICAL**: No category document can be finalized until this phase is complete
+**Ã¢Å¡Â Ã¯Â¸Â CRITICAL**: No category document can be finalized until this phase is complete
 
-- [ ] T004: Confirm the inventory contract `specs/002-repository-inventory/contracts/inventory-document-format.md` defines the required columns for all eight categories (C-001..C-005)
-- [ ] T005 [P] Confirm the data model `specs/002-repository-inventory/data-model.md` defines all seven entities (Repository Artifact, Technology, Dependency, Legacy Page, External Dependency, COM Component, Configuration Item)
-- [ ] T006 [P] Confirm the validation scenarios in `specs/002-repository-inventory/quickstart.md` (TS-001..TS-005) map to acceptance criteria AC-001..AC-005
+- [x] T004: Confirm the inventory contract `specs/002-repository-inventory/contracts/inventory-document-format.md` defines the required columns for all eight categories (C-001..C-005)
+- [x] T005 [P] Confirm the data model `specs/002-repository-inventory/data-model.md` defines all seven entities (Repository Artifact, Technology, Dependency, Legacy Page, External Dependency, COM Component, Configuration Item)
+- [x] T006 [P] Confirm the validation scenarios in `specs/002-repository-inventory/quickstart.md` (TS-001..TS-005) map to acceptance criteria AC-001..AC-005
 
 **Checkpoint**: Foundation ready - category documents can now be written in parallel
 
@@ -55,9 +55,9 @@ description: "Task list for SPEC-0002 Repository Inventory implementation"
 
 **Independent Test**: TS-001 (file present) + TS-002 (every entry traceable to a real path)
 
-- [ ] T007 [FR-001] Create `reports/repository-inventory/01-repository-inventory.md` with metadata block (Feature, Date) and `## Scope`
-- [ ] T008 [P] [FR-001] Populate `## Entries` table (Path, Type, Category, Purpose, Source) for all top-level directories and files, using the evidence in `research.md` (585 root `.asp` files, directory list)
-- [ ] T009 [FR-001] Add `## Notes` covering evidence limitations and any unclassified artifacts (per spec Â§18)
+- [x] T007 [FR-001] Create `reports/repository-inventory/01-repository-inventory.md` with metadata block (Feature, Date) and `## Scope`
+- [x] T008 [P] [FR-001] Populate `## Entries` table (Path, Type, Category, Purpose, Source) for all top-level directories and files, using the evidence in `research.md` (585 root `.asp` files, directory list)
+- [x] T009 [FR-001] Add `## Notes` covering evidence limitations and any unclassified artifacts (per spec Ã‚Â§18)
 
 **Checkpoint**: Category 1 complete and independently reviewable
 
@@ -69,9 +69,9 @@ description: "Task list for SPEC-0002 Repository Inventory implementation"
 
 **Independent**: TS-001 + TS-002 (each technology traces to evidence)
 
-- [ ] T010 [P] [FR-002] Create `reports/repository-inventory/02-technology-inventory.md` with metadata block and `## Scope`
-- [ ] T011 [P] [FR-002] Populate `## Entries` (Name, Category, Evidence, Confidence, Status) for Classic ASP/VBScript, SQL Server, HTML/CSS/JS, and other detected technologies per `research.md`
-- [ ] T012 [FR-002] Add `## Notes` with confidence levels and detection method
+- [x] T010 [P] [FR-002] Create `reports/repository-inventory/02-technology-inventory.md` with metadata block and `## Scope`
+- [x] T011 [P] [FR-002] Populate `## Entries` (Name, Category, Evidence, Confidence, Status) for Classic ASP/VBScript, SQL Server, HTML/CSS/JS, and other detected technologies per `research.md`
+- [x] T012 [FR-002] Add `## Notes` with confidence levels and detection method
 
 **Checkpoint**: US-2 complete and independently reviewable
 
@@ -83,9 +83,9 @@ description: "Task list for SPEC-0002 Repository Inventory implementation"
 
 **Independent**: TS-001 + TS-002 (each dependency traces to evidence)
 
-- [ ] T013 [P] [FR-003] Create `reports/repository-inventory/03-dependency-graph.md` with metadata block and `## Scope`
-- [ ] T014 [P] [FR-003] Populate `## Entries` (Source, Target, Type, Evidence) for include, data-access, mail, http, filesystem, and database relationships from `research.md`
-- [ ] T015 [FR-003] Add `## Notes` describing how dependencies were traced (includes, connection strings, data-access artifacts)
+- [x] T013 [P] [FR-003] Create `reports/repository-inventory/03-dependency-graph.md` with metadata block and `## Scope`
+- [x] T014 [P] [FR-003] Populate `## Entries` (Source, Target, Type, Evidence) for include, data-access, mail, http, filesystem, and database relationships from `research.md`
+- [x] T015 [FR-003] Add `## Notes` describing how dependencies were traced (includes, connection strings, data-access artifacts)
 
 **Checkpoint**: US-3 complete and independently reviewable
 
@@ -97,9 +97,9 @@ description: "Task list for SPEC-0002 Repository Inventory implementation"
 
 **Independent**: TS-001 + TS-002 (structure entries trace to real directories)
 
-- [ ] T016 [P] [FR-004] Create `reports/repository-inventory/04-project-structure.md` with metadata block and `## Scope`
-- [ ] T017 [P] [FR-004] Populate `## Entries` (Directory, Purpose, Contents summary) for all top-level directories from `research.md`
-- [ ] T018 [FR-004] Add `## Notes` on the logical grouping of directories (legacy, assets, tooling, documentation)
+- [x] T016 [P] [FR-004] Create `reports/repository-inventory/04-project-structure.md` with metadata block and `## Scope`
+- [x] T017 [P] [FR-004] Populate `## Entries` (Directory, Purpose, Contents summary) for all top-level directories from `research.md`
+- [x] T018 [FR-004] Add `## Notes` on the logical grouping of directories (legacy, assets, tooling, documentation)
 
 **Checkpoint**: US-4 complete and independently reviewable
 
@@ -111,9 +111,9 @@ description: "Task list for SPEC-0002 Repository Inventory implementation"
 
 **Independent**: TS-004 (consistent with findings) + TS-002
 
-- [ ] T019 [P] [FR-005] Create `reports/repository-inventory/05-legacy-inventory.md` with metadata block and `## Scope`
-- [ ] T020 [P] [FR-005] Populate `## Entries` (Path, Module, Role, Data Access, Auth Level) for legacy pages, mapping to `@findings/modernization_plan.md` Â§6 module map and Â§13 legacy pages
-- [ ] T021 [FR-005] Add `## Notes` recording any discrepancy between the repository and findings (per BR-002)
+- [x] T019 [P] [FR-005] Create `reports/repository-inventory/05-legacy-inventory.md` with metadata block and `## Scope`
+- [x] T020 [P] [FR-005] Populate `## Entries` (Path, Module, Role, Data Access, Auth Level) for legacy pages, mapping to `@findings/modernization_plan.md` Ã‚Â§6 module map and Ã‚Â§13 legacy pages
+- [x] T021 [FR-005] Add `## Notes` recording any discrepancy between the repository and findings (per BR-002)
 
 **Checkpoint**: US-5 complete and independently reviewable
 
@@ -125,9 +125,9 @@ description: "Task list for SPEC-0002 Repository Inventory implementation"
 
 **Independent**: TS-001 + TS-002 (each dependency traces to evidence)
 
-- [ ] T022 [P] [FR-006] Create `reports/repository-inventory/06-external-dependencies.md` with metadata block and `## Scope`
-- [ ] T023 [P] [FR-006] Populate `## Entries` (Name, Type, Used By, License, Security Note) for external services (e.g., SQL Server, mail services) from `research.md`
-- [ ] T024 [FR-006] Add `## Notes` with security notes (no secret values) per spec Â§12
+- [x] T022 [P] [FR-006] Create `reports/repository-inventory/06-external-dependencies.md` with metadata block and `## Scope`
+- [x] T023 [P] [FR-006] Populate `## Entries` (Name, Type, Used By, License, Security Note) for external services (e.g., SQL Server, mail services) from `research.md`
+- [x] T024 [FR-006] Add `## Notes` with security notes (no secret values) per spec Ã‚Â§12
 
 **Checkpoint**: US-6 complete and independently reviewable
 
@@ -139,9 +139,9 @@ description: "Task list for SPEC-0002 Repository Inventory implementation"
 
 **Independent**: TS-001 + TS-002 (each ProgID traces to evidence)
 
-- [ ] T025 [P] [FR-007] Create `reports/repository-inventory/07-com-dependencies.md` with metadata block and `## Scope`
-- [ ] T026 [P] [FR-007] Populate `## Entries` (ProgID, Assembly/File, Reference Count, Purpose, Security Note) for the 8 COM ProgIDs from `research.md` (adodb.recordset, CDONTS.Newmail, OSSMTP.SMTPSession, scripting.filesystemObject, CDO.Message, CDO.Configuration, adodb.connection, MSXML2.ServerXMLHTTP)
-- [ ] T027 [FR-007] Add `## Notes` covering the `ActiveX/OSSMTP.dll` archive and `msoe.dll` root file
+- [x] T025 [P] [FR-007] Create `reports/repository-inventory/07-com-dependencies.md` with metadata block and `## Scope`
+- [x] T026 [P] [FR-007] Populate `## Entries` (ProgID, Assembly/File, Reference Count, Purpose, Security Note) for the 8 COM ProgIDs from `research.md` (adodb.recordset, CDONTS.Newmail, OSSMTP.SMTPSession, scripting.filesystemObject, CDO.Message, CDO.Configuration, adodb.connection, MSXML2.ServerXMLHTTP)
+- [x] T027 [FR-007] Add `## Notes` covering the `ActiveX/OSSMTP.dll` archive and `msoe.dll` root file
 
 **Checkpoint**: US-7 complete and independently reviewable
 
@@ -153,9 +153,9 @@ description: "Task list for SPEC-0002 Repository Inventory implementation"
 
 **Independent**: TS-005 (no secrets) + TS-001
 
-- [ ] T028 [P] [FR-008] Create `reports/repository-inventory/08-configuration-inventory.md` with metadata block and `## Scope`
-- [ ] T029 [P] [FR-008] Populate `## Entries` (Artifact, Setting, Value Summary, Secret, Status) for `connection.asp`, `connectionold.asp`, `connectionweb.asp`, `database.sql`, `opencode.json` - using Value Summary descriptions WITHOUT secret values (spec AC-005)
-- [ ] T030 [FR-008] Add `## Notes` flagging the plaintext-credential security finding in `connection.asp` without reproducing the value
+- [x] T028 [P] [FR-008] Create `reports/repository-inventory/08-configuration-inventory.md` with metadata block and `## Scope`
+- [x] T029 [P] [FR-008] Populate `## Entries` (Artifact, Setting, Value Summary, Secret, Status) for `connection.asp`, `connectionold.asp`, `connectionweb.asp`, `database.sql`, `opencode.json` - using Value Summary descriptions WITHOUT secret values (spec AC-005)
+- [x] T030 [FR-008] Add `## Notes` flagging the plaintext-credential security finding in `connection.asp` without reproducing the value
 
 **Checkpoint**: Complete - all eight categories delivered
 
@@ -165,15 +165,15 @@ description: "Task list for SPEC-0002 Repository Inventory implementation"
 
 **Purpose**: Final validation, consistency, and governance
 
-- [ ] T031 [P] Run TS-001 validation: confirm all 10 files exist under `reports/repository-inventory/`
-- [ ] T032 [P] Run TS-002 validation: confirm every entry traces to a real artifact or finding
-- [ ] T033 [P] Run TS-003 validation: confirm `git status` shows no unintended source changes
-- [ ] T034 [P] Run TS-004 validation: cross-check `05-legacy-inventory.md` against findings; confirm discrepancies recorded
-- [ ] T035 [P] Run TS-005 validation: search all documents for `pwd=`, `password=`, `uid=`, full connection strings; confirm no secrets
-- [ ] T036 [P] Validate all documents against `contracts/inventory-document-format.md` (C-001..C-005)
-- [ ] T037 [P] Run NFR-001 reproducibility check: re-derive one category (e.g., Category 1) from the same repository state and confirm the output is identical; record the method (repository state / branch) used
-- [ ] T038 Update the Knowledge Graph (`knowledge-graph/kg.json` + `knowledge-graph/traceability-matrix.md`) per Principle IV
-- [ ] T039 Update `specs/002-repository-inventory/checklists/inventory.md` marking validated items `[x]`
+- [x] T031 [P] Run TS-001 validation: confirm all 10 files exist under `reports/repository-inventory/`
+- [x] T032 [P] Run TS-002 validation: confirm every entry traces to a real artifact or finding
+- [x] T033 [P] Run TS-003 validation: confirm `git status` shows no unintended source changes
+- [x] T034 [P] Run TS-004 validation: cross-check `05-legacy-inventory.md` against findings; confirm discrepancies recorded
+- [x] T035 [P] Run TS-005 validation: search all documents for `pwd=`, `password=`, `uid=`, full connection strings; confirm no secrets
+- [x] T036 [P] Validate all documents against `contracts/inventory-document-format.md` (C-001..C-005)
+- [x] T037 [P] Run NFR-001 reproducibility check: re-derive one category (e.g., Category 1) from the same repository state and confirm the output is identical; record the method (repository state / branch) used
+- [x] T038 Update the Knowledge Graph (`knowledge-graph/kg.json` + `knowledge-graph/traceability-matrix.md`) per Principle IV
+- [x] T039 Update `specs/002-repository-inventory/checklists/inventory.md` marking validated items `[x]`
 
 ---
 
@@ -193,7 +193,7 @@ description: "Task list for SPEC-0002 Repository Inventory implementation"
 
 ### Within Each Category
 
-- Create the document with metadata â†’ populate `## Entries` â†’ add `## Notes`
+- Create the document with metadata Ã¢â€ â€™ populate `## Entries` Ã¢â€ â€™ add `## Notes`
 
 ### Parallel Opportunities
 
@@ -232,9 +232,9 @@ Task: "Create 08-configuration-inventory.md"
 
 ### Incremental Delivery
 
-1. Complete Setup + Foundational â†’ Foundation ready
-2. Add Category 1 â†’ validate â†’ review (MVP)
-3. Add Categories 2-8 â†’ validate each â†’ review
+1. Complete Setup + Foundational Ã¢â€ â€™ Foundation ready
+2. Add Category 1 Ã¢â€ â€™ validate Ã¢â€ â€™ review (MVP)
+3. Add Categories 2-8 Ã¢â€ â€™ validate each Ã¢â€ â€™ review
 4. Each category adds value without breaking previous ones
 
 ### Parallel Team Strategy
