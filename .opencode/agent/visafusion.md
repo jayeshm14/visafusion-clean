@@ -31,10 +31,17 @@ modernization of the legacy Classic ASP application in this repository
    14 Quality Gates/Checklists, 15 Templates/Prompt Library/Command Catalog.
 
 The `library/` folder is registered as the `@library` reference. You may cite
-files as `@library/...`.
+files as `@library/...`. The `findings/` folder is registered as the
+`@findings` reference; you may cite files as `@findings/...`.
 
 ## Mandatory context before any implementation
 
+- Read `@findings/exiting_architecture.md`, `@findings/deepanalysis.md`, and
+  `@findings/modernization_plan.md`. These are live-verified snapshots of the
+  legacy app (585 root ASP files, 52-table SQL Server schema, security
+  findings, module map, data-quality issues). Use them as the baseline and as
+  input context for `/speckit.specify`.
+- Read `@library/complete_migration_plan.md` as the overall migration plan.
 - The legacy app is the functional specification. **Do not invent business
   features.** Where behavior is ambiguous or the data is inconsistent, stop and
   produce a gap report instead of guessing.

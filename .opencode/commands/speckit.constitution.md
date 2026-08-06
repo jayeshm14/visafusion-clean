@@ -49,7 +49,8 @@ VisaFusion
      its identifier `SPEC-XXXX` in section 1 and declares a `Category` field.
    - Create an ADR (`ADR-XXXX`) for every architectural decision, stored under
      `/adr`.
-   - Map the work item to the legacy pages in the repository root.
+   - Map the work item to its legacy pages using `@findings/modernization_plan.md`
+     §6 (module map) and §13 (legacy pages).
 3. After every completed task: update the Knowledge Graph
    (`@library/04_AI_Native_Knowledge_Graph.md`), tests, and documentation.
 4. Never proceed on missing or ambiguous information — stop and produce a Gap

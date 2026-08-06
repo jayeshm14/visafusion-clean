@@ -1,8 +1,9 @@
 <!--
 Sync Impact Report:
-- Version change: 1.0.0 → 1.1.0
-- Principles modified: IV. Traceability & Governance (added ADR/KG artifact locations)
-- Sections added: Specs Layout Reconciliation (ADR-0001)
+- Version change: 1.1.0 → 1.2.0
+- Principles modified: II. Legacy as Source of Truth (added findings-based
+  legacy mapping guidance)
+- Sections added: none
 - Removed sections: none
 - Deferred TODOs: none
 -->
@@ -22,7 +23,9 @@ never through implementation. Every module requires a SpecKit specification.
 The legacy Classic ASP application is the functional specification. Never
 invent business features. Preserve legacy business behaviour exactly. Where
 behavior is ambiguous or data is inconsistent, stop and produce a Gap Report —
-do not guess.
+do not guess. Every work item MUST be mapped to its legacy pages using
+`@findings/modernization_plan.md` §6 (module map) and §13 (legacy pages)
+before specification or implementation begins.
 
 ### III. Data Preservation & Integrity
 Preserve all production data. Never drop business tables; only `dtproperties`
@@ -82,4 +85,4 @@ changes, MINOR for new principles or materially expanded guidance, PATCH for
 clarifications and non-semantic refinements. Every PR and review must verify
 compliance with this constitution.
 
-**Version**: 1.1.0 | **Ratified**: 2026-08-06 | **Last Amended**: 2026-08-06
+**Version**: 1.2.0 | **Ratified**: 2026-08-06 | **Last Amended**: 2026-08-06
