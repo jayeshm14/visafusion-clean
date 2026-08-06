@@ -1,0 +1,418 @@
+<html>
+<head>
+<title>Untitled Document</title>
+</head>
+<body bgcolor="#FFFFFF">
+<table height=309 cellspacing=0 cellpadding=0 width="100%" 
+border=1 hspace="0" vspace="0" align="left">
+  <tr valign="top"> 
+    <td height=378> 
+      <table cellspacing=0 cellpadding=0 width="99%" border=0 height="70">
+        <tr> 
+          <td width=0% height="73">&nbsp;</td>
+          <td colspan=2 height="73"><img height=71 
+            src="http://www.udaanindia.com/images/topn1.jpg" width=760></td>
+        </tr>
+        <tr> 
+          <td width=0% height=14>&nbsp;</td>
+          <td align=left bgcolor=#070692 colspan=2 height=14> 
+            <div align="center">
+              <marquee><b><i><font face="Courier New, Courier, mono" color="#FFFFFF" size="3">PLEASE
+              VISIT OUR WEBSITE WITH ONLINE STATUS </font><font face="Times New Roman, Times, serif" color="#FFFFFF" size="3">&quot;WWW.UDAANINDIA.com&quot;</font></i></b></marquee>
+            </div>
+          </td>
+        </tr>
+        <tr> 
+          <td width=0% height="4">&nbsp;</td>
+          <td colspan=2 height="4"> 
+            <div align="center"><font face="Times New Roman, Times, serif" 
+            size=6><b>&nbsp;&nbsp;&nbsp;&nbsp;</b></font><b><font 
+            face="Arial Black" color=#000080 size=6><i>UPDATE</i></font><i><font 
+            face=Arial color=#000080 size=6> </font><font face=Arial 
+            color=#000080 size=4>1st July 2002 </font></i></b></div>
+          </td>
+        </tr>
+        <tr> 
+          <td width=0% height=218>&nbsp;</td>
+          <td colspan=2 height=218> 
+            <table height=1 cellspacing=0 cellpadding=0 width="99%" 
+              border=0>
+              <tr> 
+                <td colspan="2" height=435>
+                  <table width="750" border="0" height="833">
+                    <tr> 
+                      <td colspan="4" width="742" height="21">
+                        <p align="center"><b><font color="#000080">TO. MR. RAJAN DUA</font></b></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" width="742" height="21">
+                        <hr>
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" width="742" height="151"> 
+                        <p align="center"><img border="0" src="http://www.udaanindia.com/updateimg/up0107.jpg">
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" width="742" height="34"> 
+                        <div align="justify">
+                          <b><font face="Arial, Helvetica, sans-serif" size="2">AS
+                          PER RECENT NOTIFICATION FROM BELOW <span class="WSRightBold">EMBASSIES</span>
+                          - NEW DELHI, WITH IMMEDIATE EFFECT THE VISA FOR THE
+                          FOLLOWING HAS BEEN CHANGED, THE FEE WILL BE AS FOLLOWS.</font></b>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td width="328" bgcolor="#FFCCCC" colspan="2" height="24"> 
+                        <p align="center"><b><font size="4" color="#000080">UNITED
+                        KINGDOM</font></b>
+                      </td>
+                      <td width="408" bgcolor="#66CCFF" colspan="2" height="24"> 
+                      <p align="center"><b><font size="4" color="#000080">PORTUGAL</font></b> 
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td width="328" colspan="2" bgcolor="#FFCCCC" height="22"> 
+                        <div align="left">
+                          <font color="#3333ff"><b><font color="#990099">(a)
+                          Visitor, Student, Passengers in transit, Returning
+                          Residents :</font></b></font>
+                        </div>
+                      </td>
+                      <td width="219" height="22" bgcolor="#66CCFF"> 
+                      <font size="2" face="Arial"><b>* APPLICATION FEE</b></font> 
+                      </td>
+                      <td width="189" height="22" bgcolor="#66CCFF"> 
+                      <font size="2" face="Arial"><b>RS.&nbsp; 760.00</b></font>
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td width="297" bgcolor="#FFCCCC" height="18"> 
+                        <font size="2" face="Arial"><b>* STANDARD VISA</b></font>
+                      </td>
+                      <td width="31" bgcolor="#FFCCCC" height="18"> 
+                        <font size="2" face="Arial"><b>RS.&nbsp;2700.00</b></font>
+                      </td>
+                      <td width="219" height="18" bgcolor="#66CCFF"> 
+                      <font size="2" face="Arial"><b>* SINGLE ENTRY</b></font> 
+                      </td>
+                      <td width="189" height="18" bgcolor="#66CCFF"> 
+                      <font size="2" face="Arial"><b>RS. 1155.00</b></font>
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td width="223" bgcolor="#FFCCCC" height="18"> 
+                        <font size="2" face="Arial"><b>* MULTIPLE ENTRY (1 YEAR)</b></font>
+                      </td>
+                      <td width="105" bgcolor="#FFCCCC" height="18"> 
+                        <font size="2" face="Arial"><b>RS. 4500.00</b></font>
+                      </td>
+                      <td width="219" height="18" bgcolor="#66CCFF"> 
+                      <font size="2" face="Arial"><b>* MULTIPLE ENTRY</b></font> 
+                      </td>
+                      <td width="189" height="18" bgcolor="#66CCFF"> 
+                      <font size="2" face="Arial"><b>RS. 1615.00</b></font>
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td width="223" bgcolor="#FFCCCC" height="21"> 
+                        <font size="2" face="Arial"><b>* MULTIPLE ENTRY (2
+                        YEARS)</b></font>
+                      </td>
+                      <td width="105" bgcolor="#FFCCCC" height="21"> 
+                        <font size="2" face="Arial"><b>RS. 5250.00</b></font>
+                      </td>
+                      <td width="408" height="21" colspan="2" bgcolor="#66CCFF"> 
+                      &nbsp; 
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td width="223" bgcolor="#FFCCCC" height="21"> 
+                        <font size="2" face="Arial"><b>* MULTIPLE ENTRY (5
+                        YEARS)</b></font>
+                      </td>
+                      <td width="105" bgcolor="#FFCCCC" height="21"> 
+                        <font size="2" face="Arial"><b>RS. 6600.00</b></font>
+                      </td>
+                      <td width="408" height="21" colspan="2" bgcolor="#66CCFF"> 
+                      &nbsp; 
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td width="223" bgcolor="#FFCCCC" height="21"> 
+                        <font size="2" face="Arial"><b>* MULTIPLE ENTRY (10
+                        YEARS)</b></font>
+                      </td>
+                      <td width="105" bgcolor="#FFCCCC" height="21"> 
+                        <font size="2" face="Arial"><b>RS.11250.00</b></font>
+                      </td>
+                      <td width="408" colspan="2" height="21" bgcolor="#66FFCC"> 
+                      <p align="center"><b><font size="4" color="#000080">FRANCE</font></b> 
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td width="223" bgcolor="#FFCCCC" height="21"> 
+                        <div align="left">
+                          <b><font color="#990099">(b) Settlement and Marriage :</font></b>
+                        </div>
+                      </td>
+                      <td width="105" bgcolor="#FFCCCC" height="21"> 
+                        <b><font face="Arial, Helvetica, sans-serif" color="#990099" size="2">Rs.
+                        19500.00</font></b>
+                      </td>
+                      <td width="204" height="21" bgcolor="#66FFCC"> 
+                      <font size="2" face="Arial"><b>* VISA FEE (30 DAYS)</b></font> 
+                      </td>
+                      <td width="204" height="21" bgcolor="#66FFCC"> 
+                      <font size="2" face="Arial"><b>RS. 1202.00</b></font> 
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td width="223" bgcolor="#FFCCCC" height="21"> 
+                        <div align="left">
+                          <b><font color="#990099">(c) Certificate of
+                          Entitlement :</font></b>
+                        </div>
+                      </td>
+                      <td width="105" bgcolor="#FFCCCC" height="21"> 
+                        <b><font face="Arial, Helvetica, sans-serif" color="#990099" size="2">Rs.
+                        &nbsp;8250.00</font></b>
+                      </td>
+                      <td width="204" height="21" bgcolor="#66FFCC"> 
+                      <font size="2" face="Arial"><b>* VISA FEE (90 DAYS)</b></font> 
+                      </td>
+                      <td width="204" height="21" bgcolor="#66FFCC"> 
+                      <font size="2" face="Arial"><b>RS. 1683.00</b></font> 
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td width="223" bgcolor="#FFCCCC" height="21"> 
+                        <div align="left">
+                          <b><font color="#990099">(d) All other long term entry
+                          :</font></b>
+                        </div>
+                      </td>
+                      <td width="105" bgcolor="#FFCCCC" height="21"> 
+                        <b><font face="Arial, Helvetica, sans-serif" color="#990099" size="2">Rs.
+                        &nbsp;5650.00</font></b>
+                      </td>
+                      <td width="204" height="21" bgcolor="#66FFCC"> 
+                      <font size="2" face="Arial"><b>* VISA FEE (I YEAR)</b></font> 
+                      </td>
+                      <td width="204" height="21" bgcolor="#66FFCC"> 
+                      <font size="2" face="Arial"><b>RS. 2404.00</b></font> 
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td width="223" bgcolor="#FFCCCC" height="21"> 
+                        <div align="left">
+                          <b><font color="#990099">(e) Direct airside transit :</font></b>
+                        </div>
+                      </td>
+                      <td width="105" bgcolor="#FFCCCC" height="21"> 
+                        <b><font face="Arial, Helvetica, sans-serif" color="#990099" size="2">Rs.
+                        &nbsp;2000.00</font></b>
+                      </td>
+                      <td width="408" colspan="2" height="21" bgcolor="#66FFCC"> 
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td width="328" colspan="2" bgcolor="#FFCCCC" height="32"> 
+                      <font face="Arial, Helvetica, sans-serif" size="1">NOTE :
+                      FEES WILL BE ACCEPTED BY DEMAND DRAFT IN FAVOUR OF '</font><b><font face="Arial, Helvetica, sans-serif" size="2">BRITISH
+                      HIGH COMMISSION</font></b><font face="Arial, Helvetica, sans-serif" size="1">'
+                      PAYABLE AT NEW DELHI.</font> 
+                      </td>
+                      <td width="408" colspan="2" height="32" bgcolor="#66FFCC"> 
+                      &nbsp; 
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td width="736" height="21" colspan="4"> 
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td width="736" height="21" colspan="4" bgcolor="#000080"> 
+                      <p align="center"><b><font size="5" color="#FFFFFF">AUSTRALIA</font></b> 
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td width="736" height="21" colspan="4"> 
+                      <p align="center"><font face="Arial" color="#ff0000" size="5">&nbsp;<br>
+                      CELEBRATE..........REVEL............GREAT RELIEF<br>
+                      </font></p>
+                      <div align="center">
+                        <font color="#ff00ff" face="Arial" size="4">AUSTRALIAN
+                        HIGH COMMISSION HAS DECIDED TO ACCEPT</font>
+                      </div>
+                      <div align="center">
+                        <font size="4">&nbsp;</font>
+                      </div>
+                      <div align="center">
+                        <font color="#ff00ff" face="Arial" size="4">BUSINESS
+                        VISA APPLICATIONS FROM 2ND JULY.</font>
+                      </div>
+                      <div align="center">
+                        <font size="4">&nbsp;</font>
+                      </div>
+                      <div align="center">
+                        <font size="4">&nbsp;</font>
+                      </div>
+                      <div align="center">
+                        <font color="#ff00ff" face="Arial" size="4">KINDLY
+                        FORWARD US THE APPLICATIONS FOR PROCESSING</font>
+                      </div>
+                      <div align="center">
+                        <font size="4">&nbsp;</font>
+                      </div>
+                      <div align="center">
+                        <font color="#ff00ff" face="Arial" size="4">WITH
+                        IMMEDIATE EFFECT.</font>
+                      </div>
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" width="742" height="252"> 
+                        <table width="100%" border="0" align="center" height="147">
+                          <tr> 
+                            <td valign=top align=left colspan="6" height=2 bgcolor="#070692"><b><u><font face="Arial" color="#FFFFFF" size="4">HOLIDAYS 
+                              LIST FOR &nbsp;JULY 2002.</font></u></b></td>
+                          </tr>
+                          <tr> 
+                            <td valign=top align=left width="5%" height=2 bgcolor="#FFCCCC"><u><b><font 
+                        face=Courier color=#800080 size=3>DATE</font></b></u></td>
+                            <td valign=top align=left width="36%" height=2 bgcolor="#FFCCCC"><b><u><font face=Courier 
+                        color=#800080 size=3>COUNTRY</font></u></b></td>
+                            <td valign=top align=left width="4%" height=2 bgcolor="#FFCCCC"><u><b><font 
+                        face=Courier color=#800080 size=3>DATE</font></b></u></td>
+                            <td valign=top align=left height=2 bgcolor="#FFCCCC" colspan="2" width="55%"><b><u><font face=Courier 
+                        color=#800080 size=3>COUNTRY</font></u></b></td>
+                          </tr>
+                          <tr bgcolor="#FEF7ED"> 
+                            <td valign=top align=left width="5%" height=11><b><font face="Arial, Helvetica, sans-serif" size="2"><span 
+                        style="COLOR: black">1<span 
+                        style="mso-spacerun: yes"> &nbsp;</span>:</span></font></b></td>
+                            <td valign=top align=left height=11 width="36%"><b><font face="Arial, Helvetica, sans-serif" size="2"><span 
+                        style="COLOR: black">GHANA, CANADA, SOMALIA</span></font></b></td>
+                            <td valign=top align=left height=11 width="4%"><b><font face="Arial, Helvetica, sans-serif" size="2"><span 
+                        style="COLOR: black">1<span 
+                        style="color: black">9 </span><span 
+                        style="mso-spacerun: yes"> </span>:</span></font></b></td>
+                            <td valign=top align=left height=11 colspan="2" width="55%"><b><font face="Arial, Helvetica, sans-serif" size="2">BHUTAN</font></b></td>
+                          </tr>
+                          <tr bgcolor="#FEF7ED"> 
+                            <td valign=top align=left width="5%" height=2><b><font face="Arial, Helvetica, sans-serif" size="2"><span style="color: black">3</span><span 
+                        style="COLOR: black">&nbsp;<span 
+                        style="mso-spacerun: yes"> </span>:</span></font></b></td>
+                            <td valign=top align=left height=2 width="36%"><b><font face="Arial, Helvetica, sans-serif" size="2"><span 
+                        style="COLOR: black">BELARUS</span></font></b></td>
+                            <td valign=top align=left height=2 width="4%"><b><font face="Arial, Helvetica, sans-serif" size="2"><span 
+                        style="COLOR: black">20<span 
+                        style="mso-spacerun: yes"> </span>:</span></font></b></td>
+                            <td valign=top align=left height=2 colspan="2" width="55%"><b><font face="Arial, Helvetica, sans-serif" size="2">COLOMBIA</font></b></td>
+                          </tr>
+                          <tr bgcolor="#FEF7ED"> 
+                            <td valign=top align=left width="5%" height=2><b><font face="Arial, Helvetica, sans-serif" size="2"><span style="color: black">4</span><span 
+                        style="COLOR: black"><span 
+                        style="mso-spacerun: yes">&nbsp; </span>:</span></font></b></td>
+                            <td valign=top align=left height=2 width="36%"><b><font face="Arial, Helvetica, sans-serif" size="2"><span 
+                        style="COLOR: black">U.S.A., RWANDA</span></font></b></td>
+                            <td valign=top align=left height=2 width="4%"><b><font face="Arial, Helvetica, sans-serif" size="2"><span 
+                        style="COLOR: black">21<span 
+                        style="mso-spacerun: yes"> </span>:</span></font></b></td>
+                            <td valign=top align=left height=2 colspan="2" width="55%"><b><font face="Arial, Helvetica, sans-serif" size="2"><span 
+                        style="COLOR: black">BELGIUM</span></font></b></td>
+                          </tr>
+                          <tr bgcolor="#FEF7ED"> 
+                            <td valign=top align=left width="5%" height=2><b><font face="Arial, Helvetica, sans-serif" size="2"><span style="color: black">5</span><span 
+                        style="COLOR: black"> &nbsp;:</span></font></b></td>
+                            <td valign=top align=left height=4 width="36%"><b><font face="Arial, Helvetica, sans-serif" size="2"><span 
+                        style="COLOR: black">VENEZUELA</span></font></b></td>
+                            <td valign=top align=left height=4 width="4%"><b><font face="Arial, Helvetica, sans-serif" size="2">23 
+                              :</font></b></td>
+                            <td valign=top align=left height=4 colspan="2" width="55%"><b><font face="Arial, Helvetica, sans-serif" size="2">EGYPT</font></b></td>
+                          </tr>
+                          <tr bgcolor="#FEF7ED"> 
+                            <td valign=top align=left width="5%" height=2><b><font face="Arial, Helvetica, sans-serif" size="2"><span style="color: black">6</span><span 
+                        style="COLOR: black"><span 
+                        style="mso-spacerun: yes">&nbsp; </span>:</span></font></b></td>
+                            <td valign=top align=left height=4 width="36%"><b><font face="Arial, Helvetica, sans-serif" size="2"><span 
+                        style="COLOR: black">COMOROS, MALAWI</span></font></b></td>
+                            <td valign=top align=left height=4 width="4%"><b><font face="Arial, Helvetica, sans-serif" size="2">24 
+                              :</font></b></td>
+                            <td valign=top align=left height=4 colspan="2" width="55%"><b><font face="Arial, Helvetica, sans-serif" size="2">THAILAND</font></b></td>
+                          </tr>
+                          <tr bgcolor="#FEF7ED"> 
+                            <td valign=top align=left width="5%" height=13><b><font face="Arial, Helvetica, sans-serif" size="2"><span 
+                        style="COLOR: black"><span 
+                        style="color: black"> 9&nbsp; </span>:</span></font></b></td>
+                            <td valign=top align=left height=13 width="36%"><b><font face="Arial, Helvetica, sans-serif" size="2">ARGENTINA</font></b></td>
+                            <td valign=top align=left height=13 width="4%"><b><font face="Arial, Helvetica, sans-serif" size="2">25 
+                              :</font></b></td>
+                            <td valign=top align=left height=13 colspan="2" width="55%"><b><font face="Arial, Helvetica, sans-serif" size="2">THAILAND</font></b></td>
+                          </tr>
+                          <tr bgcolor="#FEF7ED"> 
+                            <td valign=top align=left width="5%" height=2><b><font face="Arial, Helvetica, sans-serif" size="2"><span 
+                        style="COLOR: black">1<span 
+                        style="color: black">1 </span><span 
+                        style="mso-spacerun: yes"> </span>:</span></font></b></td>
+                            <td valign=top align=left height=2 width="36%"><b><font face="Arial, Helvetica, sans-serif" size="2">MONGOLIA</font></b></td>
+                            <td valign=top align=left height=2 width="4%"><b><font face="Arial, Helvetica, sans-serif" size="2">26 
+                              :</font></b></td>
+                            <td valign=top align=left height=2 colspan="2" width="55%"><b><font face="Arial, Helvetica, sans-serif" size="2">MALDIVES</font></b></td>
+                          </tr>
+                          <tr bgcolor="#FEF7ED"> 
+                            <td valign=top align=left width="5%" height=2><b><font face="Arial, Helvetica, sans-serif" size="2"><span 
+                        style="COLOR: black">14<span 
+                        style="mso-spacerun: yes"> </span>:</span></font></b></td>
+                            <td valign=top align=left height=2 width="36%"><b><font face="Arial, Helvetica, sans-serif" size="2">BHUTAN,
+                              FRANCE</font></b></td>
+                            <td valign=top align=left height=4 width="4%"><b><font face="Arial, Helvetica, sans-serif" size="2">28
+                              :</font></b></td>
+                            <td valign=top align=left height=4 colspan="2" width="55%"><b><font face="Arial, Helvetica, sans-serif" size="2">PERU</font></b></td>
+                          </tr>
+                          <tr bgcolor="#FEF7ED"> 
+                            <td valign=top align=left width="5%" height=2><b><font face="Arial, Helvetica, sans-serif" size="2"><span 
+                        style="COLOR: black">17<span 
+                        style="mso-spacerun: yes"> </span>:</span></font></b></td>
+                            <td valign=top align=left height=2 width="36%"><b><font face="Arial, Helvetica, sans-serif" size="2">IRAQ</font></b></td>
+                            <td valign=top align=left height=2 width="4%"><b></b><b><font face="Arial, Helvetica, sans-serif" size="2">30 
+                              :</font></b></td>
+                            <td valign=top align=left height=2 colspan="2" width="55%"><b><font face="Arial, Helvetica, sans-serif" size="2">MOROCCO</font></b></td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr> 
+          <td width=0% height=1>&nbsp;</td>
+          <td colspan=2 height=1> 
+            <table bordercolor=#6666ff width="100%" bgcolor=#000080 border=1>
+              <tr bgcolor="#070692"> 
+                <td height="2"><font face="Batang"><b><font 
+                  color=#ffffff>FORWARDED BY:-</font> <font 
+                  color=#ffffff>UDAAN INDIA PRIVATE LIMITED. <br>
+                  CONTACT US AT:- 011-617 7435 / 616 0840 / 619 6928 / 618 2402 
+                  / 618 8075 / <br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+                  618 2403 / 610 3864. <br>
+                  E.MAIL:- <a 
+                  href="mailto:?To=udaan@spectranet.com&amp;subject=Re:%20UPDATE%20%201st%20December%202001"><font 
+                  color=#ccffff>udaan@spectranet.com</font></a><br>
+                  FOR URGENT QUERIES:- FACSIMILE : 011 - 616 0606.</font></b></font></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</html>

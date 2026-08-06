@@ -1,0 +1,1 @@
+<a href="javascript:;" OnClick="window.print()">Click here to print this page</a>

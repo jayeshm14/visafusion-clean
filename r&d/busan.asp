@@ -1,0 +1,12 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+<META content="MSHTML 6.00.2600.0" name=GENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=#ffffff>
+<p><a href="http://www.football.gr.jp/eg/2002wcup/KoreaPusan.htm">http://www.football.gr.jp/eg/2002wcup/KoreaPusan.htm</a> 
+</p>
+<p><a href="http://www.busanworldcup.net/english/busan/b_main.htm" target="_blank">http://www.busanworldcup.net/english/busan/b_main.htm</a> 
+</p>
+</BODY></HTML>

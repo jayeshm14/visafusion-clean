@@ -1,0 +1,316 @@
+<html>
+<head>
+<title>Select Date</title>
+	<style type="text/css">
+	<!--
+		A:link, A:active, A:visited { font-size: 9pt; color: #000080; line-height: 13pt; text-decoration: none; }
+		A:hover { text-decoration: underline; color: #008080;}
+		.text1 { font-size:9pt; font-style: normal; line-height: 11pt; font-weight:normal}
+		.text2 { font-size:11pt; font-style: normal; line-height: 13pt; font-weight:normal}
+	-->
+	</style>
+	<script language="javascript">
+		function Datetime(yyyy, mm, dd) 
+		{
+			this.year = yyyy;
+			this.month = mm;
+			this.date = dd;
+			
+			this.compare = function ( dt )
+			{
+				return parseInt(this.toString()) - parseInt(dt.toString());
+			};
+			
+			this.toString = function()
+			{
+				return ( this.year + "" + this.month + ""  + this.date );
+			};
+			
+			this.validateLength = function()
+			{
+				this.year = ("0000" + this.year).substring( (new String(this.year)).length );
+				this.month = ("00" + this.month).substring( (new String(this.month)).length );
+				this.date = ("00" + this.date).substring( (new String(this.date)).length );
+			};
+			
+			this.clone = function ()
+			{
+				return new Datetime(this.year, this.month, this.date);
+			};
+		}
+
+		// first of all, load image.
+		loadImage();
+
+		var leap = new Array();
+		leap[0] = new Array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
+		leap[1] = new Array(31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
+		
+		var coordinate = new Array();
+		coordinate[1] = new Array(0, 1, 2, 3);
+		coordinate[2] = new Array(0, 11, 10, 9);
+		coordinate[3] = new Array(6, 7, 8, 9);
+		coordinate[4] = new Array(6, 5, 4, 3);
+		
+		// used in up/down button control
+		var upButton = false;
+		var downButton = false;
+		
+		var currDate = new Date();
+		var cur = new Datetime(currDate.getYear(), currDate.getMonth() + 1, currDate.getDate());
+		var offset = 0;
+
+		var other = null;
+		var otherType = null;
+		var oldspncolor = null;
+
+		window.onload = function () 
+		{
+			drawCalendar( cur );
+			setYearForm( cur );
+			setMonthForm( cur );
+			setDateForm( cur );
+			drawCalendar( cur );
+		}
+		
+		function loadImage()
+		{
+			var a = new Image();	a.src = "images/smallUpButton.jpg";
+			var b = new Image();	b.src = "images/smallUpButtonOn.jpg";
+			var c = new Image();	c.src = "images/smallDownButton.jpg";
+			var d = new Image();	d.src = "images/smallDownButtonOn.jpg";
+		}
+		
+		function isLeap( year )
+		{
+			return (( year % 4 == 0 ) && ( year % 100  != 0 ) || ( year % 400 == 0 )) ? 1 : 0;
+		}
+
+		function drawCalendar( obj )
+		{
+			var d = new Date( obj.year, obj.month - 1, 1 );
+			offset = d.getDay();
+			var spn, td, td2;
+
+			for ( var i = 1; i <= 42; i++) {
+				spn = document.getElementById("d" + i);
+				spn.innerText = " ";
+			}
+		
+			var maxMonth = leap[isLeap(obj.year)][obj.month - 1];
+			obj.date = Math.min(obj.date, maxMonth);
+			for ( var i = 0; i < maxMonth; i++ ) {
+				spn = document.getElementById("d" + (i + 1 + offset));
+				spn.innerText = (i + 1);
+				td = document.getElementById("c" + (i + 1 + offset));
+				td.onclick = selectDate;
+			}
+		}
+		
+		function setYearForm( obj )
+		{
+			DTForm["year"].value = obj.year;
+		}
+	
+		function setMonthForm( obj )
+		{
+			DTForm["month"].selectedIndex = obj.month - 1;
+		}
+		
+		function setDateForm( obj )
+		{
+			var dateIndex = parseInt(obj.date) +  parseInt(offset);
+			var spn = document.getElementById("d" + dateIndex);
+			spn.style.backgroundColor = "#0000FF";
+			oldspncolor = spn.style.color;
+			spn.style.color = "#FFFFFF";
+			
+		}
+
+		function resetDateForm( obj )
+		{
+			var dateIndex = parseInt(obj.date) + parseInt(offset);
+			var spn = document.getElementById("d" + dateIndex);
+			spn.style.backgroundColor = "#FFFFFF";
+			spn.style.color = oldspncolor;
+		}
+	
+		function selectYear( offset )
+		{
+			cur.year += offset;
+			setYearForm( cur );
+			resetDateForm( cur );
+			drawCalendar( cur );
+			setDateForm( cur );
+		}
+	
+		function selectMonth()
+		{
+			cur.month = DTForm["month"].value;
+			setMonthForm( cur );
+			resetDateForm( cur );
+			drawCalendar( cur );
+			setDateForm( cur );
+		}
+		
+		function selectDate()
+		{
+			var selVal = event.srcElement.id.substring(1);
+			if ( cur.date != (selVal - offset) ) {
+				resetDateForm( cur );
+				cur.date = parseInt(selVal) - offset;
+				setDateForm( cur );
+			}
+		}
+	
+		var move = false;
+		
+		function done()
+		{
+			var cl = cur.clone();
+			cl.validateLength();
+
+			cur.validateLength();
+			if (cur.hour == "24") cur.hour = "00";
+			
+			returnValue = cur;
+			setTimeout( "window.close()", 1 );
+			return false;
+		}
+		
+		function deleteDatetime()
+		{
+			returnValue = new Datetime("", "", "", "");
+			setTimeout("window.close()", 1);
+			return false;
+		}
+
+	</script>
+</head>
+
+<body topmargin="0" bgcolor="#E7E7E7" leftmargin="1" scroll="true" onmouseup="upButton=false;downButton=false;move=false;">
+
+<form name="DTForm" id="DTForm" onsubmit="return done();">
+<table name="DTTable" width="100%" cellspacing="0" cellpadding="0" bgcolor="#000000" align="center" border="0">
+	<tr>
+		<td height="10" bgcolor="#E7E7E7" class="Text1"></td>
+	</tr>
+	<tr>
+		<td bgcolor="#E7E7E7" class="Text1" align="center">
+			<table border="0" width="293">
+				<tr>
+					<td>
+						<table width="200" cellspacing="0" cellpadding="0" bgcolor="#000000" align="center" border="0" frame="box" rules="none">
+							<tr>
+								<td width="81" bgcolor="#E7E7E7" class="Text1">
+									<input type="Text" name="year" size="9" align="center" disabled>
+								</td>
+								<td width="16" bgcolor="#E7E7E7" class="Text1"><img src="images/smallUpButton.jpg" onmousedown="upButton = true;this.src='images/smallUpButtonOn.jpg';" onmouseup="upButton = false;this.src='images/smallUpButton.jpg';" onmouseout="this.src='images/smallUpButton.jpg';" onmouseover="if ( upButton == true ) this.src='images/smallUpButtonOn.jpg';" ondblclick="selectYear( 1 )" onclick="selectYear( 1 )" ondrag="return false"><img src="images/smallDownButton.jpg" onmousedown="downButton = true;this.src='images/smallDownButtonOn.jpg';" onmouseup="downButton = false;this.src='images/smallDownButton.jpg';" onmouseout="this.src='images/smallDownButton.jpg';" onmouseover="if ( downButton == true ) this.src='images/smallDownButtonOn.jpg';" ondblclick="selectYear( -1 )" onclick="selectYear( -1 )" ondrag="return false">
+								</td>
+								<td width="103" bgcolor="#E7E7E7" class="Text1" align="right">
+									<select name="month" onchange="selectMonth()" align="center">
+										<option value="1">&nbsp;&nbsp;&nbsp;JAN&nbsp;&nbsp;&nbsp;</option>
+										<option value="2">&nbsp;&nbsp;&nbsp;FEB&nbsp;&nbsp;&nbsp;</option>
+										<option value="3">&nbsp;&nbsp;&nbsp;MAR&nbsp;&nbsp;&nbsp;</option>
+										<option value="4">&nbsp;&nbsp;&nbsp;APR&nbsp;&nbsp;&nbsp;</option>
+										<option value="5">&nbsp;&nbsp;&nbsp;MAY&nbsp;&nbsp;&nbsp;</option>
+										<option value="6">&nbsp;&nbsp;&nbsp;JUN&nbsp;&nbsp;&nbsp;</option>
+										<option value="7">&nbsp;&nbsp;&nbsp;JUL&nbsp;&nbsp;&nbsp;</option>
+										<option value="8">&nbsp;&nbsp;&nbsp;AUG&nbsp;&nbsp;&nbsp;</option>
+										<option value="9">&nbsp;&nbsp;&nbsp;SEP&nbsp;&nbsp;&nbsp;</option>
+										<option value="10">&nbsp;&nbsp;&nbsp;OCT&nbsp;&nbsp;&nbsp;</option>
+										<option value="11">&nbsp;&nbsp;&nbsp;NOV&nbsp;&nbsp;&nbsp;</option>
+										<option value="12">&nbsp;&nbsp;&nbsp;DEC&nbsp;&nbsp;&nbsp;</option>
+									</select>				
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			<table width="200" cellspacing="0" cellpadding="3" bgcolor="#000000" align="center" border="1" frame="box" rules="none">
+				<tr>
+					<th bgcolor="#CCCCCC" class="Text1" align="right"><font color="#FF2222"><span id="0_h">SUN</span></font></table></table></td>
+					<th bgcolor="#CCCCCC" class="Text1" align="right"><span id>MON
+					<th bgcolor="#CCCCCC" class="Text1" align="right"><span id>TUE
+					<th bgcolor="#CCCCCC" class="Text1" align="right"><span id>WED
+					<th bgcolor="#CCCCCC" class="Text1" align="right"><span id>THU
+					<th bgcolor="#CCCCCC" class="Text1" align="right"><span id>FRI
+					<th bgcolor="#CCCCCC" class="Text1" align="right"><font color="#2222FF">SAT</font>
+				</span></span></span></span></span></tr>
+				<tr>
+					<td id="c1" bgcolor="#FFFFFF" class="Text1" align="right"><font color="#FF2222"><span id="d1"></span></font></td>
+					<td id="c2" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d2"></span></td>
+					<td id="c3" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d3"></span></td>
+					<td id="c4" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d4"></span></td>
+					<td id="c5" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d5"></span></td>
+					<td id="c6" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d6"></span></td>
+					<td id="c7" bgcolor="#FFFFFF" class="Text1" align="right"><font color="#2222FF"><span id="d7"></span></font></td>
+				</tr>
+				<tr>
+					<td id="c8" bgcolor="#FFFFFF" class="Text1" align="right"><font color="#FF2222"><span id="d8"></span></font></td>
+					<td id="c9" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d9"></span></td>
+					<td id="c10" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d10"></span></td>
+					<td id="c11" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d11"></span></td>
+					<td id="c12" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d12"></span></td>
+					<td id="c13" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d13"></span></td>
+					<td id="c14" bgcolor="#FFFFFF" class="Text1" align="right"><font color="#2222FF"><span id="d14"></span></font></td>
+				</tr>
+				<tr>
+					<td id="c15" bgcolor="#FFFFFF" class="Text1" align="right"><font color="#FF2222"><span id="d15"></span></font></td>
+					<td id="c16" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d16"></span></td>
+					<td id="c17" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d17"></span></td>
+					<td id="c18" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d18"></span></td>
+					<td id="c19" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d19"></span></td>
+					<td id="c20" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d20"></span></td>
+					<td id="c21" bgcolor="#FFFFFF" class="Text1" align="right"><font color="#2222FF"><span id="d21"></span></font></td>
+				</tr>
+				<tr>
+					<td id="c22" bgcolor="#FFFFFF" class="Text1" align="right"><font color="#FF2222"><span id="d22"></span></font></td>
+					<td id="c23" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d23"></span></td>
+					<td id="c24" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d24"></span></td>
+					<td id="c25" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d25"></span></td>
+					<td id="c26" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d26"></span></td>
+					<td id="c27" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d27"></span></td>
+					<td id="c28" bgcolor="#FFFFFF" class="Text1" align="right"><font color="#2222FF"><span id="d28"></span></font></td>
+				</tr>
+				<tr>
+					<td id="c29" bgcolor="#FFFFFF" class="Text1" align="right"><font color="#FF2222"><span id="d29"></span></font></td>
+					<td id="c30" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d30"></span></td>
+					<td id="c31" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d31"></span></td>
+					<td id="c32" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d32"></span></td>
+					<td id="c33" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d33"></span></td>
+					<td id="c34" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d34"></span></td>
+					<td id="c35" bgcolor="#FFFFFF" class="Text1" align="right"><font color="#2222FF"><span id="d35"></span></font></td>
+				</tr>
+				<tr>
+					<td id="c36" bgcolor="#FFFFFF" class="Text1" align="right"><font color="#FF2222"><span id="d36"></span></font></td>
+					<td id="c37" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d37"></span></td>
+					<td id="c38" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d38"></span></td>
+					<td id="c39" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d39"></span></td>
+					<td id="c40" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d40"></span></td>
+					<td id="c41" bgcolor="#FFFFFF" class="Text1" align="right"><span id="d41"></span></td>
+					<td id="c42" bgcolor="#FFFFFF" class="Text1" align="right"><font color="#2222FF"><span id="d42"></span></font></td>
+				</tr>
+			</table>
+		
+	
+	<tr>
+		<td bgcolor="#E7E7E7" class="Text1" align="center" valign="bottom" height="30">
+			<center>
+				<input type="submit" value="   OK   " class="Text1">
+				&nbsp;
+				<input type="button" value="CLEAR" class="Text1" onclick="deleteDatetime()">
+				&nbsp;
+				<input type="button" value="CANCEL" class="Text1" onclick="window.close()">&nbsp;&nbsp;&nbsp;
+			</center>
+		</td>
+	</tr>
+	<tr>
+		<td height="10" width="39" bgcolor="#E7E7E7" class="Text1" align="left"></td>
+	</tr>
+
+</form>
+
+</body>
+</html>
+

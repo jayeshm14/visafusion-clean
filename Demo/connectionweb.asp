@@ -1,0 +1,7 @@
+<%
+Set webcon=server.CreateObject ("ADODB.Connection")
+WebCon.ConnectionTimeout = 0
+WebCon.CommandTimeout = 0
+webcon.open "DRIVER={SQL Server};Server=75.126.78.20;uid=a;pwd=wrong;5:31 PM 12/19/2006;database=udaanindia"
+'webcon.open "DRIVER={SQL Server};Server=207.226.17.111,1433;uid=udaanindia;pwd=uda3000;database=udaanindia"
+%>

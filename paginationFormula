@@ -1,0 +1,81 @@
+//Start for a page
+
+PageNo = request("page")
+IF PageNo="" then
+	PageNo=1
+
+END IF
+// Change rs.open query,con,2,3 to
+// rs.open query,con,3,3
+
+// To write one line on the top which shows entries and page numbers
+
+TotalRecs = rs.recordcount
+rs.Pagesize=10
+TotalPages = cInt(rs.pagecount)
+response.write "<table width='100%'> <tr><td>"
+If PageNo = 1 then
+	response.write "<Font face='arial' size=2>Total <b>" & TotalRecs & "</b> entries in <b>" & TotalPages & "</b> page(s).</b></font>"
+else 
+	response.write "<Font face='arial' size=2><b> Page " & pageno & " of " & TotalPages & "</b></font>"
+End If
+
+if TotalPages>1 then
+response.write "</td><td align=right>Pages : "
+
+for i=1 to TotalPages
+if i=cint(pageno) then
+    	response.write "&nbsp;<Font face='arial' size=2 color='#0000FF'><b>"&i &"</b></font>&nbsp;"
+    else
+    
+    	response.write "&nbsp;<a href='collection.asp?page="&i&"&cmd="&cmd&"'>"&i &"</a>&nbsp;"
+    end if
+ next
+end if 
+ response.write "</td></tr></table>"
+
+
+
+//Comment the while loop
+// To write in thepalce where the while loop starts 
+
+if rs.eof then 
+ response.write "<tr bgcolor='#F0F0FF'><td colspan=11 align=center><font face='arial' size=2 color='#ff0000'>NO DATA FOUND</font></td></tr>" 
+else
+rs.absolutepage=PageNo
+ end if
+
+For x = 1 to rs.Pagesize
+if rs.eof then 
+  exit for
+else 
+
+//At the End replace the wend with following code
+'wend
+ end if
+Next
+response.write "<table width=300 border=0><tr>"
+response.write "<td align='center'>"
+If PageNo > 1 then
+	response.write "<form method='post' action='collection.asp'>"
+	response.write "<input type='hidden' name='Page' value=" & PageNo-1 & " >"
+	response.write "<input type='hidden' name='cmd' value="&cmd& " >"
+	response.write "<font face='arial' size=2>"
+	response.write "<input type='submit' value='<< Prev'></form>"
+Else
+	response.write "&nbsp;"
+End If
+response.write "</td><td align='center'>"
+If NOT rs.eof then
+	response.write "<form method='post' action='collection.asp'>"	
+	response.write "<input type='hidden' name='cmd' value="&cmd& " >"
+		response.write "<input type='hidden' name='Page' value=" & PageNo+1 & ">"
+	response.write "<font face='arial' size=2>"
+	response.write "<input type='submit' value='Next >>'></form>"
+Else
+	response.write "&nbsp;"
+End If
+response.write "</td></tr></table>"				 
+
+
+

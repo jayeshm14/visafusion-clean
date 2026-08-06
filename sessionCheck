@@ -1,0 +1,8 @@
+<%
+response.buffer= true
+
+if session("uname")="" then
+response.clear
+response.redirect "relogin.asp?rsn=S"
+end if
+%>

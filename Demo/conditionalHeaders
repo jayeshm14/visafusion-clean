@@ -1,0 +1,12 @@
+<% if session("priv")="adm" then %> 
+              
+<!-- #include file="topadmin.asp" -->           
+      <%
+elseif session("priv")="emp" then
+%>
+<!-- #include file="top.asp" --> 
+<% 
+elseif session("priv")="agt" then
+%>
+<!-- #include file="topAgent.asp" -->
+<% end if %>

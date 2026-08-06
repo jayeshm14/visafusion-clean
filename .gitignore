@@ -1,0 +1,31 @@
+# ---- OS / editor metadata (never commit) ----
+.DS_Store
+._*
+Thumbs.db
+desktop.ini
+
+# ---- Visual Studio / machine-local workspace ----
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ---- FrontPage / Dreamweaver metadata (legacy) ----
+_vti_cnf/
+_notes/
+_notes/
+
+# ---- Build output (future ASP.NET Core) ----
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.cache
+
+# ---- Logs / temp ----
+*.log
+*.tmp
+temp/

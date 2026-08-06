@@ -1,0 +1,14 @@
+<html><head><title></title></head><body bgcolor='#FFFFFF'>
+<p align="justify"><font face="Arial" size="2"><b>DEAR SIR/MADAM, <br>
+  <br>
+  THIS IS TO BRING TO YOUR NOTICE THAT THE 'HIGH COMMISSION OF THE FEDERAL REPUBLIC 
+  OF NIGERIA ' - NEW DELHI NOW REQUIRES THE INVITATION LETTER AND CERTIFICATE 
+  OF INCORPORATION OF NIGERIAN COMPANY SHOULD SPECIFICALLY MENTION THE <font color="#FF0000">RC 
+  NO.</font> OF NIGERIAN COMPANY AND TO BE FAXED DIRECTLY TO THE EMBASSY &amp; 
+  A COPY OF THE SAME TO BE ENCLOSED WITH THE APPLICATION FOR REFERENCE. </b></font></p>
+<p align="left"><b><font face="Arial" size="2">THANKS &amp; REGARDS<br>
+  <br>
+  UMA SHANKAR BHARDWAJ<br>
+  UDAAN INDIA PVT. LTD.<br>
+  NEW DELHI</font></b></p>
+</body></html>

@@ -1,0 +1,55 @@
+input.ud {  font-family: Arial, Helvetica, sans-serif; font-size: 9pt; font-style: normal; background-color: #FFCC00; border-top-width: 0px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 0px}
+span.ColumnHeaderFont
+{
+font-family:arial, helvettica, verdana;
+font-size: 9pt;
+font-weight: bold;
+color: #000000;
+}
+span.TableDataFont
+{
+font-family:arial, helvettica, verdana;
+font-size: 10pt;
+color: #000000;
+}
+span.WebSite
+{
+font-family: arial,helvettica, verdana;
+font-size: 9pt;
+color: #000066;
+}
+span.WSRightBold
+{
+font-family:arial, helvettica, verdana;
+font-size: 9pt;
+font-weight: bold;
+color: #006620;
+}
+span.barfont
+{
+font-family:arial, helvettica, verdana;
+font-size: 8pt;
+font-weight: bold;
+color: #3300cc;
+}
+span.TableCaption
+{
+font-family:arial, helvettica, verdana;
+font-size: 16pt;
+font-weight: bold;
+color: #000066;
+}
+span.TableDataBold
+{
+font-family:arial, helvettica, verdana;
+font-size: 10pt;
+font-weight: bold;
+color: #000000;
+}
+span.Message
+{
+font-family:arial, helvettica, verdana;
+font-size: 10pt;
+color: #ff0000;
+font-weight: bold;
+}

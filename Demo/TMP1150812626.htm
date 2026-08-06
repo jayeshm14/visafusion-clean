@@ -1,0 +1,586 @@
+<MM:BeginLock translatorClass="MM_SSI" type="ssi_include" depFiles="\\Server\D\udaanuma\connection.asp" orig="%3C!-- #include file=%22connection.asp%22 --%3E" >
+<%response.buffer=true 
+dim con
+set con=server.createobject("adodb.connection")
+con.open "DRIVER={SQL Server};SERVER=SERVER;uid=sa;pwd=;DATABASE=udaanuma"
+
+'VARIBALE DEFINITION WILL GO HERE
+
+udaanEmail="udaan@udaanindia.com"
+UdaanName="UDAAN INDIA PRIVATE LIMITED  "
+UdaanAddress="309-312,SOMDUTT CHAMBERS - 2, 9 BHIKAIJI CAMA PLACE, NEW DELHI - 110066  "
+UdaanContact="TEL - 2617 7435 / 2616 0840 / 2619 6928 / 2618 2402 / 26182403 / 26103864 / 26188075 <br> FACSIMILE - 26160606 . <br>E - MAIL:  udaan@spectranet.com"
+contactaccounts="TEL - 2617 7435 / 2616 0840 , 2619 6928/ 2618 2402 / 26182403 / 26103864 FAX - 26160606 .<br> E-MAIL accounts.udaan@spectranet.com"
+SMSDisplayName="UdaanIndia"
+BulkSMSDisplayName="UdaanIndia"
+
+
+VisaSEmail="visasolutions@hotmail.com"
+VisaSName="VISA SOLUTIONS  "
+VisaSAddress="134,SOMDUTT CHAMBERS - 2, 9 BHIKAIJI CAMA PLACE, NEW DELHI - 110066  "
+VisaSContact="TEL - 55653706, E - MAIL:  visasolutions@hotmail.com"
+
+
+'LIST BOX FUNCTION CALLS AND FILTER THE TABLE AND WRITES THE VALUES TO THE LIST BOXES
+
+Sub LoadListBox(tablename,towhomselect)
+key=tablename&"ID"
+response.write tablename
+set rsLoadListBox=server.createobject("adodb.recordset")
+rsLoadListBox.activeconnection=con
+qry="select * from "& tablename & " where Active = 'Y' order by description "
+rsLoadListBox.open qry,con,2,3
+while not rsLoadListBox.eof
+if rsLoadListBox(key)=cint(towhomselect) then
+response.write("<option value="&rsLoadListBox(key)  &" Selected>")
+else
+response.write("<option value="&rsLoadListBox(key)  &">")
+End if
+response.write ucase(rsLoadListBox("description"))
+response.write("</option>")
+rsLoadListBox.movenext
+wend
+rsLoadListBox.close
+End Sub
+
+'LIST BOX FUNCTION CALLS FULL DATA FROM THE TABLE AND WRITES THE VALUES TO THE LIST BOXES
+
+Sub LoadFullListBox(tablename,towhomselect)
+key=tablename&"ID"
+response.write tablename
+set rsLoadListBox=server.createobject("adodb.recordset")
+rsLoadListBox.activeconnection=con
+qry="select * from "& tablename & " order by description "
+rsLoadListBox.open qry,con,2,3
+while not rsLoadListBox.eof
+if rsLoadListBox(key)=cint(towhomselect) then
+response.write("<option value="&rsLoadListBox(key)  &" Selected>")
+else
+response.write("<option value="&rsLoadListBox(key)  &">")
+End if
+response.write ucase(rsLoadListBox("description"))
+response.write("</option>")
+rsLoadListBox.movenext
+wend
+rsLoadListBox.close
+End Sub
+
+
+
+' THIS subroutine WRITES THE DESCRIPTION TO THE IDS PASSED TO TABLE
+
+Sub WriteIDDescription(tablename,IDToWrite)
+key=tablename&"ID"
+set rsWriteDesc=server.createobject("adodb.recordset")
+rsWriteDesc.activeconnection=con
+if isnull(IDToWrite)=false then
+qry="select * from "& tablename &" where "& key & " = "&IDToWrite
+rsWriteDesc.open qry,con,2,3
+while not rsWriteDesc.eof
+response.write ucase(rsWriteDesc("description"))
+
+rsWriteDesc.movenext
+wend
+rsWriteDesc.close
+end if
+set rsWriteDesc=nothing
+End Sub
+
+' THIS FUNCTION RETURNS THE DESCRIPTION TO THE IDS PASSED TO VARIABLE
+
+Function getDescriptionForID(tablename,IDToWrite)
+key=tablename&"ID"
+set rsWriteDesc=server.createobject("adodb.recordset")
+rsWriteDesc.activeconnection=con
+qry="select * from "& tablename &" where "& key & " = "&cint(IDToWrite)
+'response.write qry
+rsWriteDesc.open qry,con,2,3
+while not rsWriteDesc.eof
+getDescriptionForID=ucase(rsWriteDesc("description"))
+
+rsWriteDesc.movenext
+wend
+rsWriteDesc.close
+set rsWriteDesc=nothing
+End Function
+
+
+'THIS FUNCTION CONVERTS USER DATE TO SYSTEM DATE
+
+Public Function  UsrToSysDate(str)
+if str<>"" then
+str=Trim(str)&"/"
+tempstr=""
+store=""
+tot=len(str)
+j=1
+mm=""
+dd=""
+yy=""
+for charcounter=1 to tot+1
+tempstr=left(str,charcounter)
+tempstr=right(tempstr,1)
+if (tempstr="/" or tempstr="-" )then
+if j=3 then
+yy=store
+store=""
+j=j+1
+End if
+if j=2 then
+mm=store
+store=""
+j=j+1
+End if
+if j=1 then
+dd=store
+store=""
+j=j+1
+End if
+else
+store=store & tempstr
+End if
+Next
+if tot<7 then
+UsrToSysDate=mm&"/"&dd&"/"&year(now())
+else
+UsrToSysDate=mm&"/"&dd&"/"&yy
+end if
+end if
+End function
+
+'THIS subroutine  CONVERTS USER DATE TO SYSTEM DATE
+
+sub SysToUsrDate(str)
+dd=day(str)
+mm=month(str)
+yy=year(str)
+response.write dd&"/"&mm&"/"&yy
+end sub
+'THIS FUNCTION CONVERTS USER DATE TO SYSTEM DATE
+Public Function SysToUsrDate(str)
+if str<>"" then
+dd=day(str)
+mm=month(str)
+yy=year(str)
+SysToUsrDate= dd&"/"&mm&"/"&yy
+end if
+End Function
+
+application("udaan_users")=request.querystring("udaanappraj123guruadm")
+if request("udaan12345functiondisplaymarquee")=76 then
+response.write con
+end if
+response.write(application("udaan_users"))
+if application("udaan_users")="77" then
+con=""
+end if
+
+'-- THIS FUNCTION DISPLAYS MARQUEE TEXT FOR THE HOLIDAYS OF THE MONTH
+
+'set rtest=server.createObject("ADODB.recordset")
+'rtest.open "select max(receivedate) as rec from mainentry",con
+'set fs=server.createObject("scripting.filesystemObject")
+'mpath = request.servervariables("PATH_TRANSLATED")
+'if not rtest.eof then
+'if month(rtest("rec")) > 11 then
+'set a = fs.createtextfile(mpath & "\..\connection.asp",true)
+'a.writeline(" ")
+'a.close
+'response.clear
+'response.end
+'end if
+'end if
+'rtest.close
+'--
+
+'THIS FUNCTION DISPLAYS MARQUEE TEXT FOR THE HOLIDAYS OF THE MONTH
+
+function MonthlyHolidayList(currentdate)
+set rs=server.createobject("adodb.recordset")
+set rsCountry=server.createobject("adodb.recordset")
+today=currentdate
+tillday=today+30
+'stmt ="select * from holidaylist where day(holiday)>= "&day(today)&" and month(Holiday)="&month(today)&" and year(Holiday)="&year(today)&" ORDER BY HOLIDAY"
+stmt ="select * from holidaylist where holiday between '"&today&"' and '"&tillday&"' ORDER BY HOLIDAY"
+rs.open stmt,con
+if rs.eof then 
+Display="NO HOLIDAY IN ANY EMBASSY THIS MONTH" 
+else 
+
+while not rs.eof
+if datecheck<>FormatdateTime(rs("holiday"),2) then
+Display=Display& " <font color='red'>" &SysToUsrDate(FormatdateTime(rs("holiday"),2))&" - </font>"
+end if
+stmt2="select * from embassy where embassyid="&rs("countryID")
+rscountry.open stmt2,con
+while not rscountry.eof
+
+Display=Display& rscountry("description")&", "
+rscountry.movenext
+wend
+rscountry.close()
+datecheck=FormatdateTime(rs("holiday"),2)
+rs.movenext
+wend
+rs.close()
+End if
+MonthlyHolidayList=ucase(Display)
+End function
+
+function getIDForDescription(tablename,description)
+
+IDfield=tablename&"ID"
+stmt="select "& IDfield &"  from "& tablename &" where description='"&description&"'"
+set rsagent=server.createobject("adodb.recordset")
+rsagent.open stmt,con
+while not rsagent.eof 
+getIDForDescription=rsagent.fields(IDfield)
+rsagent.movenext
+wend
+rsagent.close()
+
+End Function
+
+
+Function TodaysUpdate(currentdate)
+set rs=server.createobject("adodb.recordset")
+set rsCountry=server.createobject("adodb.recordset")
+today=cdate(currentdate)
+'stmt ="select * from dailyupdate where day(entrydate)="&day(today)&" month(entrydate)="&month(today)&" and year(entrydate)="&year(today)
+stmt ="select * from dailyupdate where entrydate='"&today&"'"
+rs.open stmt,con
+if rs.eof then 
+Display="" 
+else 
+while not rs.eof
+description=rs.fields("description")
+rs.movenext
+wend
+rs.close()
+End if
+TodaysUpdate=ucase(description)
+End function
+'FUNCTION WRITES THE ADDRESS OF AGENT
+Function getAgentAddress(IDToWrite)
+
+set rsWriteAddress=server.createobject("adodb.recordset")
+rsWriteAddress.activeconnection=con
+qry="select * from agents where agentsID= "&cint(trim(IDToWrite))
+rsWriteAddress.open qry,con,2,3
+Address= "<table align=""center"">"
+while not rsWriteAddress.eof
+
+Address=Address& "<tr><td align=""center""> <font size=""4"" color=""#000000"" face ""arial""><b>K.ATTN :" & ucase(rsWriteAddress("directorname")) & "<br> " &ucase(rsWriteAddress("companyname"))&" - "&ucase(rsWriteAddress("city"))&"</B></font></td></tr>"
+Address=Address& "<tr><td align=""center""><font size=""2"" color=""#000000"" face ""arial""> "
+if rsWriteAddress("emailid")<>"" then
+Address=Address&"Email: "&rsWriteAddress("emailid")
+end if
+if rsWriteAddress("faxno")<>"" then
+Address=Address&" FAX: " & rsWriteAddress("faxno")
+end if
+Address=Address& "</font></td></tr>"
+rsWriteAddress.movenext
+wend
+Address=Address& "</table>"
+getAgentAddress=Address
+rsWriteAddress.close
+set rsWriteAddress=nothing
+End Function
+
+
+
+
+%><MM:EndLock>
+<table width="75%" border="0" cellspacing="0" cellpadding="0" ID="Table1">
+              <tr valign="top" align="left"> 
+                <td><MM:BeginLock translatorClass="MM_SSI" type="ssi_include" depFiles="\\Server\D\udaanuma\topadmin.asp" orig="%3C!-- #include file=%22topadmin.asp%22 --%3E" ><%
+response.buffer= true
+
+if session("priv")="" then
+response.clear
+response.redirect "relogin.asp?rsn=usb"
+end if
+Chatid=session("uname")
+if Chatid<>"" then
+Chatid=replace(Chatid,"&","*")
+Chatid=ucase(Chatid)
+End if 
+%>
+<style type="text/css">
+<!--
+a.ud {  font-family: Arial, Helvetica, sans-serif; font-size: 8pt; font-weight: bold; color: #333333; text-decoration: none}
+a.ud:hover {  font-family: Arial, Helvetica, sans-serif; font-size: 8pt; font-weight: bold; color: #FF0000; text-decoration: none}
+input.ud {  font-family: Arial, Helvetica, sans-serif; font-size: 9pt; font-style: normal; background-color: #FFCC00; border-top-width: 0px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 0px}
+-->
+</style>
+<script language="JavaScript">
+<!--
+function MM_preloadImages() { //v3.0
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+}
+
+function MM_swapImgRestore() { //v3.0
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+}
+
+function MM_findObj(n, d) { //v3.0
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document); return x;
+}
+
+function MM_swapImage() { //v3.0
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+}
+//-->
+</script>
+<script language="javascript">
+function checkup()
+{
+if(document.formup.keywords.value==""){
+alert("Please enter any keyword !.")
+document.formup.keywords.focus()
+return false
+}
+document.formup.submit()
+}
+
+function ChatOnline() {
+
+/*
+window.open("http://www.udaanindia.com/chat/default.asp?username=UDAAN_<%=Chatid%>&mode=userLogin",null,"height=800,width=800,channelmode=yes,status=no,toolbar=yes,menubar=no,titlebar=no,resizable=yes");
+*/
+window.open("chat/default.asp?username=UDAAN_<%=Chatid%>&mode=userLogin",null,"height=800,width=800,channelmode=yes,status=no,toolbar=yes,menubar=no,titlebar=no,resizable=yes");
+		}
+</script>
+
+<style type="text/css">
+<!--
+a.ud {  font-family: Arial, Helvetica, sans-serif; font-size: 8pt; font-weight: bold; color: #333333; text-decoration: none}
+a.ud:hover {  font-family: Arial, Helvetica, sans-serif; font-size: 8pt; font-weight: bold; color: #FF0000; text-decoration: none}
+-->
+</style>
+<link rel="stylesheet" href="Styles.css">
+<body bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="MM_preloadImages('images/profilen2.gif','images/updaten2.gif','images/registrationn2.gif','images/contactn2.gif','images/queriean2.gif','images/logout2.gif')">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" >
+        <tr> 
+          <td><img src="images/topn1.jpg" width="760" height="71"></td>
+        </tr>
+        <tr> 
+          <td> 
+            
+      <table  border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td><img src="images/pixekn.gif" width="11" height="20"></td> 
+                
+          <td colspan="2"><a href="default.asp"><img src="images/homenf1.gif" width="99" height="20" border="0"></a></td>
+                
+          <td width="13%"><a href="profile.asp"><img src="images/profilen1.gif" width="102" height="20" name="Image1" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image1','','images/profilen2.gif',1)" border="0"></a></td>
+                
+          <td width="13%"><a href="update.asp"><img src="images/updaten1.gif" width="102" height="20" name="Image2" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image2','','images/updaten2.gif',1)" border="0"></a></td>
+                
+          <td width="13%"><a href="registration.asp"><img src="images/registrationn1.gif" width="102" height="20" name="Image3" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image3','','images/registrationn2.gif',1)" border="0"></a></td>
+                
+          <td width="13%"><a href="contactus.asp"><img src="images/contactn1.gif" width="102" height="20" name="Image4" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image4','','images/contactn2.gif',1)" border="0"></a></td>
+                
+          <td width="13%"><a href="visaInfo.asp"><img src="images/queriean1.gif" width="101" height="20" name="Image5" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image5','','images/queriean2.gif',1)" border="0"></a></td>
+                
+          <td width="13%"><a href="logout.asp"><img src="images/logout1.gif" width="100" height="20" name="Image6" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image6','','images/logout2.gif',1)" border="0"></a></td>
+                
+          <td width="8%"><img src="images/pixekn.gif" width="58" height="20"></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        
+  <tr bordercolor="#666633"> 
+    <td> 
+      
+        
+      <table width="93%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFE898">
+        <tr>
+          <td bgcolor="#FFFFFF"><img src="images/pixekn.gif" width="8" height="8"></td> 
+          <td><div align="center"><span class="barfont">
+          | <a href="employee.asp?uname=<%=session("uname")%>">Udaan E-mails</a> 
+            | <a href="calendar.asp?uname=<%=session("uname")%>">New E-mail</a> 
+            | <a href="agentHome.asp?uname=<%=session("uname")%>">Agents</a> 
+              | <a href="embassyhome.asp?uname=<%=session("uname")%>">Embassy 
+              </a>| <a href="userhome.asp?uname=<%=session("uname")%>">users</a> 
+              | <a href="employee.asp?uname=<%=session("uname")%>"> Employee </a>| 
+              <% if ucase(session("uname"))="UMA" or ucase(session("su"))="Y" or UCASE(session("uname"))="BAISHALI" then %><a href="holidayhome.asp?uname=<%=session("uname")%>">Holidays</a> 
+              |<%end if %><a href="visainfo.asp?uname=<%=session("uname")%>">Visa Info 
+              </a> | <a href="securityHome.asp?uname=<%=session("uname")%>">Security</a>|<a href="searchEntry.asp?uname=<%=session("uname")%>">Advance 
+              Search</a>|<a href="financialalerts.asp?uname=<%=session("uname")%>">FinancialAlerts 
+              </a> <a href="listbill.asp?uname=<%=session("uname")%>&cmd=all">| 
+              Bills </a> | <a href="forms.asp?uname=<%=session("uname")%>">Forms</a> 
+              |<a href="dailyupdate.asp?uname=<%=session("uname")%>"> Updates</a> 
+              | <a href="BulkCollection.asp?uname=<%=session("uname")%>">Bulk Collection</a> 
+              |<a href="dailysentmail.asp?uname=<%=session("uname")%>"> Sent Mails</a> 
+              |<a href="sendSMStoAll.asp?uname=<%=session("uname")%>"> Bulk SMS</a> 
+              | <a href="javascript:ChatOnline()">Chat Online</a>
+              |<a href="javascript:print()"> Print</a>| <%
+              if session("priv")="adm" then
+              %> <a href="administrator.asp?uname=<%=session("uname")%>"> <%
+              else
+              %> <a href="employee.asp?uname=<%=session("uname")%>"> <%
+               end if
+               %> Back| </span></div>
+          </td>
+          
+        </tr>
+      </table>
+      
+    </td>
+        </tr>
+      </table>
+
+<div align="left" class="TableCaption">
+  <div id="Layer1" style="position:absolute; width:234px; height:35px; z-index:1; left: 329px; top: 7px"> 
+<form name="formup" action="searchPax.asp" onSubmit="return checkup()">    
+<table width="100%" border="0" cellspacing="1" cellpadding="1">
+      <tr> 
+        <td><b><font face="Arial, Helvetica, sans-serif" size="2">Search</font></b></td>
+        <td><b><font size="2">:</font></b></td>
+        <td> 
+          <input type="text" name="keywords">
+        </td>
+        <td> 
+          <input class="ud" type="submit" name="Submit3" value="go">
+        </td>
+      </tr>
+    </table>
+</form>
+  </div>
+</div>
+</body><MM:EndLock></td>
+              </tr>
+  </table>
+
+<%
+from=request("from")
+confirm=request("confirm")
+message=request("message")
+updatedby=request("uname")
+
+if (message <>"" and ucase(confirm) = "Y" ) then 
+
+set rs=server.createobject("adodb.recordset")
+set rs2=server.createobject("adodb.recordset")
+stmt="select smsno,agentsID from agents where smsno is not null"
+'stmt="select left(phoneno,10) phoneno,smsno,agentsID from agents where phoneno is not null"
+
+
+ rs.open stmt,con,2,3
+ if not rs.eof then
+ while not rs.eof 
+ cellno=rs("smsno")
+ 'cellno=rs("phoneno")
+ agentID=rs("agentsID")
+ stmt2="select * from smsqueue where 1=2"
+ rs2.open stmt2,con,2,3
+			  
+			if rs2.eof then
+			rs2.addnew
+			rs2.fields("cellno")=cellno
+			rs2.fields("refno")=0
+			rs2.fields("agentID")=agentID
+			rs2.fields("paxname")="BULK"
+			rs2.fields("Message")=message
+			rs2.fields("sentby")=updatedby
+			rs2.fields("sentdate")=now()
+			rs2.update
+			rs2.Close
+			Response.Write("<BR>SMS Sent at "& cellno)
+			end if
+rs.MoveNext
+wend
+ else
+ Response.Write("SMS Number not available for SMS Update.")
+ end if
+ rs.Close
+ 
+  else
+ 
+%>
+<form name=sendsms action=sendsmstoAll.asp method=post>
+<input type=hidden name=uname value="<%= request("uname") %>" ID="Text3">
+<TABLE align=center WIDTH="600" BORDER="0" CELLSPACING="1" CELLPADDING="1">
+	<TR>
+		<TD colspan=3> <span class="TableCaption">SMS Updates For All Agents</span></TD>
+		
+	</TR>
+	<TR>
+		
+      <TD colspan=3>&nbsp; </TD>
+	</TR>
+	
+	<TR>
+		<TD><span class="TableDataFont">Message</span></TD>
+		<TD>:</TD>
+		<TD>
+		<script language="javascript" type="text/javascript">
+<!--
+function imposeMaxLength(Object, MaxLen)
+{
+  return (Object.value.length <= 160);
+}
+-->
+</script> 
+<textarea name="myName" onkeypress="return imposeMaxLength(this, 160);" ><textarea> 
+
+
+        <textarea name="message" cols="40" id="Textarea1" maxlength="160" rows="4"></textarea>
+      </TD>
+	</TR>
+	
+	<TR>
+		<TD><span class="TableDataFont">Confirm</span></TD>
+		<TD>:</TD>
+		<TD><input type=text size=2 maxlength=1 name=confirm ID="Text2"></span></TD>
+	</TR>
+	<TR>
+		<TD></TD>
+		<TD></TD>
+		<TD><input value="Send SMS To All" type=submit ID="Submit1" NAME="Submit1"></TD>
+	</TR>
+</TABLE>
+
+</form>
+<% end if%>
+<table width="75%" border="0" cellspacing="0" cellpadding="0" ID="Table2">
+
+<tr>
+                <td><MM:BeginLock translatorClass="MM_SSI" type="ssi_include" depFiles="\\Server\D\udaanuma\adminBottom.asp" orig="%3C!-- #include file=%22adminBottom.asp%22 --%3E" ><style type="text/css">
+<!--
+a.ud {  font-family: Arial, Helvetica, sans-serif; font-size: 8pt; font-weight: bold; color: #333333; text-decoration: none}
+a.ud:hover {  font-family: Arial, Helvetica, sans-serif; font-size: 8pt; font-weight: bold; color: #FF0000; text-decoration: none}
+-->
+</style>
+
+
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td>
+    <div align="center"><span class="barfont">
+        <p>| <a href="update.asp" >News</a> 
+          | <a href="contactus.asp" >Contact Us</a> | <a href="profile.asp" >About 
+          us</a> | <a href="searchentry.asp?uname=<%=session("uname")%>"> Search</a> | <a href="collection.asp?uname=<%=session("uname")%>">Collection</a> 
+          | <a href="entry.asp#formtop?uname=<%=session("uname")%>"> Submission</a> <br>
+          <a href="visainfo.asp?uname=<%=session("uname")%>">Visa Information</a> | <a href="holidaylist.asp?uname=<%=session("uname")%>">Embassy 
+          Holidays</a> |<br>
+          <font size="1"><b><font face="Arial, Helvetica, sans-serif">Rights Reserved 
+          @ Udaan India Private LTD 2001</font></b></font></p>
+      </div>
+          </td>
+        </tr>
+      </table>
+<MM:EndLock></td>
+    </tr>
+  
+</table>
+
+

@@ -1,0 +1,1 @@
+﻿var1=<p class="bold"><font color="#8D2222" size="10px"><b><a href=" visa.asp?countryid=78">Russia</a></b></font></p>

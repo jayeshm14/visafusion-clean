@@ -1,0 +1,98 @@
+<html>
+<head>
+<title>UPDATE</title>
+</head>
+<body bgcolor="#FFFFFF">
+<table height=303 cellspacing=0 cellpadding=0 width="95%" 
+border=1 hspace="0" vspace="0" align="left">
+  <tr valign="top"> 
+    <td height=124> 
+      <table cellspacing=0 cellpadding=0 width="97%" border=0 height="70">
+        <tr> 
+          <td width=0% height="73">&nbsp;</td>
+          <td colspan=5 height="73"><img height=71 
+            src="http://www.udaanindia.com/images/topn1.jpg" width=760></td>
+        </tr>
+        <tr bgcolor="#000099"> 
+          <td width=0% height=14>&nbsp;</td>
+          <td align=left colspan=5 height=14> 
+            <div align="center"> <marquee BEHAVIOR="ALTERNATE"><b><i><font face="Courier New, Courier, mono" color="#FFFFFF" size="3">PLEASE 
+              VISIT OUR WEBSITE WITH ONLINE STATUS </font><font face="Times New Roman, Times, serif" color="#FFFFFF" size="3">&quot;WWW.UDAANINDIA.com&quot;</font></i></b></marquee> 
+            </div>
+          </td>
+        </tr>
+        <tr bgcolor="#000099"> 
+          <td width=0% height="55">&nbsp;</td>
+          <td colspan=5 height="55"> 
+            <table width="100%" border="0" vspace="0" hspace="0">
+              <tr> 
+                <td width="13%" height="58" bgcolor="#000099"><img src="http://www.udaanindia.com/updateimg/aus1.jpg" width="100" height="200" align="top"></td>
+                <td width="75%" height="58"> 
+                  <table width="100%" border="0" bgcolor="#FFFFFF">
+                    <tr> 
+                      <td> 
+                        <div align="center"><font size="6"><b><font 
+            face="Arial Black" color=#000080 size=6><i>UPDATE</i></font><i><font 
+            face=Arial color=#000080 size=6> </font><font face="Arial" color="#000080" size="4">29th 
+                          July 2002</font></i><font size="7" color="#000099"></font></b></font></div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td height="2"> 
+                        <div align="center"><b><font face="Courier New" size="3">To 
+                          Mr. RAJAN DUA&nbsp; </font></b></div>
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td> 
+                        <div align="center"><b><font size="5" color="#000099"><U>AUSTRALIA</U></font></b></div>
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td height="4"> 
+                        <div align="justify"><font face="Arial"><b><font size="2">WE HEREBY RE-CONFIRM THAT THE 
+                          VISA OFFICE IN THE AUSTRALIA HIGH COMMISSION NEW DELHI, 
+                          WHICH HAD BEEN MAINTAINING A LIMITED SERVICE SINCE 4th 
+                          JUNE 2002, HAS RETURNED TO THE FULL RANGE( BUSINESS, 
+                          TOURIST, STUDENT, WORK, TRANSIT) OF VISA SERVICES FROM 
+                          23rd JULY 2002. </font></b></font></div>
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td><marquee direction="LEFT"><img src="http://www.udaanindia.com/updateimg/uma-kang.gif"></marquee></td>
+                    </tr>
+                  </table>
+                </td>
+                <td width="12%" height="58" bgcolor="#000099"><img src="http://www.udaanindia.com/updateimg/aus2.jpg" width="100" height="200"></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr bgcolor="#000099"> 
+          <td width=0% height=1>&nbsp;</td>
+          <td colspan=5 height=1> 
+            <table bordercolor=#6666ff width="100%" bgcolor=#000080 border=1>
+              <tr bgcolor="#070692"> 
+                <td height="2">
+                  <div align="center"><font face="Batang"><b><font color="#ffffff" size="4">FORWARDED 
+                    BY:-</font> <font color="#ffffff" size="4">UDAAN INDIA PRIVATE 
+                    LIMITED. </font><font 
+                  color=#ffffff><br>
+                    CONTACT US AT:- 011-617 7435 / 616 0840 / 619 6928 / 618 2402 
+                    / 618 8075 / <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+                    618 2403 / 610 3864. <br>
+                    E.MAIL:- <a 
+                  href="mailto:?To=udaan@spectranet.com&amp;subject=Re:%20UPDATE%20%201st%20December%202001"><font 
+                  color=#ccffff>udaan@spectranet.com</font></a><br>
+                    FOR URGENT QUERIES:- FACSIMILE : 011 - 616 0606.</font></b></font></div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</html>

