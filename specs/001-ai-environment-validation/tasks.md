@@ -36,9 +36,9 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create validation directories `scripts/ai-environment-validation/`, `tests/ai-environment-validation/`, and `reports/ai-environment-validation/` per plan.md structure
-- [ ] T002 [P] Create ADR-0002 documenting the validation-gate architecture (script + CI workflow + report artifacts) in `adr/ADR-0002.md` (Constitution Principle IV, plan GATE D)
-- [ ] T003 [P] Create CI workflow skeleton `.github/workflows/ai-environment-validation.yml` with trigger paths `findings/**` and `library/**`
+- [x] T001 Create validation directories `scripts/ai-environment-validation/`, `tests/ai-environment-validation/`, and `reports/ai-environment-validation/` per plan.md structure
+- [x] T002 [P] Create ADR-0002 documenting the validation-gate architecture (script + CI workflow + report artifacts) in `adr/ADR-0002.md` (Constitution Principle IV, plan GATE D)
+- [x] T003 [P] Create CI workflow skeleton `.github/workflows/ai-environment-validation.yml` with trigger paths `findings/**` and `library/**`
 
 ---
 
@@ -48,9 +48,9 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Create the 12-integration registry (id, name, canonical search terms, governing doc, constitution principle) in `scripts/ai-environment-validation/integrations.psd1` per data-model.md
-- [ ] T005 Implement doc-scanning helper (Select-String over `findings/` and `library/`) in `scripts/ai-environment-validation/validate-ai-environment.ps1`
-- [ ] T006 Implement the status classifier (validated / partial / missing / contradictory per BR-002 and spec §17 rules) in `scripts/ai-environment-validation/validate-ai-environment.ps1`
+- [x] T004 Create the 12-integration registry (id, name, canonical search terms, governing doc, constitution principle) in `scripts/ai-environment-validation/integrations.psd1` per data-model.md
+- [x] T005 Implement doc-scanning helper (Select-String over `findings/` and `library/`) in `scripts/ai-environment-validation/validate-ai-environment.ps1`
+- [x] T006 Implement the status classifier (validated / partial / missing / contradictory per BR-002 and spec §17 rules) in `scripts/ai-environment-validation/validate-ai-environment.ps1`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -64,14 +64,14 @@
 
 ### Tests for User Story 1 (Pester — write FIRST, ensure they FAIL before implementation) ⚠️
 
-- [ ] T007 [P] [US1] Write Pester tests for integration detection and status classification (incl. name-only-mention → partial per BR-002) in `tests/ai-environment-validation/validate-ai-environment.Tests.ps1`
+- [x] T007 [P] [US1] Write Pester tests for integration detection and status classification (incl. name-only-mention → partial per BR-002) in `tests/ai-environment-validation/validate-ai-environment.Tests.ps1`
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] Implement the integration scanning loop using the registry (T004) and doc scanner (T005) in `scripts/ai-environment-validation/validate-ai-environment.ps1` (depends on T004, T005)
-- [ ] T009 [US1] Implement workflow-directive detection (BR-002: directive required, not just a name mention) in `scripts/ai-environment-validation/validate-ai-environment.ps1`
-- [ ] T010 [US1] Implement provenance recording (source file + line per finding) in `scripts/ai-environment-validation/validate-ai-environment.ps1` (FR-004)
-- [ ] T011 [US1] Implement repeatable run semantics (ISO-8601 date, deterministic ordering, exit code reflects `passed`) in `scripts/ai-environment-validation/validate-ai-environment.ps1` (FR-005, NFR-001)
+- [x] T008 [US1] Implement the integration scanning loop using the registry (T004) and doc scanner (T005) in `scripts/ai-environment-validation/validate-ai-environment.ps1` (depends on T004, T005)
+- [x] T009 [US1] Implement workflow-directive detection (BR-002: directive required, not just a name mention) in `scripts/ai-environment-validation/validate-ai-environment.ps1`
+- [x] T010 [US1] Implement provenance recording (source file + line per finding) in `scripts/ai-environment-validation/validate-ai-environment.ps1` (FR-004)
+- [x] T011 [US1] Implement repeatable run semantics (ISO-8601 date, deterministic ordering, exit code reflects `passed`) in `scripts/ai-environment-validation/validate-ai-environment.ps1` (FR-005, NFR-001)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -85,13 +85,13 @@
 
 ### Tests for User Story 2 (Pester — write FIRST) ⚠️
 
-- [ ] T012 [P] [US2] Write Pester contract test for the `summary.json` schema (field names, types, required-ness, 12 integration entries) in `tests/ai-environment-validation/validate-ai-environment.Tests.ps1`
+- [x] T012 [P] [US2] Write Pester contract test for the `summary.json` schema (field names, types, required-ness, 12 integration entries) in `tests/ai-environment-validation/validate-ai-environment.Tests.ps1`
 
 ### Implementation for User Story 2
 
-- [ ] T013 [US2] Implement Markdown report generation (`report.md`), including a Gap Report section for non-validated integrations (BR-003), in `scripts/ai-environment-validation/validate-ai-environment.ps1`
-- [ ] T014 [US2] Implement JSON summary generation per `contracts/validation-summary.md` (`summary.json`) in `scripts/ai-environment-validation/validate-ai-environment.ps1`
-- [ ] T015 [US2] Implement the traceability-matrix rendering (FR-002) into `report.md` in `scripts/ai-environment-validation/validate-ai-environment.ps1`
+- [x] T013 [US2] Implement Markdown report generation (`report.md`), including a Gap Report section for non-validated integrations (BR-003), in `scripts/ai-environment-validation/validate-ai-environment.ps1`
+- [x] T014 [US2] Implement JSON summary generation per `contracts/validation-summary.md` (`summary.json`) in `scripts/ai-environment-validation/validate-ai-environment.ps1`
+- [x] T015 [US2] Implement the traceability-matrix rendering (FR-002) into `report.md` in `scripts/ai-environment-validation/validate-ai-environment.ps1`
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -105,12 +105,12 @@
 
 ### Tests for User Story 3 (Pester — write FIRST) ⚠️
 
-- [ ] T016 [P] [US3] Write Pester tests for CI/on-demand result equivalence and `passed` flag semantics in `tests/ai-environment-validation/validate-ai-environment.Tests.ps1`
+- [x] T016 [P] [US3] Write Pester tests for CI/on-demand result equivalence and `passed` flag semantics in `tests/ai-environment-validation/validate-ai-environment.Tests.ps1`
 
 ### Implementation for User Story 3
 
-- [ ] T017 [US3] Finalize `.github/workflows/ai-environment-validation.yml` to run `scripts/ai-environment-validation/validate-ai-environment.ps1` and fail the check on non-zero exit (depends on T003)
-- [ ] T018 [US3] Implement on-demand parameterization (`-SourceDirs`, `-OutputDir`, `-ReportOnly`) in `scripts/ai-environment-validation/validate-ai-environment.ps1` (FR-006)
+- [x] T017 [US3] Finalize `.github/workflows/ai-environment-validation.yml` to run `scripts/ai-environment-validation/validate-ai-environment.ps1` and fail the check on non-zero exit (depends on T003)
+- [x] T018 [US3] Implement on-demand parameterization (`-SourceDirs`, `-OutputDir`, `-ReportOnly`) in `scripts/ai-environment-validation/validate-ai-environment.ps1` (FR-006)
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -120,11 +120,11 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T019 [P] Run the `quickstart.md` validation end-to-end, fix any gaps found, and assert completion within the 30-minute NFR-002 budget
-- [ ] T020 Update the Knowledge Graph (`knowledge-graph/kg.json` + `knowledge-graph/traceability-matrix.md`) with SPEC-0001, ADR-0002, and this feature's artifacts (Constitution Principle IV)
-- [ ] T021 [P] Update documentation (README/docs) describing the validation workflow and its outputs
-- [ ] T022 [P] Security review: confirm read-only access over docs, no secrets, no production data in `scripts/ai-environment-validation/` and `.github/workflows/ai-environment-validation.yml` (spec §12)
-- [ ] T023 Re-run `specs/001-ai-environment-validation/checklists/validation.md` and resolve flagged requirement gaps (e.g., CHK019 recovery flow — doc restored → status returns to validated)
+- [x] T019 [P] Run the `quickstart.md` validation end-to-end, fix any gaps found, and assert completion within the 30-minute NFR-002 budget
+- [x] T020 Update the Knowledge Graph (`knowledge-graph/kg.json` + `knowledge-graph/traceability-matrix.md`) with SPEC-0001, ADR-0002, and this feature's artifacts (Constitution Principle IV)
+- [x] T021 [P] Update documentation (README/docs) describing the validation workflow and its outputs
+- [x] T022 [P] Security review: confirm read-only access over docs, no secrets, no production data in `scripts/ai-environment-validation/` and `.github/workflows/ai-environment-validation.yml` (spec §12)
+- [x] T023 Re-run `specs/001-ai-environment-validation/checklists/validation.md` and resolve flagged requirement gaps (e.g., CHK019 recovery flow — doc restored → status returns to validated)
 
 ---
 

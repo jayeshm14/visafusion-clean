@@ -10,65 +10,65 @@
 
 ## Requirement Completeness
 
-- [ ] CHK001 - Are requirements defined covering all 12 documented engineering integrations, not a subset? [Completeness, Spec §9 FR-001]
-- [ ] CHK002 - Is a requirement documented for both execution modes (automated CI gate and on-demand agent run)? [Completeness, Spec §9 FR-006]
-- [ ] CHK003 - Are requirements defined for producing the report artifacts (Markdown + JSON summary) on every run? [Completeness, Spec §9 FR-007]
-- [ ] CHK004 - Are requirements defined for flagging missing, partial, and contradictory integrations? [Completeness, Spec §9 FR-003]
-- [ ] CHK005 - Is the governance artifact requirement (ADR-0002 for the CI-gate architecture) captured in the feature docs? [Completeness, Plan §Constitution Check GATE D]
+- [x] CHK001 - Are requirements defined covering all 12 documented engineering integrations, not a subset? [Completeness, Spec §9 FR-001]
+- [x] CHK002 - Is a requirement documented for both execution modes (automated CI gate and on-demand agent run)? [Completeness, Spec §9 FR-006]
+- [x] CHK003 - Are requirements defined for producing the report artifacts (Markdown + JSON summary) on every run? [Completeness, Spec §9 FR-007]
+- [x] CHK004 - Are requirements defined for flagging missing, partial, and contradictory integrations? [Completeness, Spec §9 FR-003]
+- [x] CHK005 - Is the governance artifact requirement (ADR-0002 for the CI-gate architecture) captured in the feature docs? [Completeness, Plan §Constitution Check GATE D]
 
 ## Requirement Clarity
 
 - [x] CHK006 - Is the "workflow directive" criterion (BR-002) defined precisely enough to apply without interpretation? [Clarity, Spec §10 BR-002] (resolved 2026-08-06: detection criteria added — normative keyword or imperative verb)
-- [ ] CHK007 - Is the JSON summary specified with a defined schema (field names, types, required-ness), not left open-ended? [Clarity, Spec §9 FR-007 / contracts/validation-summary.md]
-- [ ] CHK008 - Is the 30-minute completion target quantified with a clear unit of measure? [Clarity, Spec §11 NFR-002]
-- [ ] CHK009 - Is the exact list of 12 integrations enumerated unambiguously? [Clarity, Spec §4]
+- [x] CHK007 - Is the JSON summary specified with a defined schema (field names, types, required-ness), not left open-ended? [Clarity, Spec §9 FR-007 / contracts/validation-summary.md]
+- [x] CHK008 - Is the 30-minute completion target quantified with a clear unit of measure? [Clarity, Spec §11 NFR-002]
+- [x] CHK009 - Is the exact list of 12 integrations enumerated unambiguously? [Clarity, Spec §4]
 
 ## Requirement Consistency
 
-- [ ] CHK010 - Do the per-integration status values (validated / partial / missing / contradictory) align across spec, data-model, and contract? [Consistency, Spec §9 FR-005 / contracts]
-- [ ] CHK011 - Does the CI trigger description (FR-008) match the trigger paths in the plan and research? [Consistency, Spec §9 FR-008 / research.md]
-- [ ] CHK012 - Do acceptance criteria AC-005..007 map one-to-one to FR-006..008? [Consistency, Spec §20]
-- [ ] CHK013 - Is the report-location assumption consistent across spec, plan, and research? [Consistency, Spec §Assumptions / plan.md]
+- [x] CHK010 - Do the per-integration status values (validated / partial / missing / contradictory) align across spec, data-model, and contract? [Consistency, Spec §9 FR-005 / contracts]
+- [x] CHK011 - Does the CI trigger description (FR-008) match the trigger paths in the plan and research? [Consistency, Spec §9 FR-008 / research.md]
+- [x] CHK012 - Do acceptance criteria AC-005..007 map one-to-one to FR-006..008? [Consistency, Spec §20]
+- [x] CHK013 - Is the report-location assumption consistent across spec, plan, and research? [Consistency, Spec §Assumptions / plan.md]
 
 ## Acceptance Criteria Quality
 
-- [ ] CHK014 - Can AC-001 (all 12 integrations checked) be objectively verified? [Measurability, Spec §20 AC-001]
-- [ ] CHK015 - Is the CI gate's merge-blocking behavior expressed as a measurable criterion? [Acceptance Criteria, Spec §20 AC-005]
-- [ ] CHK016 - Can AC-006 (report artifacts in the repository) be verified without implementation knowledge? [Acceptance Criteria, Spec §20 AC-006]
+- [x] CHK014 - Can AC-001 (all 12 integrations checked) be objectively verified? [Measurability, Spec §20 AC-001]
+- [x] CHK015 - Is the CI gate's merge-blocking behavior expressed as a measurable criterion? [Acceptance Criteria, Spec §20 AC-005]
+- [x] CHK016 - Can AC-006 (report artifacts in the repository) be verified without implementation knowledge? [Acceptance Criteria, Spec §20 AC-006]
 
 ## Scenario Coverage
 
-- [ ] CHK017 - Are requirements defined for the primary flow (all integrations validated)? [Coverage, Spec §23 TS-001]
-- [ ] CHK018 - Are requirements defined for the exception flow (integration becomes missing after a doc change)? [Coverage, Spec §9 FR-003]
+- [x] CHK017 - Are requirements defined for the primary flow (all integrations validated)? [Coverage, Spec §23 TS-001]
+- [x] CHK018 - Are requirements defined for the exception flow (integration becomes missing after a doc change)? [Coverage, Spec §9 FR-003]
 - [x] CHK019 - Are requirements defined for the recovery flow (status returns to validated after the doc is restored)? [Coverage, Spec §23 TS-009] (resolved 2026-08-06: TS-009 added)
-- [ ] CHK020 - Are requirements defined for equivalent results between CI gate and on-demand runs? [Coverage, Spec §20 AC-005]
+- [x] CHK020 - Are requirements defined for equivalent results between CI gate and on-demand runs? [Coverage, Spec §20 AC-005]
 
 ## Edge Case Coverage
 
-- [ ] CHK021 - Is the name-only-mention (no workflow directive) edge case explicitly specified as partial? [Edge Case, Spec §10 BR-002 / §23 TS-004]
-- [ ] CHK022 - Is the edge case of the CI gate not triggering on unrelated repository changes specified? [Edge Case, Spec §23 TS-008]
+- [x] CHK021 - Is the name-only-mention (no workflow directive) edge case explicitly specified as partial? [Edge Case, Spec §10 BR-002 / §23 TS-004]
+- [x] CHK022 - Is the edge case of the CI gate not triggering on unrelated repository changes specified? [Edge Case, Spec §23 TS-008]
 
 ## Non-Functional Requirements
 
-- [ ] CHK023 - Is determinism/reproducibility specified with a verifiable criterion (same inputs → same result)? [Non-Functional, Spec §11 NFR-001]
-- [ ] CHK024 - Are security constraints (read-only over docs, no secrets, no production data) specified? [Non-Functional, Spec §12]
-- [ ] CHK025 - Is the performance target (30-minute budget) consistent with the expected actual runtime documented in research? [Non-Functional, Spec §11 NFR-002 / research.md]
+- [x] CHK023 - Is determinism/reproducibility specified with a verifiable criterion (same inputs → same result)? [Non-Functional, Spec §11 NFR-001]
+- [x] CHK024 - Are security constraints (read-only over docs, no secrets, no production data) specified? [Non-Functional, Spec §12]
+- [x] CHK025 - Is the performance target (30-minute budget) consistent with the expected actual runtime documented in research? [Non-Functional, Spec §11 NFR-002 / research.md]
 
 ## Dependencies & Assumptions
 
-- [ ] CHK026 - Is the dependency on the `findings/` and `library/` docs explicitly documented? [Dependency, Spec §22]
-- [ ] CHK027 - Is the authoritative-source assumption (BR-001) documented and validated? [Assumption, Spec §10 BR-001]
-- [ ] CHK028 - Is the report-path open decision (finalized during planning) explicitly flagged as pending? [Assumption, Spec §Assumptions]
+- [x] CHK026 - Is the dependency on the `findings/` and `library/` docs explicitly documented? [Dependency, Spec §22]
+- [x] CHK027 - Is the authoritative-source assumption (BR-001) documented and validated? [Assumption, Spec §10 BR-001]
+- [x] CHK028 - Is the report-path open decision (finalized during planning) explicitly flagged as pending? [Assumption, Spec §Assumptions]
 
 ## Ambiguities & Conflicts
 
-- [ ] CHK029 - Is the term "documented engineering integrations" free of ambiguity about the scope of the 12 items? [Ambiguity, Spec §3]
-- [ ] CHK030 - Does any residual conflict exist between the agent-performed assumption and the automated CI gate requirement? [Conflict, Spec §Assumptions vs §9 FR-006]
+- [x] CHK029 - Is the term "documented engineering integrations" free of ambiguity about the scope of the 12 items? [Ambiguity, Spec §3]
+- [x] CHK030 - Does any residual conflict exist between the agent-performed assumption and the automated CI gate requirement? [Conflict, Spec §Assumptions vs §9 FR-006]
 
 ## Governance & Traceability
 
-- [ ] CHK031 - Is the Knowledge Graph update requirement (after task completion) reflected in the feature's requirements or plan? [Traceability, Constitution Principle IV]
-- [ ] CHK032 - Is Docs-as-Code compliance (version-controlled, PR-reviewed artifacts) specified? [Traceability, Spec §9 FR-007 / library/06]
+- [x] CHK031 - Is the Knowledge Graph update requirement (after task completion) reflected in the feature's requirements or plan? [Traceability, Constitution Principle IV]
+- [x] CHK032 - Is Docs-as-Code compliance (version-controlled, PR-reviewed artifacts) specified? [Traceability, Spec §9 FR-007 / library/06]
 
 ## Notes
 
@@ -77,3 +77,5 @@
 - Link to relevant resources or documentation
 - Items are numbered sequentially for easy reference
 - All items reference a spec section or use a quality marker ([Gap]/[Ambiguity]/[Conflict]/[Assumption]) per the traceability requirement (>=80%)
+- All 32 items verified against the current spec.md / plan.md / contracts on 2026-08-06 (post-remediation, 0 findings); CHK006 and CHK019 carry inline resolution notes.
+- Implementation re-verification 2026-08-06 (Phase 6, T023): CHK019 recovery flow proven end-to-end — renaming `library/05_GraphRAG_and_MCP.md` flags graphrag/mcp as `missing`, restoring returns them to `validated` (TS-009); 37/37 Pester tests pass; report artifacts generated per FR-007; CI workflow triggers on findings/library paths (FR-008); ReportOnly on-demand mode verified (FR-006).

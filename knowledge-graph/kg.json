@@ -35,7 +35,12 @@
     { "id": "TOOL-Dependabot", "type": "Dependabot Alert", "label": "Dependency scanning" },
     { "id": "TOOL-NDepend", "type": "NDepend Rule", "label": "Dependency analysis" },
     { "id": "TOOL-OTel", "type": "Trace Span", "label": "OpenTelemetry" },
-    { "id": "CAT-Backstage", "type": "Catalog Entity", "label": "Backstage catalog" }
+    { "id": "CAT-Backstage", "type": "Catalog Entity", "label": "Backstage catalog" },
+    { "id": "SPEC-0001-AIENV", "type": "Requirement", "label": "AI Environment Validation", "status": "Approved" },
+    { "id": "ADR-0002", "type": "ADR", "label": "AI Environment Validation Gate Architecture", "status": "Accepted" },
+    { "id": "TOOL-Validation", "type": "Job", "label": "validate-ai-environment.ps1 (12-integration gate)" },
+    { "id": "ART-Report", "type": "Page", "label": "reports/ai-environment-validation/report.md" },
+    { "id": "ART-Summary", "type": "API", "label": "reports/ai-environment-validation/summary.json (schema v1)" }
   ],
   "edges": [
     { "from": "SPEC-0001", "to": "ADR-0001", "type": "references" },
@@ -69,6 +74,15 @@
     { "from": "MOD-006", "to": "TOOL-Dependabot", "type": "validates" },
     { "from": "ADR-0001", "to": "TOOL-NDepend", "type": "validates" },
     { "from": "MOD-001", "to": "TOOL-OTel", "type": "calls" },
-    { "from": "ADR-0001", "to": "CAT-Backstage", "type": "references" }
+    { "from": "ADR-0001", "to": "CAT-Backstage", "type": "references" },
+    { "from": "SPEC-0001-AIENV", "to": "ADR-0002", "type": "references" },
+    { "from": "SPEC-0001-AIENV", "to": "TOOL-Validation", "type": "implements" },
+    { "from": "SPEC-0001-AIENV", "to": "ART-Report", "type": "generates" },
+    { "from": "SPEC-0001-AIENV", "to": "ART-Summary", "type": "generates" },
+    { "from": "TOOL-Validation", "to": "TOOL-CodeQL", "type": "validates" },
+    { "from": "TOOL-Validation", "to": "TOOL-Dependabot", "type": "validates" },
+    { "from": "TOOL-Validation", "to": "TOOL-NDepend", "type": "validates" },
+    { "from": "TOOL-Validation", "to": "TOOL-OTel", "type": "validates" },
+    { "from": "TOOL-Validation", "to": "CAT-Backstage", "type": "validates" }
   ]
 }
