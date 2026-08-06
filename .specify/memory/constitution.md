@@ -1,11 +1,8 @@
 <!--
 Sync Impact Report:
-- Version change: 0.0.0 (template) → 1.0.0 (initial ratification)
-- Principles added: 5 (I. Specification-First, II. Legacy as Source of Truth,
-  III. Data Preservation & Integrity, IV. Traceability & Governance,
-  V. Quality, Delivery & No-Assumption Rule)
-- Sections added: Engineering Process & Security Standards,
-  Definition of Done & Fixed Execution Order
+- Version change: 1.0.0 → 1.1.0
+- Principles modified: IV. Traceability & Governance (added ADR/KG artifact locations)
+- Sections added: Specs Layout Reconciliation (ADR-0001)
 - Removed sections: none
 - Deferred TODOs: none
 -->
@@ -37,6 +34,8 @@ Everything must be traceable: each requirement maps to an architecture
 component, domain model, database object, API endpoint, UI page, test case,
 documentation, and migration step. The Knowledge Graph must be updated after
 every completed task. Every architectural decision requires an ADR (ADR-XXXX).
+ADRs are stored under `/adr` as `ADR-XXXX.md`; the Knowledge Graph is
+materialized under `/knowledge-graph` (kg.json + traceability-matrix.md).
 
 ### V. Quality, Delivery & No-Assumption Rule
 Every implementation must have automated tests. Every change must update
@@ -51,6 +50,17 @@ Identity. Solution name is **VisaFusion**. GitHub is the single source of
 truth. Security by default: no plaintext passwords, no query-string identity,
 no string-concatenated SQL, no anonymous write endpoints, and the legacy
 `connection.asp` backdoor must be removed.
+
+## Specs Layout Reconciliation
+
+Per ADR-0001, feature specifications produced by `/speckit.specify` use the
+SpecKit-native flat layout `specs/NNN-<short-name>/spec.md` (required for
+tooling resolution via `.specify/feature.json`). The category folders
+(`epics`, `features`, `modules`, `database`, `api`, `ui`, `security`,
+`migration`, `testing`) remain for organizational and cross-cutting
+specifications. Every feature spec embeds its `SPEC-XXXX` identifier in
+section 1 and declares a `Category` field. This supersedes the earlier
+category-subfolder-only reading of `library/03 §3`.
 
 ## Definition of Done & Fixed Execution Order
 
@@ -72,4 +82,4 @@ changes, MINOR for new principles or materially expanded guidance, PATCH for
 clarifications and non-semantic refinements. Every PR and review must verify
 compliance with this constitution.
 
-**Version**: 1.0.0 | **Ratified**: 2026-08-06 | **Last Amended**: 2026-08-06
+**Version**: 1.1.0 | **Ratified**: 2026-08-06 | **Last Amended**: 2026-08-06

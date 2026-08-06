@@ -50,7 +50,8 @@ Implementation must stop if a specification is missing or unapproved.
 
 ``` text
 /specs
-  /epics
+  /NNN-short-name        # feature specs produced by /speckit.specify (spec.md)
+  /epics                 # organizational and cross-cutting specifications
   /features
   /modules
   /database
@@ -60,6 +61,14 @@ Implementation must stop if a specification is missing or unapproved.
   /migration
   /testing
 ```
+
+Layout reconciliation (ADR-0001): feature specifications produced by
+`/speckit.specify` use the SpecKit-native flat layout `specs/NNN-<short-name>/spec.md`
+(required for tooling resolution via `.specify/feature.json` and the sequential numbering
+scheme). The category folders remain for organizational and cross-cutting specifications.
+Every feature spec embeds its `SPEC-XXXX` identifier in section 1 and declares a
+`Category` field mapping to one of the category folders, preserving traceability.
+ADRs live under `/adr` as `ADR-XXXX.md`.
 
 ------------------------------------------------------------------------
 

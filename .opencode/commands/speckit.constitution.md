@@ -42,9 +42,13 @@ VisaFusion
    `/specs/testing`.
 2. For every work item, before writing any code:
    - Produce a SpecKit specification with the 24 required sections
-     (`@library/03_SpecKit_SDD_Framework.md` §4), saving it under the matching
-     `/specs` subfolder with identifier `SPEC-XXXX`.
-   - Create an ADR (`ADR-XXXX`) for every architectural decision.
+     (`@library/03_SpecKit_SDD_Framework.md` §4) using the VisaFusion
+     spec-template override (`.specify/templates/overrides/spec-template.md`).
+   - Feature specs are created by `/speckit.specify` under the SpecKit-native
+     layout `specs/NNN-<short-name>/spec.md` (per ADR-0001); each spec embeds
+     its identifier `SPEC-XXXX` in section 1 and declares a `Category` field.
+   - Create an ADR (`ADR-XXXX`) for every architectural decision, stored under
+     `/adr`.
    - Map the work item to the legacy pages in the repository root.
 3. After every completed task: update the Knowledge Graph
    (`@library/04_AI_Native_Knowledge_Graph.md`), tests, and documentation.
