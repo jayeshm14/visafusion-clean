@@ -78,6 +78,12 @@ Typical engineering commands:
 -   Produce API contracts
 -   Generate regression tests
 -   Build release notes
+-   Run Event Storming for a bounded context
+-   Register service in the Backstage catalog
+-   Review CodeQL findings
+-   Review Dependabot alerts
+-   Validate NDepend dependency rules
+-   Verify OpenTelemetry instrumentation
 
 Commands are deterministic and require explicit inputs.
 
@@ -105,6 +111,9 @@ All generated artifacts shall:
 -   Include authorship metadata
 -   Include revision history
 -   Maintain consistent naming
+
+Documentation follows Docs-as-Code: versioned in the repository,
+reviewed through pull requests, and validated in CI.
 
 ------------------------------------------------------------------------
 

@@ -68,6 +68,29 @@ Rules:
 
 Each context owns its data and business rules.
 
+## Event Storming
+
+Use Event Storming as the deterministic discovery and design practice
+for each bounded context before implementation.
+
+Process:
+
+1.  Identify domain events (past tense, e.g. "Application Submitted").
+2.  Identify commands that trigger events.
+3.  Identify aggregates and aggregate roots that handle commands.
+4.  Identify external systems, policies, and read models.
+5.  Identify bounded contexts and their boundaries.
+6.  Record the output as a versioned design artifact.
+
+Rules:
+
+-   Event Storming precedes specification for new or ambiguous contexts.
+-   Every discovered domain event maps to a Knowledge Graph node.
+-   Ambiguity discovered during Event Storming produces a Gap Report, not
+    a guess.
+-   Outputs are version controlled and linked to the resulting
+    specification.
+
 ------------------------------------------------------------------------
 
 # 4. C4 Model
@@ -168,6 +191,8 @@ Before merge verify:
 -   ADR updates
 -   C4 diagrams updated
 -   Specification traceability intact
+-   NDepend dependency analysis passes (no forbidden dependency edges,
+    no cyclic dependencies, architecture rules enforced)
 
 ------------------------------------------------------------------------
 

@@ -73,9 +73,14 @@ automation.
 ## Documentation Agent
 
 Synchronizes specifications, architecture, ADRs, release notes, and user
-documentation.
+documentation. Documentation is maintained as code (Docs-as-Code) and
+published from the repository.
 
-------------------------------------------------------------------------
+## Service Discovery
+
+Agents discover services, ownership, and dependencies through the
+Backstage software catalog before making changes. The catalog is
+maintained as code and reflects the Knowledge Graph.------------------------------------------------------------------------
 
 # 4. Shared Context
 

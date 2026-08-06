@@ -63,6 +63,8 @@ Implement:
 -   Health checks
 -   Audit logs
 
+Use **OpenTelemetry** as the standard instrumentation layer for
+distributed tracing, metrics, and log correlation across services.
 Operational telemetry should support troubleshooting without exposing
 sensitive data.
 
@@ -89,8 +91,9 @@ Security is integrated into every pipeline stage.
 
 Minimum controls:
 
--   Static code analysis
--   Dependency scanning
+-   Static code analysis (CodeQL in the CI pipeline)
+-   Dependency scanning (Dependabot for automated vulnerability
+    updates)
 -   Secret scanning
 -   Container scanning (if applicable)
 -   Security review before release

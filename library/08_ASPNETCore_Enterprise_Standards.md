@@ -118,6 +118,7 @@ Never duplicate validation logic.
 -   Health checks
 -   Exception middleware
 -   Audit logging for business actions
+-   OpenTelemetry instrumentation for distributed tracing and metrics
 
 ------------------------------------------------------------------------
 
@@ -164,6 +165,21 @@ A feature is complete only when: - Architecture unchanged or updated
 intentionally - Specifications implemented - APIs documented - Tests
 passing - Security reviewed - Logging added - Documentation updated -
 Traceability maintained
+
+# 13. Developer Portal & Software Catalog
+
+Maintain a **Backstage** software catalog as the developer portal for
+the VisaFusion platform.
+
+-   Every service, API, and component is registered as a catalog entity.
+-   Each entity records ownership, metadata, dependencies, and
+    documentation links.
+-   The catalog is defined as code (catalog-info.yaml) and version
+    controlled.
+-   The catalog reflects the Knowledge Graph and architecture documents
+    as the single source of truth.
+-   AI agents and engineers discover services and their ownership
+    through the catalog before making changes.
 
 This document establishes deterministic ASP.NET Core engineering
 standards for VisaFusion.

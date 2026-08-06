@@ -17,7 +17,8 @@ authoritative semantic model for VisaFusion.
 Requirement, Epic, Feature, Module, Page, API, Domain Entity, DTO,
 Service, Repository, Table, Column, View, Stored Procedure, Function,
 Job, Event, Business Rule, Validation Rule, Permission, Test Case, ADR,
-Risk.
+Risk, Catalog Entity (Backstage), Trace Span (OpenTelemetry), CodeQL
+Finding, Dependabot Alert, NDepend Rule.
 
 ## Core Relationships
 
