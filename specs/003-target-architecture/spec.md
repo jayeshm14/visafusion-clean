@@ -141,6 +141,14 @@ module surface.
 - **NFR-005**: The solution MUST target .NET 8 (LTS) (clarified 2026-08-06).
 - **NFR-006**: The solution MUST provide structured logging (Serilog) to file and SQL, plus
   OpenTelemetry tracing and metrics (clarified 2026-08-06).
+- **NFR-007**: When the `VisaEntry` database is unreachable at startup or during a request,
+  the solution MUST fail fast with a clear, logged error (no silent fallback, no
+  swallowed exceptions); Web UI and Api return a standardized 500 response (added
+  2026-08-07, checklist CHK033).
+- **NFR-008**: Scalability limits (horizontal/vertical) are explicitly deferred: this
+  feature establishes a single-process monolith host; scaling strategy is decided in a
+  later feature once module load characteristics are known (added 2026-08-07, checklist
+  CHK040).
 
 ## 12. Security
 
@@ -194,6 +202,10 @@ module surface.
 
 - Standardized error handling for both Web and Api entry points.
 - No swallowed exceptions (`on error resume next` behavior is not carried forward).
+- Recovery/rollback: startup and migration failures MUST fail fast with a clear, logged
+  error and a non-zero exit; no partial-start state is left running. This feature performs
+  no schema changes, so no data rollback is required here — rollback/recovery for schema
+  changes is owned by the Data Remediation feature (added 2026-08-07, checklist CHK029).
 
 ## 19. Audit Requirements
 
@@ -253,6 +265,8 @@ module surface.
 | FR-008      | §2           | Jobs    | —        | —   | —   | TS-002 | —         |
 | FR-009      | —            | —       | —        | —   | —   | TS-001 | —         |
 | FR-010      | §2, §12      | Identity| —        | Api | Web | TS-002 | §7        |
+| NFR-007     | §18          | —       | VisaEntry | Api | Web | TS-002 | —         |
+| NFR-008     | §13          | —       | —        | —   | —   | —      | —         |
 
 ## Assumptions
 

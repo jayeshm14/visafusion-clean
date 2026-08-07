@@ -1,0 +1,18 @@
+<Project>
+
+  <!--
+    VisaFusion solution-wide cross-cutting constants (SPEC-0003 T017).
+    Consumed by the single Web host (Serilog schema, OpenTelemetry service name)
+    and by all projects for assembly metadata. Applied after project evaluation.
+  -->
+
+  <PropertyGroup>
+    <!-- OpenTelemetry service name (NFR-006) -->
+    <VisaFusionOtelServiceName>VisaFusion.Web</VisaFusionOtelServiceName>
+    <!-- Serilog SQL sink table name (NFR-006) -->
+    <VisaFusionSerilogSqlTable>Logs</VisaFusionSerilogSqlTable>
+    <!-- Serilog file sink path (NFR-006) -->
+    <VisaFusionSerilogFile>logs/visafusion-.log</VisaFusionSerilogFile>
+  </PropertyGroup>
+
+</Project>

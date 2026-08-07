@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\VisaFusion.Core\VisaFusion.Core.csproj" />
+    <ProjectReference Include="..\VisaFusion.Data\VisaFusion.Data.csproj" />
+    <ProjectReference Include="..\VisaFusion.Identity\VisaFusion.Identity.csproj" />
+  </ItemGroup>
+
+  <!--
+    VisaFusion.Api is a class library (no own Program.cs, FR-002) but hosts
+    ASP.NET Core controllers. The ASP.NET Core shared framework is referenced
+    via FrameworkReference (no online NuGet dependency).
+  -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
