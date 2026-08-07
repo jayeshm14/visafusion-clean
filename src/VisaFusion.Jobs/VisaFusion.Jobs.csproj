@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <!--
+    Microsoft.Extensions.Hosting is provided by the ASP.NET Core shared framework
+    (FrameworkReference) instead of a NuGet PackageReference because the build
+    environment has no online NuGet source (SPEC-0003 T007).
+  -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VisaFusion.Core\VisaFusion.Core.csproj" />
+    <ProjectReference Include="..\VisaFusion.Data\VisaFusion.Data.csproj" />
+  </ItemGroup>
+</Project>

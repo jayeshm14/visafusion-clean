@@ -54,11 +54,51 @@ Invoke-Pester ./tests/ai-environment-validation/validate-ai-environment.Tests.ps
 change to `findings/**` or `library/**` and blocks merge on failure.
 
 See `specs/001-ai-environment-validation/quickstart.md` for the full guide.
+- `library/03_SpecKit_SDD_Framework.md` — Specification-Driven Development
+- `library/12_VisaFusion_Legacy_Modernization_Playbook.md` — migration methodology
+- `library/complete_migration_plan.md` — overall migration plan
+
+## VisaFusion Solution (SPEC-0003 Target Architecture)
+
+The ASP.NET Core solution lives under `src/` (six projects) with tests under
+`tests/`. See `specs/003-target-architecture/` for the full specification,
+plan, contracts, and task list.
+
 
 ## Documentation Index
 
 - `library/01_System_Role_and_Principles.md` — mission, principles, Definition of Done
 - `library/02_OpenCode_Operating_System.md` — fixed execution order
-- `library/03_SpecKit_SDD_Framework.md` — Specification-Driven Development
-- `library/12_VisaFusion_Legacy_Modernization_Playbook.md` — migration methodology
-- `library/complete_migration_plan.md` — overall migration plan
+| Project | Purpose |
+|---------|---------|
+| `src/VisaFusion.Web` | Single host (FR-002): Razor Pages UI + `/api/v1` controllers; Serilog + OpenTelemetry (NFR-006) |
+| `src/VisaFusion.Api` | `/api/v1` controllers (class library; no own `Program.cs`) |
+| `src/VisaFusion.Core` | Domain + Application layers (business rules, shared by Web and Api) |
+| `src/VisaFusion.Data` | EF Core DbContext, entity configurations, migrations |
+| `src/VisaFusion.Identity` | ASP.NET Core Identity stores mapping to legacy `Udaan_users`/`agents`/`registration` |
+| `src/VisaFusion.Jobs` | Background worker: SMS queue, email queue, scheduled reports |
+
+### Secrets (NFR-004) — never commit secrets
+
+Connection strings and SMS/SMTP credentials are configuration, not source code.
+`appsettings.json` and `appsettings.Development.json` contain placeholders only.
+
+For local development, store real values with **User Secrets**:
+
+```powershell
+cd src/VisaFusion.Web
+dotnet user-secrets init
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=...;Database=VisaFusion;Trusted_Connection=True;TrustServerCertificate=True"
+dotnet user-secrets set "Sms:ApiKey" "..."      # if applicable
+dotnet user-secrets set "Smtp:Password" "..."   # if applicable
+```
+
+Machine-local `appsettings.*.local.json` files are git-ignored
+(see `.gitignore`). In CI/cloud, use Key Vault or environment variables.
+
+### Build and test
+
+```powershell
+dotnet build VisaFusion.sln
+dotnet test VisaFusion.sln
+```

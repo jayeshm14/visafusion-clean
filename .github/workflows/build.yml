@@ -1,0 +1,30 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build VisaFusion.sln
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8 (LTS)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore VisaFusion.sln
+
+      - name: Build (warnings as errors)
+        run: dotnet build VisaFusion.sln --no-restore -c Release
+
+      - name: Test
+        run: dotnet test VisaFusion.sln --no-build -c Release

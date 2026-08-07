@@ -29,3 +29,39 @@ obj/
 *.log
 *.tmp
 temp/
+
+# ---- ASP.NET Core / .NET build artifacts (SPEC-0003 T010) ----
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+*.nupkg
+*.snupkg
+*.dll
+*.exe
+*.pdb
+*.cache
+TestResults/
+coverage/
+
+# ---- Secrets - NEVER commit ----
+# Machine-local overrides only; committed appsettings.json / appsettings.Development.json
+# contain placeholders (NFR-004, SPEC-0003 T014).
+appsettings.*.local.json
+secrets.json
+*.pfx
+
+# ---- User Secrets (dotnet user-secrets) ----
+# The .NET User Secrets ID is stored in the csproj; actual secrets live in
+# %APPDATA%\Microsoft\UserSecrets\<user-secrets-id>\ on the developer machine.
+
+# ---- Artifacts / publish output ----
+artifacts/
+publish/
+dist/
+build/
+
+# ---- Database backups (never commit) ----
+dbBackup/
+*.bak

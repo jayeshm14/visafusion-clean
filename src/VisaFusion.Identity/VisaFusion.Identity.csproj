@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\VisaFusion.Data\VisaFusion.Data.csproj" />
+  </ItemGroup>
+
+  <!--
+    ASP.NET Core Identity (Microsoft.AspNetCore.Identity) is provided by the
+    ASP.NET Core shared framework via FrameworkReference (T050). The
+    Microsoft.Extensions.Identity.Stores package supplies the store abstractions.
+  -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.20" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
