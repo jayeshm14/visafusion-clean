@@ -54,11 +54,6 @@ Invoke-Pester ./tests/ai-environment-validation/validate-ai-environment.Tests.ps
 change to `findings/**` or `library/**` and blocks merge on failure.
 
 See `specs/001-ai-environment-validation/quickstart.md` for the full guide.
-
-## Documentation Index
-
-- `library/01_System_Role_and_Principles.md` — mission, principles, Definition of Done
-- `library/02_OpenCode_Operating_System.md` — fixed execution order
 - `library/03_SpecKit_SDD_Framework.md` — Specification-Driven Development
 - `library/12_VisaFusion_Legacy_Modernization_Playbook.md` — migration methodology
 - `library/complete_migration_plan.md` — overall migration plan
@@ -69,6 +64,11 @@ The ASP.NET Core solution lives under `src/` (six projects) with tests under
 `tests/`. See `specs/003-target-architecture/` for the full specification,
 plan, contracts, and task list.
 
+
+## Documentation Index
+
+- `library/01_System_Role_and_Principles.md` — mission, principles, Definition of Done
+- `library/02_OpenCode_Operating_System.md` — fixed execution order
 | Project | Purpose |
 |---------|---------|
 | `src/VisaFusion.Web` | Single host (FR-002): Razor Pages UI + `/api/v1` controllers; Serilog + OpenTelemetry (NFR-006) |
