@@ -10,6 +10,7 @@ using OpenTelemetry.Trace;
 using Serilog;
 using VisaFusion.Api;
 using VisaFusion.Api.Endpoints;
+using VisaFusion.Api.Errors;
 using VisaFusion.Core;
 using VisaFusion.Core.Application;
 using VisaFusion.Data.Persistence;
@@ -70,6 +71,14 @@ public partial class Program
         var jwtIssuer = builder.Configuration["Jwt:Issuer"]!;
         var jwtAudience = builder.Configuration["Jwt:Audience"]!;
         var jwtKey = builder.Configuration["Jwt:Key"]!;
+
+        // Fail fast in Production with placeholder/dev-only configuration
+        // (T075, MD-3, NFR-004): never run a production host with the committed
+        // development JWT key or a localhost/Trusted_Connection connection string.
+        ProductionSecretsGuard.Validate(
+            builder.Environment.EnvironmentName,
+            jwtKey,
+            builder.Configuration.GetConnectionString("DefaultConnection") ?? string.Empty);
         builder.Services
             .AddAuthentication()
             .AddJwtBearer(options =>
@@ -86,8 +95,10 @@ public partial class Program
                     ClockSkew = TimeSpan.FromMinutes(1),
                 };
 
-                // Standardized problem-details JSON for 401 (T042,
-                // contracts/api-v1-scaffolding.md "Error Format").
+                // Standardized problem-details JSON for 401 (T042, T073,
+                // contracts/api-v1-scaffolding.md "Error Format"). The shared
+                // factory (VisaFusion.Api.Errors.ApiError) is the single source
+                // of truth for the /api/v1 error shape.
                 options.Events = new JwtBearerEvents
                 {
                     OnChallenge = async context =>
@@ -95,13 +106,8 @@ public partial class Program
                         context.HandleResponse();
                         context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                         context.Response.ContentType = "application/problem+json";
-                        var payload = System.Text.Json.JsonSerializer.Serialize(new
-                        {
-                            type = "https://tools.ietf.org/html/rfc9110#section-15.6.1",
-                            title = "Unauthorized",
-                            status = 401,
-                            traceId = context.HttpContext.TraceIdentifier,
-                        });
+                        var payload = System.Text.Json.JsonSerializer.Serialize(
+                            ApiError.Create(StatusCodes.Status401Unauthorized, "Unauthorized", context.HttpContext));
                         await context.Response.WriteAsync(payload);
                     },
                 };
@@ -144,9 +150,10 @@ public partial class Program
         app.MapControllers();
 
         // ---- /api/v1 versioned surface (T046, FR-004) ----
-        // Health is unauthenticated (contracts/api-v1-scaffolding.md §1).
-        app.MapGet("/api/v1/health", (HttpContext ctx, IWebHostEnvironment env) =>
-            HealthEndpoint.Handle(ctx, env));
+        // Health is unauthenticated (contracts/api-v1-scaffolding.md §1). The
+        // version is resolved from the shared Core surface (T074, MD-2).
+        app.MapGet("/api/v1/health", (HttpContext ctx, IWebHostEnvironment env, ISharedRuleService sharedRuleService) =>
+            HealthEndpoint.Handle(ctx, env, sharedRuleService));
 
         // Representative endpoints per area (T045, FR-004). Authorized per the
         // migration plan §4.2 role matrix (T047). The employee endpoint invokes
@@ -195,6 +202,11 @@ public partial class Program
 
         // Public area is anonymous-allowed by design (migration plan §4.2).
         app.MapGet("/api/v1/public", (HttpContext ctx) => RepresentativeEndpoint.Handle(ctx));
+
+        // Auth area is anonymous-allowed by design (T070, HG-1): the legacy Auth
+        // module is the anonymous login/registration entry point, so requiring a
+        // token to reach the auth representative contradicts its purpose.
+        app.MapGet("/api/v1/auth", (HttpContext ctx) => AuthEndpoint.Handle(ctx));
 
         app.Run();
     }
