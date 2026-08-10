@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\VisaFusion.Data\VisaFusion.Data.csproj" />
+    <ProjectReference Include="..\..\src\VisaFusion.Migration\VisaFusion.Migration.csproj" />
   </ItemGroup>
 
 </Project>

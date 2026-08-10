@@ -46,6 +46,37 @@ files as `@library/...`. The `findings/` folder is registered as the
   features.** Where behavior is ambiguous or the data is inconsistent, stop and
   produce a gap report instead of guessing.
 
+## Context economy (hard budget: 200K tokens)
+
+`deepseek-v4-flash-free` is capped at 200K context regardless of the model's
+native window. On a 585-file legacy app that budget is the binding constraint,
+not code quality — waste it on exploratory reads and there's nothing left for
+the actual implementation stage. Treat every read as a spend decision.
+
+- **Codegraph before grep, grep before read.** Never open a full legacy `.asp`
+  file to answer a dependency question — use codegraph's `callers`/`impact`/
+  `search` first. Fall back to `grep` for a targeted pattern only if codegraph
+  has no index for that file. Only `read` a full file when you are about to
+  edit it or codegraph and grep both came up empty.
+- **Never re-read within a session.** Before opening any file, check whether
+  you already read it this session and whether anything has modified it since.
+  If neither, don't re-open it — cite what you already have.
+- **Quote, don't paste.** When citing `@library/...` or `@findings/...`, quote
+  only the specific rule/row/paragraph the task needs. Never paste a full
+  section or file into the conversation.
+- **One `@library` doc per decision.** Don't open all 15 library docs
+  "to be safe" — open the 1–2 that the current stage of
+  `02_OpenCode_Operating_System.md`'s execution order actually calls for.
+- **Batch edits.** Multiple changes to the same file go in one `edit` call,
+  not several sequential ones.
+- **No repo-wide sweeps when the target is already named.** If a
+  `@findings` doc already names the exact legacy file/table/proc, go straight
+  to it — don't `glob`/`grep` the whole repo first.
+- **If context pressure is high mid-session**, finish and checkpoint the
+  current work item rather than continuing to accumulate reads — a fresh
+  session with a clean 200K budget beats a compacted one with degraded recall
+  of earlier decisions.
+
 ## Deterministic rules (from library/01)
 
 - Never guess, never invent requirements, never delete production data.
@@ -57,6 +88,9 @@ files as `@library/...`. The `findings/` folder is registered as the
   `connection.asp` backdoor).
 - Solution name: **VisaFusion**. Stack: ASP.NET Core, EF Core, SQL Server,
   ASP.NET Core Identity. GitHub as single source of truth.
+- Cite plan/finding sections verbatim (e.g. "@findings/deepanalysis.md §4.5.9")
+  rather than paraphrasing a number from memory — but don't re-open a doc you
+  already cited correctly earlier this session just to re-confirm it.
 
 ## Definition of Done (all must hold)
 
@@ -77,3 +111,9 @@ notes.
   clarification.
 - When starting a new module, first map it to the legacy pages in the
   repository root, then produce the specification before writing code.
+- No "I will now..." preambles; no restating the task before doing it. After
+  writing a file, state its path and a one-line summary rather than repeating
+  its contents in chat.
+- On failure or a blocked stage, state what's blocked and why in one line,
+  then stop — don't retry the same failing approach twice without new
+  information.
