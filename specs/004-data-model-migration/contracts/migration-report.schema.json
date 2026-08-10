@@ -1,0 +1,224 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://visafusion.local/schemas/migration-report.schema.json",
+  "title": "VisaFusion Migration Report",
+  "description": "Machine-readable migration report produced by the VisaFusion data model migration (SPEC-0004 FR-007, NFR-005). One report per migration run; append-only log retained for audit (spec §19).",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "runId",
+    "startedAt",
+    "completedAt",
+    "operator",
+    "sourceDatabase",
+    "targetDatabase",
+    "offlineWindow",
+    "tables",
+    "identity",
+    "cleansing",
+    "validation",
+    "discrepancies"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "runId": {
+      "type": "string",
+      "description": "Unique id of this migration run (e.g., GUID)."
+    },
+    "startedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "operator": {
+      "type": "string",
+      "description": "Identity of the operator who ran the migration (spec §19)."
+    },
+    "sourceDatabase": {
+      "type": "string",
+      "const": "VisaEntry"
+    },
+    "targetDatabase": {
+      "type": "string",
+      "const": "VisaFusion"
+    },
+    "offlineWindow": {
+      "type": "object",
+      "required": ["legacyAppStopped", "windowStart", "windowEnd"],
+      "properties": {
+        "legacyAppStopped": {
+          "type": "boolean",
+          "const": true,
+          "description": "Offline migration: legacy app stopped for the window (NFR-002)."
+        },
+        "windowStart": { "type": "string", "format": "date-time" },
+        "windowEnd": { "type": "string", "format": "date-time" }
+      }
+    },
+    "tables": {
+      "type": "array",
+      "description": "One entry per legacy table (all 52 accounted for, AC-001).",
+      "items": {
+        "type": "object",
+        "required": [
+          "legacyTable",
+          "disposition",
+          "targetEntity",
+          "sourceRowCount",
+          "targetRowCount",
+          "checksumMatch",
+          "cleansingApplied",
+          "status"
+        ],
+        "properties": {
+          "legacyTable": { "type": "string" },
+          "disposition": {
+            "type": "string",
+            "enum": ["M", "M-RO", "COND", "ARCH", "DROP"]
+          },
+          "targetEntity": { "type": ["string", "null"] },
+          "sourceRowCount": { "type": "integer", "minimum": 0 },
+          "targetRowCount": { "type": "integer", "minimum": 0 },
+          "checksum": {
+            "type": ["string", "null"],
+            "description": "Checksum of migrated data (null for DROP/ARCH tables)."
+          },
+          "cleaningApplied": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Cleansing rule ids applied to this table (FR-005 a-d)."
+          },
+          "status": {
+            "type": "string",
+            "enum": ["migrated", "archived", "dropped", "cond-pending", "error"]
+          },
+          "error": {
+            "type": ["string", "null"],
+            "description": "Error detail when status is 'error' (spec §18)."
+          }
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "required": ["imported", "skippedDuplicates", "plaintextRemaining"],
+      "properties": {
+        "imported": {
+          "type": "object",
+          "properties": {
+            "agents": { "type": "integer", "minimum": 0 },
+            "registration": { "type": "integer", "minimum": 0 },
+            "udaanUsers": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "skippedDuplicates": {
+          "type": "array",
+          "description": "Duplicate username/email records skipped by first-source-wins (FR-004).",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": { "type": "string", "enum": ["agents", "registration", "Udaan_users"] },
+              "username": { "type": "string" },
+              "email": { "type": "string" }
+            }
+          }
+        },
+        "plaintextRemaining": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Must be 0 (AC-004)."
+        }
+      }
+    },
+    "cleansing": {
+      "type": "array",
+      "description": "Approved cleansing actions applied, each with recorded sign-off (BR-005).",
+      "items": {
+        "type": "object",
+        "required": ["rule", "table", "action", "rowsAffected", "signoff"],
+        "properties": {
+          "rule": { "type": "string", "enum": ["a", "b", "c", "d", "e"] },
+          "table": { "type": "string" },
+          "action": { "type": "string" },
+          "rowsAffected": { "type": "integer", "minimum": 0 },
+          "signoff": {
+            "type": "object",
+            "required": ["by", "approver", "date"],
+            "properties": {
+              "by": { "type": "string", "description": "Operator who ran the step (spec §19)." },
+              "approver": { "type": "string", "description": "Business approver of the cleansing rule (FR-005)." },
+              "date": { "type": "string", "format": "date" }
+            }
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["tablesMigrated", "rowsMigrated", "tablesArchived", "tablesDropped", "errors"],
+      "properties": {
+        "tablesMigrated": { "type": "integer", "minimum": 0 },
+        "rowsMigrated": { "type": "integer", "minimum": 0 },
+        "tablesArchived": { "type": "integer", "minimum": 0 },
+        "tablesDropped": { "type": "integer", "minimum": 0 },
+        "errors": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "description": "Outcome of the validate step (FR-009).",
+      "required": [
+        "passed",
+        "validatedAtUtc",
+        "tablesCompared",
+        "tablesWithCountMismatch",
+        "tablesWithChecksumMismatch",
+        "integrityViolations"
+      ],
+      "properties": {
+        "passed": { "type": "boolean" },
+        "validatedAtUtc": { "type": "string", "format": "date-time" },
+        "tablesCompared": { "type": "integer", "minimum": 0 },
+        "tablesWithCountMismatch": { "type": "integer", "minimum": 0 },
+        "tablesWithChecksumMismatch": { "type": "integer", "minimum": 0 },
+        "integrityViolations": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "deferredForeignKeys": {
+      "type": "array",
+      "description": "GAP-0001 relationships recorded as DEFER: column + index kept, FK constraint omitted, reason documented (data-model.md §4).",
+      "items": {
+        "type": "object",
+        "required": ["childTable", "childColumn", "parentTable", "reason"],
+        "properties": {
+          "childTable": { "type": "string" },
+          "childColumn": { "type": "string" },
+          "parentTable": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "discrepancies": {
+      "type": "array",
+      "description": "Source-vs-target discrepancies reported, never silently corrected (spec §18).",
+      "items": {
+        "type": "object",
+        "required": ["table", "kind", "detail"],
+        "properties": {
+          "table": { "type": "string" },
+          "kind": {
+            "type": "string",
+            "enum": ["row-count", "checksum", "referential-integrity", "other"]
+          },
+          "detail": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using VisaFusion.Api.Errors;
 
 namespace VisaFusion.Web.Middleware;
 
@@ -62,13 +63,9 @@ public sealed class ExceptionHandlingMiddleware
         context.Response.StatusCode = statusCode;
         context.Response.ContentType = "application/problem+json";
 
-        var problem = new
-        {
-            type = "https://tools.ietf.org/html/rfc9110#section-15.6.1",
-            title,
-            status = statusCode,
-            traceId,
-        };
+        // Standardized problem-details factory (T016, T073): single source of
+        // truth for the /api/v1 error shape (contracts/api-v1-scaffolding.md).
+        var problem = ApiError.Create(statusCode, title, context);
 
         await context.Response.WriteAsync(JsonSerializer.Serialize(problem, JsonOptions));
     }

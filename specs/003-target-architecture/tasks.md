@@ -194,6 +194,43 @@ description: "Task list template for feature implementation"
 
 ---
 
+## Phase 9: Convergence (appended 2026-08-07 by /speckit.converge)
+
+**Purpose**: Close the gaps found during the convergence assessment. F1 (missing `auth`
+representative endpoint) is a HIGH-severity FR-004/AC-002 requirement; F2–F7 are the
+unfinished Phase 8 Polish items. Ordered CRITICAL/HIGH first. This phase is append-only;
+Phases 1–8 and their completed tasks are unchanged.
+
+- [ ] T063 [P] [HIGH] Add the missing `/api/v1/auth` representative endpoint in `src/VisaFusion.Web/Program.cs` (FR-004, T045, contracts/api-v1-scaffolding.md §2). The eight areas are `public, auth, employee, agent, admin, billing, reporting, notifications`; the implementation maps 7 of 8 — `auth` is omitted. Route it anonymous-allowed (mirrors `/api/v1/public`): the legacy Auth module (`authenticate.asp`, `logon.asp`, `regsub*.asp`, migration plan §5 `AuthController`) is the anonymous login/registration entry point — requiring a token to reach the auth representative contradicts the module's purpose. Return the standard stub `{ items: [], count: 0 }` via `RepresentativeEndpoint.Handle(ctx)`.
+- [ ] T064 [P] [MEDIUM] Extend `tests/FunctionalTests/ApiSurfaceTests.cs` (or add `AuthAreaEndpointTests.cs`) asserting `GET /api/v1/auth` returns 200 with `count: 0` without a bearer token (mirroring the existing `/api/v1/public` test), proving the eighth area endpoint resolves (FR-004, AC-002)
+- [ ] T065 [P] [MEDIUM] Run `specs/003-target-architecture/quickstart.md` end-to-end (TS-001..TS-005) and record PASS/FAIL results for each scenario in the quickstart (T058); include the new `/api/v1/auth` check in TS-002
+- [ ] T066 [P] [MEDIUM] Update `knowledge-graph/kg.json` and `knowledge-graph/traceability-matrix.md` with SPEC-0003 nodes/edges (project structure, hosting decision, `/api/v1` surface, shared-Core rule, JWT/cookie auth, Jobs workers) per constitution Principle IV (T059)
+- [ ] T067 [P] [MEDIUM] Add `adr/ADR-0003.md` documenting the SPEC-0003 implementation decisions: JWT bearer for Api vs cookie for Web UI (FR-010), Serilog (file + SQL) + OpenTelemetry observability (NFR-006), single-host resolution (FR-002), `/api/v1` route-prefix versioning (T046); reference ADR-0001 (T060)
+- [ ] T068 [P] [LOW] Record T055/T056/T057 scan results (already verified: zero matches for `pwd=|password=|uid=sa|sa123`, string-concatenated SQL, and backdoor parameters in `src/`/`tests/`) and mark them `[x]`; mark spec status `Approved` in `specs/003-target-architecture/spec.md` (T061; checklists are already fully `[x]`)
+- [ ] T069 [MEDIUM] Final validation: `dotnet build VisaFusion.sln` + `dotnet test VisaFusion.sln` pass with 31+ tests green; commit the convergence increment (T063–T068) with a clean working tree (T062)
+
+---
+
+## Phase 10: Code Review Fixes (appended 2026-08-09 by deep code review)
+
+**Purpose**: Resolve the severity-ranked findings in `review-003.md` (CR-1, CR-2, HG-1,
+HG-2, MD-1, MD-2, MD-3). Ordered CRITICAL/HIGH first. This phase is append-only;
+Phases 1–9 and their completed tasks are unchanged.
+
+- [x] T070 [P] [HIGH] Add the missing `/api/v1/auth` representative endpoint in `src/VisaFusion.Api/Endpoints/AuthEndpoint.cs` (FR-004, T045, contracts/api-v1-scaffolding.md §2). The eight areas are `public, auth, employee, agent, admin, billing, reporting, notifications`; the implementation maps 7 of 8 — `auth` is omitted (HG-1). Route it anonymous-allowed (mirrors `/api/v1/public`): the legacy Auth module (`authenticate.asp`, `logon.asp`, `regsub*.asp`, migration plan §5 `AuthController`) is the anonymous login/registration entry point. Return the standard stub `{ items: [], count: 0 }` via `RepresentativeEndpoint.Handle(ctx)`.
+- [x] T071 [CRITICAL] Fix `tests/IntegrationTests/DbContextTests.cs` so the connection string is read from the `VISAENTRY_TEST_CONNECTION` environment variable (fallback to the local dev instance) and the DB-dependent tests `Skip` when the server is unreachable; correct the doc comment to match behavior (CR-1). Optionally add a `services: mcr.microsoft.com/mssql/server` container job to `.github/workflows/build.yml` so integration tests run on CI.
+- [x] T072 [CRITICAL] Delete `src/VisaFusion.Web/wwwroot/updateimg/test_newarun123.asp` (legacy ASP with hardcoded `uid=sa;pwd=;DATABASE=udaanuma` connection string and SMTP relay details, served statically by `UseStaticFiles()` — CR-2). Re-grep `src/` for legacy script files (`.asp`, `.aspx`, `.asa`) and remove the root-level `connection.asp` backdoor (LW-4) once data-migration reads are complete.
+- [x] T073 [MEDIUM] Wire `ApiError.Create(...)` from `src/VisaFusion.Api/Errors/ApiError.cs` into the `OnChallenge` handler and `ExceptionHandlingMiddleware` in `src/VisaFusion.Web/Program.cs` (MD-1), or delete the class and record the decision in an ADR. Verify with `grep "ApiError\."` that the factory is referenced.
+- [x] T074 [HIGH] Complete `tests/FunctionalTests/SharedRuleTests.cs` (HG-2, MD-2): mint a test token using the factory `Jwt:Key`, call both the Web service and the `/api/v1/employee` Api endpoint, and assert identical shared-rule output (AC-003, TS-003). Wire the employee endpoint to resolve the rule via `ISharedRuleService` and have `HealthEndpoint` use `GetApiVersion()` instead of the hardcoded `version = "1"`.
+- [x] T075 [MEDIUM] Dev-secrets hygiene (MD-3): add `appsettings.*.local.json` (ignored, `CopyToPublishDirectory=Never`), document production overrides (env vars / User Secrets) in `README.md`, and add a startup guard in `src/VisaFusion.Web/Program.cs` that refuses to run in Production with the placeholder JWT key or a `localhost`/`Trusted_Connection` connection string.
+
+**Acceptance (Phase 10):** build clean; all tests green (integration tests CI-safe via
+T071); zero `ApiError.`/`ISharedRuleService` dead references; no legacy `.asp` under
+`src/`; `/api/v1/auth` reachable; no plaintext credentials in `src/`; `review-003.md`
+findings all closed.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies

@@ -65,3 +65,6 @@ build/
 # ---- Database backups (never commit) ----
 dbBackup/
 *.bak
+
+# ---- CodeGraph local index (regenerable via `codegraph init`) ----
+.codegraph/

@@ -74,6 +74,20 @@ public class ApiSurfaceTests : IClassFixture<VisaFusionWebApplicationFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
+    [Fact]
+    public async Task Auth_Endpoint_Is_Anonymous_Allowed_And_Returns_Empty_Stub()
+    {
+        // T064/T070 (HG-1): the eighth area endpoint must resolve. The legacy Auth
+        // module is the anonymous login/registration entry point, so /api/v1/auth
+        // is anonymous-allowed and returns the standard stub { items: [], count: 0 }.
+        var response = await _client.GetAsync("/api/v1/auth");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<RepresentativeListResponse>();
+        Assert.NotNull(body);
+        Assert.Equal(0, body.Count);
+    }
+
     private string CreateTestToken(string role)
     {
         var jwtKey = _factory.Services.GetService(typeof(IConfiguration)) is IConfiguration config

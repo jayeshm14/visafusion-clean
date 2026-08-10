@@ -1,114 +1,755 @@
-{
-  "schema_version": "1.0",
-  "generated": "2026-08-06",
-  "source": "library/04_AI_Native_Knowledge_Graph.md",
-  "nodes": [
-    { "id": "SPEC-0001", "type": "Requirement", "label": "Project Modernization Baseline", "status": "Approved" },
-    { "id": "ADR-0001", "type": "ADR", "label": "Target Architecture and Specs Layout", "status": "Accepted" },
-    { "id": "MOD-001", "type": "Module", "label": "Visa Processing", "legacy": "insertEntry.asp, listforagents.asp" },
-    { "id": "MOD-002", "type": "Module", "label": "Agent Management", "legacy": "topAgent.asp" },
-    { "id": "MOD-003", "type": "Module", "label": "Billing", "legacy": "invoice.asp" },
-    { "id": "MOD-004", "type": "Module", "label": "Notifications", "legacy": "SendSMS.asp" },
-    { "id": "MOD-005", "type": "Module", "label": "Reporting", "legacy": "reports" },
-    { "id": "MOD-006", "type": "Module", "label": "Identity & Security", "legacy": "connection.asp" },
-    { "id": "TBL-Mainentry", "type": "Table", "label": "Mainentry", "rows": 271724 },
-    { "id": "TBL-bighistory", "type": "Table", "label": "bighistory", "rows": 1430841 },
-    { "id": "TBL-StatusHistory", "type": "Table", "label": "StatusHistory", "rows": 1287261 },
-    { "id": "TBL-sentmails", "type": "Table", "label": "sentmails", "rows": 553523 },
-    { "id": "TBL-PaxStatus", "type": "Table", "label": "PaxStatus", "rows": 359338 },
-    { "id": "TBL-invoice", "type": "Table", "label": "invoice", "rows": 271239 },
-    { "id": "TBL-Ledger", "type": "Table", "label": "Ledger", "rows": 26565 },
-    { "id": "CTX-Identity", "type": "Domain Entity", "label": "Identity Context" },
-    { "id": "CTX-Visa", "type": "Domain Entity", "label": "Visa Processing Context" },
-    { "id": "CTX-Agent", "type": "Domain Entity", "label": "Agent Management Context" },
-    { "id": "CTX-Billing", "type": "Domain Entity", "label": "Billing Context" },
-    { "id": "CTX-Notify", "type": "Domain Entity", "label": "Notifications Context" },
-    { "id": "CTX-Report", "type": "Domain Entity", "label": "Reporting Context" },
-    { "id": "API-v1", "type": "API", "label": "/api/v1" },
-    { "id": "UI-Razor", "type": "Page", "label": "Razor Pages back-office" },
-    { "id": "TEST-Golden", "type": "Test Case", "label": "Golden-file regression suite" },
-    { "id": "MIG-0001", "type": "Job", "label": "Data migration" },
-    { "id": "SEC-RBAC", "type": "Permission", "label": "Role-based authorization" },
-    { "id": "SEC-Backdoor", "type": "Risk", "label": "connection.asp backdoor (removed)" },
-    { "id": "SEC-Orphans", "type": "Risk", "label": "6517 orphaned Mainentry->agent" },
-    { "id": "TOOL-CodeQL", "type": "CodeQL Finding", "label": "Static analysis" },
-    { "id": "TOOL-Dependabot", "type": "Dependabot Alert", "label": "Dependency scanning" },
-    { "id": "TOOL-NDepend", "type": "NDepend Rule", "label": "Dependency analysis" },
-    { "id": "TOOL-OTel", "type": "Trace Span", "label": "OpenTelemetry" },
-    { "id": "CAT-Backstage", "type": "Catalog Entity", "label": "Backstage catalog" },
-    { "id": "SPEC-0001-AIENV", "type": "Requirement", "label": "AI Environment Validation", "status": "Approved" },
-    { "id": "ADR-0002", "type": "ADR", "label": "AI Environment Validation Gate Architecture", "status": "Accepted" },
-    { "id": "TOOL-Validation", "type": "Job", "label": "validate-ai-environment.ps1 (12-integration gate)" },
-    { "id": "ART-Report", "type": "Page", "label": "reports/ai-environment-validation/report.md" },
-    { "id": "ART-Summary", "type": "API", "label": "reports/ai-environment-validation/summary.json (schema v1)" },
-    { "id": "SPEC-0002", "type": "Requirement", "label": "Repository Inventory", "status": "Approved" },
-    { "id": "INV-Repo", "type": "Page", "label": "reports/repository-inventory/01-repository-inventory.md" },
-    { "id": "INV-Tech", "type": "Page", "label": "reports/repository-inventory/02-technology-inventory.md" },
-    { "id": "INV-Dep", "type": "Page", "label": "reports/repository-inventory/03-dependency-graph.md" },
-    { "id": "INV-Struct", "type": "Page", "label": "reports/repository-inventory/04-project-structure.md" },
-    { "id": "INV-Legacy", "type": "Page", "label": "reports/repository-inventory/05-legacy-inventory.md" },
-    { "id": "INV-ExtDep", "type": "Page", "label": "reports/repository-inventory/06-external-dependencies.md" },
-    { "id": "INV-Com", "type": "Page", "label": "reports/repository-inventory/07-com-dependencies.md" },
-    { "id": "INV-Config", "type": "Page", "label": "reports/repository-inventory/08-configuration-inventory.md" },
-    { "id": "INV-Disc", "type": "Page", "label": "reports/repository-inventory/discrepancies.md" }
-  ],
-  "edges": [
-    { "from": "SPEC-0001", "to": "ADR-0001", "type": "references" },
-    { "from": "SPEC-0001", "to": "MOD-001", "type": "implements" },
-    { "from": "SPEC-0001", "to": "MOD-002", "type": "implements" },
-    { "from": "SPEC-0001", "to": "MOD-003", "type": "implements" },
-    { "from": "SPEC-0001", "to": "MOD-004", "type": "implements" },
-    { "from": "SPEC-0001", "to": "MOD-005", "type": "implements" },
-    { "from": "SPEC-0001", "to": "MOD-006", "type": "implements" },
-    { "from": "MOD-001", "to": "TBL-Mainentry", "type": "reads" },
-    { "from": "MOD-001", "to": "TBL-bighistory", "type": "reads" },
-    { "from": "MOD-001", "to": "TBL-StatusHistory", "type": "reads" },
-    { "from": "MOD-001", "to": "TBL-PaxStatus", "type": "reads" },
-    { "from": "MOD-004", "to": "TBL-sentmails", "type": "writes" },
-    { "from": "MOD-003", "to": "TBL-invoice", "type": "reads" },
-    { "from": "MOD-003", "to": "TBL-Ledger", "type": "reads" },
-    { "from": "MOD-001", "to": "CTX-Visa", "type": "owns" },
-    { "from": "MOD-002", "to": "CTX-Agent", "type": "owns" },
-    { "from": "MOD-003", "to": "CTX-Billing", "type": "owns" },
-    { "from": "MOD-004", "to": "CTX-Notify", "type": "owns" },
-    { "from": "MOD-005", "to": "CTX-Report", "type": "owns" },
-    { "from": "MOD-006", "to": "CTX-Identity", "type": "owns" },
-    { "from": "MOD-001", "to": "API-v1", "type": "calls" },
-    { "from": "MOD-001", "to": "UI-Razor", "type": "calls" },
-    { "from": "SPEC-0001", "to": "TEST-Golden", "type": "tested_by" },
-    { "from": "SPEC-0001", "to": "MIG-0001", "type": "migrates_to" },
-    { "from": "MOD-006", "to": "SEC-RBAC", "type": "secures" },
-    { "from": "MOD-006", "to": "SEC-Backdoor", "type": "replaces" },
-    { "from": "SPEC-0001", "to": "SEC-ORphans", "type": "references" },
-    { "from": "MOD-006", "to": "TOOL-CodeQL", "type": "validates" },
-    { "from": "MOD-006", "to": "TOOL-Dependabot", "type": "validates" },
-    { "from": "ADR-0001", "to": "TOOL-NDepend", "type": "validates" },
-    { "from": "MOD-001", "to": "TOOL-OTel", "type": "calls" },
-    { "from": "ADR-0001", "to": "CAT-Backstage", "type": "references" },
-    { "from": "SPEC-0001-AIENV", "to": "ADR-0002", "type": "references" },
-    { "from": "SPEC-0001-AIENV", "to": "TOOL-Validation", "type": "implements" },
-    { "from": "SPEC-0001-AIENV", "to": "ART-Report", "type": "generates" },
-    { "from": "SPEC-0001-AIENV", "to": "ART-Summary", "type": "generates" },
-    { "from": "TOOL-Validation", "to": "TOOL-CodeQL", "type": "validates" },
-    { "from": "TOOL-Validation", "to": "TOOL-Dependabot", "type": "validates" },
-    { "from": "TOOL-Validation", "to": "TOOL-NDepend", "type": "validates" },
-    { "from": "TOOL-Validation", "to": "TOOL-OTel", "type": "validates" },
-    { "from": "TOOL-Validation", "to": "CAT-Backstage", "type": "validates" },
-    { "from": "SPEC-0002", "to": "INV-Repo", "type": "generates" },
-    { "from": "SPEC-0002", "to": "INV-Tech", "type": "generates" },
-    { "from": "SPEC-0002", "to": "INV-Dep", "type": "generates" },
-    { "from": "SPEC-0002", "to": "INV-Struct", "type": "generates" },
-    { "from": "SPEC-0002", "to": "INV-Legacy", "type": "generates" },
-    { "from": "SPEC-0002", "to": "INV-ExtDep", "type": "generates" },
-    { "from": "SPEC-0002", "to": "INV-Com", "type": "generates" },
-    { "from": "SPEC-0002", "to": "INV-Config", "type": "generates" },
-    { "from": "SPEC-0002", "to": "INV-Disc", "type": "generates" },
-    { "from": "INV-Legacy", "to": "MOD-001", "type": "documents" },
-    { "from": "INV-Legacy", "to": "MOD-002", "type": "documents" },
-    { "from": "INV-Legacy", "to": "MOD-003", "type": "documents" },
-    { "from": "INV-Legacy", "to": "MOD-004", "type": "documents" },
-    { "from": "INV-Legacy", "to": "MOD-005", "type": "documents" },
-    { "from": "INV-Legacy", "to": "MOD-006", "type": "documents" },
-    { "from": "INV-Config", "to": "SEC-Backdoor", "type": "documents" }
-  ]
+﻿{
+    "schema_version":  "1.0",
+    "generated":  "2026-08-09",
+    "source":  "library/04_AI_Native_Knowledge_Graph.md",
+    "nodes":  [
+                  {
+                      "id":  "SPEC-0001",
+                      "type":  "Requirement",
+                      "label":  "Project Modernization Baseline",
+                      "status":  "Approved"
+                  },
+                  {
+                      "id":  "ADR-0001",
+                      "type":  "ADR",
+                      "label":  "Target Architecture and Specs Layout",
+                      "status":  "Accepted"
+                  },
+                  {
+                      "id":  "MOD-001",
+                      "type":  "Module",
+                      "label":  "Visa Processing",
+                      "legacy":  "insertEntry.asp, listforagents.asp"
+                  },
+                  {
+                      "id":  "MOD-002",
+                      "type":  "Module",
+                      "label":  "Agent Management",
+                      "legacy":  "topAgent.asp"
+                  },
+                  {
+                      "id":  "MOD-003",
+                      "type":  "Module",
+                      "label":  "Billing",
+                      "legacy":  "invoice.asp"
+                  },
+                  {
+                      "id":  "MOD-004",
+                      "type":  "Module",
+                      "label":  "Notifications",
+                      "legacy":  "SendSMS.asp"
+                  },
+                  {
+                      "id":  "MOD-005",
+                      "type":  "Module",
+                      "label":  "Reporting",
+                      "legacy":  "reports"
+                  },
+                  {
+                      "id":  "MOD-006",
+                      "type":  "Module",
+                      "label":  "Identity \u0026 Security",
+                      "legacy":  "connection.asp"
+                  },
+                  {
+                      "id":  "TBL-Mainentry",
+                      "type":  "Table",
+                      "label":  "Mainentry",
+                      "rows":  271724
+                  },
+                  {
+                      "id":  "TBL-bighistory",
+                      "type":  "Table",
+                      "label":  "bighistory",
+                      "rows":  1430841
+                  },
+                  {
+                      "id":  "TBL-StatusHistory",
+                      "type":  "Table",
+                      "label":  "StatusHistory",
+                      "rows":  1287261
+                  },
+                  {
+                      "id":  "TBL-sentmails",
+                      "type":  "Table",
+                      "label":  "sentmails",
+                      "rows":  553523
+                  },
+                  {
+                      "id":  "TBL-PaxStatus",
+                      "type":  "Table",
+                      "label":  "PaxStatus",
+                      "rows":  359338
+                  },
+                  {
+                      "id":  "TBL-invoice",
+                      "type":  "Table",
+                      "label":  "invoice",
+                      "rows":  271239
+                  },
+                  {
+                      "id":  "TBL-Ledger",
+                      "type":  "Table",
+                      "label":  "Ledger",
+                      "rows":  26565
+                  },
+                  {
+                      "id":  "CTX-Identity",
+                      "type":  "Domain Entity",
+                      "label":  "Identity Context"
+                  },
+                  {
+                      "id":  "CTX-Visa",
+                      "type":  "Domain Entity",
+                      "label":  "Visa Processing Context"
+                  },
+                  {
+                      "id":  "CTX-Agent",
+                      "type":  "Domain Entity",
+                      "label":  "Agent Management Context"
+                  },
+                  {
+                      "id":  "CTX-Billing",
+                      "type":  "Domain Entity",
+                      "label":  "Billing Context"
+                  },
+                  {
+                      "id":  "CTX-Notify",
+                      "type":  "Domain Entity",
+                      "label":  "Notifications Context"
+                  },
+                  {
+                      "id":  "CTX-Report",
+                      "type":  "Domain Entity",
+                      "label":  "Reporting Context"
+                  },
+                  {
+                      "id":  "API-v1",
+                      "type":  "API",
+                      "label":  "/api/v1"
+                  },
+                  {
+                      "id":  "UI-Razor",
+                      "type":  "Page",
+                      "label":  "Razor Pages back-office"
+                  },
+                  {
+                      "id":  "TEST-Golden",
+                      "type":  "Test Case",
+                      "label":  "Golden-file regression suite"
+                  },
+                  {
+                      "id":  "MIG-0001",
+                      "type":  "Job",
+                      "label":  "Data migration"
+                  },
+                  {
+                      "id":  "SEC-RBAC",
+                      "type":  "Permission",
+                      "label":  "Role-based authorization"
+                  },
+                  {
+                      "id":  "SEC-Backdoor",
+                      "type":  "Risk",
+                      "label":  "connection.asp backdoor (removed)"
+                  },
+                  {
+                      "id":  "SEC-Orphans",
+                      "type":  "Risk",
+                      "label":  "6517 orphaned Mainentry-\u003eagent"
+                  },
+                  {
+                      "id":  "TOOL-CodeQL",
+                      "type":  "CodeQL Finding",
+                      "label":  "Static analysis"
+                  },
+                  {
+                      "id":  "TOOL-Dependabot",
+                      "type":  "Dependabot Alert",
+                      "label":  "Dependency scanning"
+                  },
+                  {
+                      "id":  "TOOL-NDepend",
+                      "type":  "NDepend Rule",
+                      "label":  "Dependency analysis"
+                  },
+                  {
+                      "id":  "TOOL-OTel",
+                      "type":  "Trace Span",
+                      "label":  "OpenTelemetry"
+                  },
+                  {
+                      "id":  "CAT-Backstage",
+                      "type":  "Catalog Entity",
+                      "label":  "Backstage catalog"
+                  },
+                  {
+                      "id":  "SPEC-0001-AIENV",
+                      "type":  "Requirement",
+                      "label":  "AI Environment Validation",
+                      "status":  "Approved"
+                  },
+                  {
+                      "id":  "ADR-0002",
+                      "type":  "ADR",
+                      "label":  "AI Environment Validation Gate Architecture",
+                      "status":  "Accepted"
+                  },
+                  {
+                      "id":  "TOOL-Validation",
+                      "type":  "Job",
+                      "label":  "validate-ai-environment.ps1 (12-integration gate)"
+                  },
+                  {
+                      "id":  "ART-Report",
+                      "type":  "Page",
+                      "label":  "reports/ai-environment-validation/report.md"
+                  },
+                  {
+                      "id":  "ART-Summary",
+                      "type":  "API",
+                      "label":  "reports/ai-environment-validation/summary.json (schema v1)"
+                  },
+                  {
+                      "id":  "SPEC-0002",
+                      "type":  "Requirement",
+                      "label":  "Repository Inventory",
+                      "status":  "Approved"
+                  },
+                  {
+                      "id":  "INV-Repo",
+                      "type":  "Page",
+                      "label":  "reports/repository-inventory/01-repository-inventory.md"
+                  },
+                  {
+                      "id":  "INV-Tech",
+                      "type":  "Page",
+                      "label":  "reports/repository-inventory/02-technology-inventory.md"
+                  },
+                  {
+                      "id":  "INV-Dep",
+                      "type":  "Page",
+                      "label":  "reports/repository-inventory/03-dependency-graph.md"
+                  },
+                  {
+                      "id":  "INV-Struct",
+                      "type":  "Page",
+                      "label":  "reports/repository-inventory/04-project-structure.md"
+                  },
+                  {
+                      "id":  "INV-Legacy",
+                      "type":  "Page",
+                      "label":  "reports/repository-inventory/05-legacy-inventory.md"
+                  },
+                  {
+                      "id":  "INV-ExtDep",
+                      "type":  "Page",
+                      "label":  "reports/repository-inventory/06-external-dependencies.md"
+                  },
+                  {
+                      "id":  "INV-Com",
+                      "type":  "Page",
+                      "label":  "reports/repository-inventory/07-com-dependencies.md"
+                  },
+                  {
+                      "id":  "INV-Config",
+                      "type":  "Page",
+                      "label":  "reports/repository-inventory/08-configuration-inventory.md"
+                  },
+                  {
+                      "id":  "INV-Disc",
+                      "type":  "Page",
+                      "label":  "reports/repository-inventory/discrepancies.md"
+                  },
+                  {
+                      "id":  "SPEC-0003",
+                      "type":  "Requirement",
+                      "label":  "Target Architecture (VisaFusion solution)",
+                      "status":  "Draft"
+                  },
+                  {
+                      "id":  "SPEC-0004",
+                      "type":  "Requirement",
+                      "label":  "Complete Data Model Migration (52 tables)",
+                      "status":  "Accepted"
+                  },
+                  {
+                      "id":  "MIG-Tool",
+                      "type":  "Job",
+                      "label":  "VisaFusion.Migration console (8 commands, exit 0-5)"
+                  },
+                  {
+                      "id":  "MIG-CLI",
+                      "type":  "API",
+                      "label":  "contracts/migration-cli.md (fixed command order)"
+                  },
+                  {
+                      "id":  "MIG-Report",
+                      "type":  "API",
+                      "label":  "reports/migration-\u003crunId\u003e.json (schema v1)"
+                  },
+                  {
+                      "id":  "MIG-DataModel",
+                      "type":  "Page",
+                      "label":  "specs/004-data-model-migration/data-model.md"
+                  },
+                  {
+                      "id":  "MIG-Plan",
+                      "type":  "Page",
+                      "label":  "specs/004-data-model-migration/plan.md"
+                  },
+                  {
+                      "id":  "MIG-Tasks",
+                      "type":  "Page",
+                      "label":  "specs/004-data-model-migration/tasks.md (54 tasks)"
+                  },
+                  {
+                      "id":  "MIG-Checklist",
+                      "type":  "Page",
+                      "label":  "specs/004-data-model-migration/checklists/migration.md (54 items)"
+                  },
+                  {
+                      "id":  "DB-VisaFusion",
+                      "type":  "Table",
+                      "label":  "target VisaFusion database (52-table disposition)"
+                  },
+                  {
+                      "id":  "ADR-0003",
+                      "type":  "ADR",
+                      "label":  "Migration Tooling (VisaFusion.Migration)",
+                      "status":  "Accepted"
+                  },
+                  {
+                      "id":  "GAP-0001",
+                      "label":  "FK map vs live data (sentinel 0 / orphans, DEFER disposition)",
+                      "type":  "Risk"
+                  },
+                  {
+                      "id":  "GAP-0002",
+                      "label":  "agents.agentsID 4114 duplicate (populated profile + NULL ghost, exit 2 until sign-off)",
+                      "type":  "Risk"
+                  }
+              ],
+    "edges":  [
+                  {
+                      "from":  "SPEC-0001",
+                      "to":  "ADR-0001",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "SPEC-0001",
+                      "to":  "MOD-001",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0001",
+                      "to":  "MOD-002",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0001",
+                      "to":  "MOD-003",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0001",
+                      "to":  "MOD-004",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0001",
+                      "to":  "MOD-005",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0001",
+                      "to":  "MOD-006",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "MOD-001",
+                      "to":  "TBL-Mainentry",
+                      "type":  "reads"
+                  },
+                  {
+                      "from":  "MOD-001",
+                      "to":  "TBL-bighistory",
+                      "type":  "reads"
+                  },
+                  {
+                      "from":  "MOD-001",
+                      "to":  "TBL-StatusHistory",
+                      "type":  "reads"
+                  },
+                  {
+                      "from":  "MOD-001",
+                      "to":  "TBL-PaxStatus",
+                      "type":  "reads"
+                  },
+                  {
+                      "from":  "MOD-004",
+                      "to":  "TBL-sentmails",
+                      "type":  "writes"
+                  },
+                  {
+                      "from":  "MOD-003",
+                      "to":  "TBL-invoice",
+                      "type":  "reads"
+                  },
+                  {
+                      "from":  "MOD-003",
+                      "to":  "TBL-Ledger",
+                      "type":  "reads"
+                  },
+                  {
+                      "from":  "MOD-001",
+                      "to":  "CTX-Visa",
+                      "type":  "owns"
+                  },
+                  {
+                      "from":  "MOD-002",
+                      "to":  "CTX-Agent",
+                      "type":  "owns"
+                  },
+                  {
+                      "from":  "MOD-003",
+                      "to":  "CTX-Billing",
+                      "type":  "owns"
+                  },
+                  {
+                      "from":  "MOD-004",
+                      "to":  "CTX-Notify",
+                      "type":  "owns"
+                  },
+                  {
+                      "from":  "MOD-005",
+                      "to":  "CTX-Report",
+                      "type":  "owns"
+                  },
+                  {
+                      "from":  "MOD-006",
+                      "to":  "CTX-Identity",
+                      "type":  "owns"
+                  },
+                  {
+                      "from":  "MOD-001",
+                      "to":  "API-v1",
+                      "type":  "calls"
+                  },
+                  {
+                      "from":  "MOD-001",
+                      "to":  "UI-Razor",
+                      "type":  "calls"
+                  },
+                  {
+                      "from":  "SPEC-0001",
+                      "to":  "TEST-Golden",
+                      "type":  "tested_by"
+                  },
+                  {
+                      "from":  "SPEC-0001",
+                      "to":  "MIG-0001",
+                      "type":  "migrates_to"
+                  },
+                  {
+                      "from":  "MOD-006",
+                      "to":  "SEC-RBAC",
+                      "type":  "secures"
+                  },
+                  {
+                      "from":  "MOD-006",
+                      "to":  "SEC-Backdoor",
+                      "type":  "replaces"
+                  },
+                  {
+                      "from":  "SPEC-0001",
+                      "to":  "SEC-Orphans",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "MOD-006",
+                      "to":  "TOOL-CodeQL",
+                      "type":  "validates"
+                  },
+                  {
+                      "from":  "MOD-006",
+                      "to":  "TOOL-Dependabot",
+                      "type":  "validates"
+                  },
+                  {
+                      "from":  "ADR-0001",
+                      "to":  "TOOL-NDepend",
+                      "type":  "validates"
+                  },
+                  {
+                      "from":  "MOD-001",
+                      "to":  "TOOL-OTel",
+                      "type":  "calls"
+                  },
+                  {
+                      "from":  "ADR-0001",
+                      "to":  "CAT-Backstage",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "SPEC-0001-AIENV",
+                      "to":  "ADR-0002",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "SPEC-0001-AIENV",
+                      "to":  "TOOL-Validation",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0001-AIENV",
+                      "to":  "ART-Report",
+                      "type":  "generates"
+                  },
+                  {
+                      "from":  "SPEC-0001-AIENV",
+                      "to":  "ART-Summary",
+                      "type":  "generates"
+                  },
+                  {
+                      "from":  "TOOL-Validation",
+                      "to":  "TOOL-CodeQL",
+                      "type":  "validates"
+                  },
+                  {
+                      "from":  "TOOL-Validation",
+                      "to":  "TOOL-Dependabot",
+                      "type":  "validates"
+                  },
+                  {
+                      "from":  "TOOL-Validation",
+                      "to":  "TOOL-NDepend",
+                      "type":  "validates"
+                  },
+                  {
+                      "from":  "TOOL-Validation",
+                      "to":  "TOOL-OTel",
+                      "type":  "validates"
+                  },
+                  {
+                      "from":  "TOOL-Validation",
+                      "to":  "CAT-Backstage",
+                      "type":  "validates"
+                  },
+                  {
+                      "from":  "SPEC-0002",
+                      "to":  "INV-Repo",
+                      "type":  "generates"
+                  },
+                  {
+                      "from":  "SPEC-0002",
+                      "to":  "INV-Tech",
+                      "type":  "generates"
+                  },
+                  {
+                      "from":  "SPEC-0002",
+                      "to":  "INV-Dep",
+                      "type":  "generates"
+                  },
+                  {
+                      "from":  "SPEC-0002",
+                      "to":  "INV-Struct",
+                      "type":  "generates"
+                  },
+                  {
+                      "from":  "SPEC-0002",
+                      "to":  "INV-Legacy",
+                      "type":  "generates"
+                  },
+                  {
+                      "from":  "SPEC-0002",
+                      "to":  "INV-ExtDep",
+                      "type":  "generates"
+                  },
+                  {
+                      "from":  "SPEC-0002",
+                      "to":  "INV-Com",
+                      "type":  "generates"
+                  },
+                  {
+                      "from":  "SPEC-0002",
+                      "to":  "INV-Config",
+                      "type":  "generates"
+                  },
+                  {
+                      "from":  "SPEC-0002",
+                      "to":  "INV-Disc",
+                      "type":  "generates"
+                  },
+                  {
+                      "from":  "INV-Legacy",
+                      "to":  "MOD-001",
+                      "type":  "documents"
+                  },
+                  {
+                      "from":  "INV-Legacy",
+                      "to":  "MOD-002",
+                      "type":  "documents"
+                  },
+                  {
+                      "from":  "INV-Legacy",
+                      "to":  "MOD-003",
+                      "type":  "documents"
+                  },
+                  {
+                      "from":  "INV-Legacy",
+                      "to":  "MOD-004",
+                      "type":  "documents"
+                  },
+                  {
+                      "from":  "INV-Legacy",
+                      "to":  "MOD-005",
+                      "type":  "documents"
+                  },
+                  {
+                      "from":  "INV-Legacy",
+                      "to":  "MOD-006",
+                      "type":  "documents"
+                  },
+                  {
+                      "from":  "INV-Config",
+                      "to":  "SEC-Backdoor",
+                      "type":  "documents"
+                  },
+                  {
+                      "from":  "SPEC-0003",
+                      "to":  "ADR-0001",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "SPEC-0003",
+                      "to":  "API-v1",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0003",
+                      "to":  "UI-Razor",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0004",
+                      "to":  "MIG-0001",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0004",
+                      "to":  "MIG-Plan",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "SPEC-0004",
+                      "to":  "MIG-DataModel",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "SPEC-0004",
+                      "to":  "MIG-CLI",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "SPEC-0004",
+                      "to":  "MIG-Tasks",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "SPEC-0004",
+                      "to":  "MIG-Checklist",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "SPEC-0004",
+                      "to":  "SEC-Orphans",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "SPEC-0004",
+                      "to":  "ADR-0003",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "MIG-0001",
+                      "to":  "MIG-Tool",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "MIG-0001",
+                      "to":  "DB-VisaFusion",
+                      "type":  "migrates_to"
+                  },
+                  {
+                      "from":  "MIG-0001",
+                      "to":  "TBL-Mainentry",
+                      "type":  "reads"
+                  },
+                  {
+                      "from":  "MIG-0001",
+                      "to":  "TBL-bighistory",
+                      "type":  "reads"
+                  },
+                  {
+                      "from":  "MIG-0001",
+                      "to":  "TBL-StatusHistory",
+                      "type":  "reads"
+                  },
+                  {
+                      "from":  "MIG-0001",
+                      "to":  "TBL-sentmails",
+                      "type":  "reads"
+                  },
+                  {
+                      "from":  "MIG-0001",
+                      "to":  "TBL-PaxStatus",
+                      "type":  "reads"
+                  },
+                  {
+                      "from":  "MIG-0001",
+                      "to":  "TBL-invoice",
+                      "type":  "reads"
+                  },
+                  {
+                      "from":  "MIG-0001",
+                      "to":  "TBL-Ledger",
+                      "type":  "reads"
+                  },
+                  {
+                      "from":  "MIG-Tool",
+                      "to":  "MIG-CLI",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "MIG-Tool",
+                      "to":  "MIG-Report",
+                      "type":  "generates"
+                  },
+                  {
+                      "from":  "MIG-Report",
+                      "to":  "MIG-DataModel",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "GAP-0001",
+                      "to":  "SPEC-0004",
+                      "type":  "blocking"
+                  },
+                  {
+                      "from":  "GAP-0001",
+                      "to":  "MIG-DataModel",
+                      "type":  "amends"
+                  },
+                  {
+                      "from":  "MIG-0001",
+                      "to":  "GAP-0001",
+                      "type":  "records"
+                  },
+                  {
+                      "from":  "GAP-0001",
+                      "to":  "DB-VisaFusion",
+                      "type":  "affects"
+                  }
+              ]
 }

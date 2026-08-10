@@ -84,3 +84,86 @@ Documentation-only feature: `INV-Legacy` documents legacy modules MOD-001..MOD-0
 `INV-Config` documents the SEC-Backdoor finding. No legacy business behavior
 changes (Constitution Principle II). Deliverable location fixed by spec §5 as
 `reports/repository-inventory/` (CHK004 remediation).
+
+---
+
+## SPEC-0004 — Complete Data Model Migration
+
+Generated: 2026-08-09 | Source: `specs/004-data-model-migration/spec.md`, plan.md,
+research.md, data-model.md, contracts/, tasks.md (54 tasks)
+
+| Requirement | Architecture | Domain | Database | API | UI | Test | Migration |
+|-------------|--------------|--------|----------|-----|----|------|-----------|
+| FR-001 52-table disposition | MIG-Plan | data-model §3 | DB-VisaFusion | — | — | TS-001 (T023, T041) | MIG-0001 |
+| FR-002 verbatim preservation | MIG-Plan | data-model §6 | DB-VisaFusion | — | — | TS-001 (T023) | MIG-0001 |
+| FR-003 PK/FK/index reconstruction | MIG-Plan | data-model §2/§4 | DB-VisaFusion | — | — | TS-002 (T020, T041) | MIG-0001 |
+| FR-004 identity import (hashed) | MIG-Plan | data-model §5 | AspNetUsers | — | — | TS-003 (T037, T041) | MIG-0001 |
+| FR-005 cleansing rules (a-d) | MIG-Plan | data-model §6 | DB-VisaFusion | — | — | TS-004/TS-005 (T028-T035) | MIG-0001 |
+| FR-005a copy-time dedupe (status 508) | MIG-Plan | data-model §6, CopyTransform | DB-VisaFusion | — | — | T035, CopyTests | MIG-0001 |
+| FR-011 duplicate-key guard | MIG-Plan | data-model §3.1, DuplicateKeyGuard | DB-VisaFusion | — | — | CopyTests (GAP-0002) | MIG-0001 |
+| FR-006 append-only audit | MIG-Plan | data-model §7 | StatusHistory, bighistory, sentmails, smshistory | — | — | TS-006 (T024, T027) | MIG-0001 |
+| FR-007 migration report | MIG-Plan | contracts/migration-report.schema.json | — | MIG-Report | — | TS-001 (T042, T045) | MIG-0001 |
+| FR-008 legacy untouched | MIG-Plan | — | VisaEntry (read-only) | — | — | TS-007 (T048) | MIG-0001 |
+| FR-009 validation | MIG-Plan | data-model §8 | DB-VisaFusion | — | — | TS-001..TS-008 (T041, T043) | MIG-0001 |
+| NFR-002 4-hour window | MIG-Plan | — | — | — | — | T053 | MIG-0001 |
+| BR-001 no business drop | MIG-Plan | data-model §3.5 | DB-VisaFusion | — | — | T054 | MIG-0001 |
+| BR-002 hashed passwords | MIG-Plan | data-model §5 | AspNetUsers | — | — | TS-003 (T039) | MIG-0001 |
+| BR-004 COND archived | MIG-Plan | data-model §3.3 | DB-VisaFusion | — | — | — | MIG-0001 |
+| BR-005 sign-off gating | MIG-Plan | data-model §6 | — | — | — | T035 | MIG-0001 |
+| fixed-order step guard (§2, exit 1) | MIG-Plan | StepRunner.EnsureRequestedStepIsRunnable | DB-VisaFusion (run state) | — | — | StepRunnerPredecessorTests (TS-008) | MIG-0001 |
+
+### Module → Legacy Mapping (this feature)
+
+Migration-only feature: reads the legacy `VisaEntry` database (52 tables, read-only)
+and writes the target `VisaFusion` database. No legacy page behavior changes
+(Constitution Principle II). Blocking decisions recorded: CountryID target reference
+(data-model.md §4), COND-table owner confirmations, `invoice`/`invoicedetail`
+disposition (migration plan §12). ADR-0003 (migration tooling) accepted 2026-08-10 (T052).
+
+### Resolved defects (2026-08-10, full-suite verification of the 16 spec'd test files)
+
+1. **`ChecksumSql` CONCAT_WS single-column defect**: tables with exactly one
+   non-identity column (`Attestation`, `certificate`, `cab`, `hotel`) generated
+   `CONCAT_WS('|', col)` — 2 arguments, which SQL Server rejects (requires 3–254).
+   Fixed by padding with a constant `N''` so the expression is always valid and the
+   source/target comparison stays deterministic. Regressions caught by 4
+   `ValidationTests` integration tests.
+2. **`TableCatalog` COND `TargetTable` null**: the 7 COND tables (`hotel`, `cab`,
+   `paxhotel`, `paxCab`, `scheduler`, `priwork`, `subscriber`) had
+   `TargetTable: null`, but `schema` creates them (data-model.md §3.3, BR-004) —
+   verified live. `TargetTable` set for all 7 (target names match legacy); copy
+   still skips Cond disposition explicitly. Caught by
+   `SchemaTests.Catalog_Has_38_Target_Tables` (38 = 26 M + 5 MRO + 7 COND).
+
+### Resolved defect — silent exit-2 on out-of-order `--step` (2026-08-09)
+
+Found during DoD deep verification: requesting `--step validate|cleanse|identity`
+before `copy` completed exited 2 (StepFailure) with **no log output**. Root cause:
+`Program.cs` registered Serilog with `AddLogging(dispose: true)`; the StepRunner
+predecessor check threw `PreflightException` outside its try block, and during stack
+unwinding the `using` provider disposed the shared static `Log.Logger` before
+Program.cs's `catch` ran `Log.Fatal` — so the exception was swallowed.
+Fix: (1) `AddLogging(dispose: false)` so the outer catch/finally stays authoritative
+(NFR-006); (2) extracted the pure `StepRunner.EnsureRequestedStepIsRunnable` guard
+into the try block so out-of-order/unknown steps raise `PreflightException` → exit 1
+with a precise message (contract §2, §4). Regression tests:
+`tests/UnitTests/StepRunnerPredecessorTests.cs` (TS-008).
+
+### Open gap — GAP-0001 (FK map vs live data, 2026-08-09)
+
+Verified against the live `VisaEntry` database: 14 of the 27 FK relationships in
+`data-model.md` §4 cannot be enforced (sentinel `0` values with no lookup row, or
+orphaned references). Disposition recorded in `findings/gap-0001-fk-validity.md`;
+the DbContext omits the DEFER-ed FK constraints (indexes retained) and marks the
+two FK principal indexes (`Entry.Refno`, `Invoice.Invoiceno`) unique (verified).
+Requires owner confirmation of the DEFER disposition (gap §4).
+
+### Open gap — GAP-0002 (legacy `agents.agentsID` duplicate, 2026-08-09)
+
+Verified against the live `VisaEntry` database: `agents.agentsID = 4114` has two
+rows (populated `CUSTOMER-UDAAN` profile + all-NULL ghost row). `agentsID` is an
+identity column in legacy, so the ghost row required explicit `IDENTITY_INSERT`
+and is not reproducible by application flow. No approved cleansing rule covers
+it; the copy step's `DuplicateKeyGuard` fails fast (exit 2) before writing any
+row. Owner decision required (recommended: keep populated profile, drop ghost).
+See `findings/gap-0002-agents-duplicate.md`.
