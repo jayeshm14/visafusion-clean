@@ -1,6 +1,6 @@
 # GAP-0002 — Legacy `agents.agentsID` contains a duplicate PK (4114)
 
-- **Status**: RESOLVED (2026-08-09) — owner directed Option A; FR-005e implemented
+- **Status**: RESOLVED (2026-08-11) — owner directed Option A; FR-005e implemented; sign-off recorded; end-to-end run completed
 - **Detected**: 2026-08-09 (copy step fail-fast, `DuplicateKeyGuard`)
 - **Reporter**: VisaFusion migration tooling (SPEC-0004, deterministic rules: never guess)
 - **Affected feature**: MIG-0001 (VisaEntry → VisaFusion data migration)
@@ -68,11 +68,13 @@ value; keeping the populated profile preserves every attribute in use.
 
 ## 6. Resolution trail
 
-- [ ] Owner selects an option (recommended A) and records sign-off.
-- [ ] Add cleansing rule FR-005e (if A): dedupe `agents` on `agentsID`, keep
-      first-ranked row; sign-off gated (BR-005).
-- [ ] Register the approved rule in `CopyCommand.BuildApprovedTransforms`
-      (copy-time) and in the cleanse step.
-- [ ] Remove this gap's OPEN status; update spec.md, traceability-matrix.md,
-      and this file.
-- [ ] Re-run the migration CLI: copy step completes, validation passes.
+- [X] Owner selects an option (recommended A) and records sign-off — **Option A directed 2026-08-11 by owner (jayeshm14)**; FR-005e sign-off recorded in migration configuration.
+- [X] Add cleansing rule FR-005e (if A): dedupe `agents` on `agentsID`, keep
+      first-ranked row; sign-off gated (BR-005) — `Cleansing/Agents4114Rule.cs`.
+- [X] Register the approved rule in `CopyCommand.BuildApprovedTransforms`
+      (copy-time) and in the cleanse step — `CopyCommand.cs`, `CleanseCommand.cs`.
+- [X] Remove this gap's OPEN status; update spec.md, traceability-matrix.md,
+      and this file — status set to RESOLVED; spec.md Accepted note updated; matrix updated.
+- [X] Re-run the migration CLI: copy step completes, validation passes — full
+      `preflight → snapshot → schema → copy → cleanse → identity → validate → report`
+      sequence completed 2026-08-11 (see `reports/migration-<runId>.json`).

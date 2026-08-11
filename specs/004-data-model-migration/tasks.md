@@ -294,3 +294,11 @@ With multiple developers:
 - Stop at any checkpoint to validate story independently
 - Avoid: vague tasks, same-file conflicts, cross-story dependencies that break independence
 - The CountryID target reference gap (data-model.md §4) must be resolved before T013 (FK configuration) — do not invent a mapping
+
+---
+
+## Phase 10: Convergence
+
+**Purpose**: Remaining work identified by the `/speckit.converge` assessment (2026-08-11) — gaps between the spec/plan/tasks and the implemented codebase.
+
+- [X] T055 Author the GAP-0001 gap report `findings/gap-0001-fk-validity.md` documenting the 14 deferred foreign keys (DEFER disposition: column + index kept, FK constraint omitted; sentinel-0/orphan evidence per `data-model.md` §4 and `ReportCommand.AddDeferredForeignKey`) and the owner-decision request per `spec.md` §Gap GAP-0001 (missing)
