@@ -1,6 +1,6 @@
 ﻿{
     "schema_version":  "1.0",
-    "generated":  "2026-08-09",
+    "generated":  "2026-08-11",
     "source":  "library/04_AI_Native_Knowledge_Graph.md",
     "nodes":  [
                   {
@@ -327,6 +327,11 @@
                   {
                       "id":  "GAP-0002",
                       "label":  "agents.agentsID 4114 duplicate (populated profile + NULL ghost, exit 2 until sign-off)",
+                      "type":  "Risk"
+                  },
+                  {
+                      "id":  "GAP-0003",
+                      "label":  "Target database strategy (in-place VisaEntry vs separate VisaFusion target) - RESOLVED Option A",
                       "type":  "Risk"
                   }
               ],
@@ -750,6 +755,21 @@
                       "from":  "GAP-0001",
                       "to":  "DB-VisaFusion",
                       "type":  "affects"
+                  },
+                  {
+                      "from":  "GAP-0003",
+                      "to":  "SPEC-0004",
+                      "type":  "affects"
+                  },
+                  {
+                      "from":  "GAP-0003",
+                      "to":  "ADR-0001",
+                      "type":  "amends"
+                  },
+                  {
+                      "from":  "GAP-0003",
+                      "to":  "ADR-0003",
+                      "type":  "references"
                   }
               ]
 }

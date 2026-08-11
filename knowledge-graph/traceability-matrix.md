@@ -167,3 +167,11 @@ and is not reproducible by application flow. No approved cleansing rule covers
 it; the copy step's `DuplicateKeyGuard` fails fast (exit 2) before writing any
 row. Owner decision required (recommended: keep populated profile, drop ghost).
 See `findings/gap-0002-agents-duplicate.md`.
+
+### Resolved gap — GAP-0003 (target database strategy, 2026-08-11)
+
+Owner decision (Option A): confirm the separate `VisaFusion` target database per
+ADR-0003 / SPEC-0004; "in-place" means the same SQL Server instance — the legacy
+`VisaEntry` database stays read-only (FR-008) and is never written to. Recorded
+in `findings/gap-0003-inplace-vs-target-db.md`; constitution v1.3.1 and
+ADR-0001 (Amendment 2026-08-11) reflect the clarification.
