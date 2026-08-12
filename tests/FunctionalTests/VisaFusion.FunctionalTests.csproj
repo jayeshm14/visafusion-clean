@@ -12,10 +12,17 @@
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.20" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.20" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="xunit" Version="2.5.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
   </ItemGroup>
+  <!--
+    Microsoft.EntityFrameworkCore.InMemory (8.0.20, test-only) — SPEC-0005 T007
+    deviation: the 5-role login functional test needs a hermetic identity store;
+    the plan's "no new NuGet packages" assumption was already falsified at T002,
+    and the InMemory provider is the standard hermetic EF test backing store.
+  -->
 
   <ItemGroup>
     <Using Include="Xunit" />

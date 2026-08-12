@@ -134,8 +134,12 @@ decisions and their rationale.
 
 - **Decision**: The importer reads `active` from all three legacy sources
   (`agents.active`, `registration.active`, `Udaan_users.active`) and sets
-  `LockoutEnabled = !active`, plus a past `LockoutEnd` for inactive accounts so they
-  are actually blocked at sign-in (FR-009/AC-010).
+  `LockoutEnabled = !active`, plus a far-future `LockoutEnd` for inactive accounts so
+  they are actually blocked at sign-in (FR-009/AC-010). CORRECTED 2026-08-11 from the
+  original "past `LockoutEnd`" wording: `UserManager.IsLockedOutAsync` in the installed
+  8.0.29 shared framework returns `true` only when `LockoutEnabled` is set AND
+  `LockoutEnd >= DateTimeOffset.UtcNow` — a past `LockoutEnd` would NOT block the
+  account, so the permanent-lockout value is a far-future date.
 - **Rationale**: Verified `IdentityImporter.cs` line 188 hardcodes `LockoutEnabled = 1`
   in the INSERT VALUES — the deviation documented in the spec §5/§9. The legacy
   `active` flag's meaning is preserved (inactive → cannot sign in).

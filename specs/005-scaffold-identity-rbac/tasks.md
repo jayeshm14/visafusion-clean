@@ -33,8 +33,8 @@
 
 **Purpose**: Re-verify the SPEC-0003/SPEC-0004 baseline the feature builds on (scaffold already exists — no project initialization is needed) and confirm the branch is clean.
 
-- [ ] T001 Build the full solution and boot `VisaFusion.Web` with no external services beyond SQL Server (re-verifies FR-001/FR-002; `dotnet build VisaFusion.sln`)
-- [ ] T002 [P] Verify the identity-store NuGet reference (`Microsoft.Extensions.Identity.Stores`) is already referenced by `src/VisaFusion.Identity/VisaFusion.Identity.csproj` and confirm no new NuGet packages are required (plan.md §Technical Context), then record the confirmation in the feature docs
+- [x] T001 Build the full solution and boot `VisaFusion.Web` with no external services beyond SQL Server (re-verifies FR-001/FR-002; `dotnet build VisaFusion.sln`) — build verified 2026-08-11: succeeded, 0 warnings / 0 errors
+- [x] T002 [P] Verify the identity-store NuGet reference (`Microsoft.Extensions.Identity.Stores`) is already referenced by `src/VisaFusion.Identity/VisaFusion.Identity.csproj` and confirm no new NuGet packages are required (plan.md §Technical Context), then record the confirmation in the feature docs — VERIFIED 2026-08-11: `Microsoft.Extensions.Identity.Stores 8.0.20` present. **DEVIATION**: the plan's "no new packages" assumption is falsified — the installed 8.0.29 shared framework does not ship `Microsoft.AspNetCore.Identity.EntityFrameworkCore` (nor any EF Core assembly); `Microsoft.AspNetCore.Identity.EntityFrameworkCore 8.0.20` was added to `VisaFusion.Identity.csproj` (version aligned with EF Core/Identity.Stores 8.0.20; EF Core itself flows transitively from `VisaFusion.Data`)
 
 **Checkpoint**: Baseline verified — Phase 2 can start.
 
@@ -46,9 +46,9 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 [P] Create `VisaFusionIdentityDbContext` (IdentityDbContext<VisaFusionUser, IdentityRole, string>) mapping `AspNetUsers`/`AspNetRoles`/`AspNetUserRoles` plus the auxiliary tables (`AspNetUserClaims`, `AspNetRoleClaims`, `AspNetUserLogins`, `AspNetUserTokens`) with the custom columns `LegacyUdaanUserId`/`LegacyRegistrationId`/`AgentId` in `src/VisaFusion.Identity/Persistence/VisaFusionIdentityDbContext.cs` (spec §16, data-model.md §1)
-- [ ] T004 [P] Extend `IdentityImporter.EnsureIdentitySchemaAsync` DDL idempotently with the four standard auxiliary Identity tables so the full store contract exists in the target `VisaFusion` database — `src/VisaFusion.Migration/Identity/IdentityImporter.cs` (spec §16; keep the identity step re-runnable)
-- [ ] T005 [P] Create the auth request/response contracts `LoginRequest.cs`, `LoginResponse.cs`, `RegisterRequest.cs`, `ChangePasswordRequest.cs` in `src/VisaFusion.Api/Contracts/` (reuse `ApiError.cs`; spec §15, contracts/auth-api.md)
+- [x] T003 [P] Create `VisaFusionIdentityDbContext` (IdentityDbContext<VisaFusionUser, IdentityRole, string>) mapping `AspNetUsers`/`AspNetRoles`/`AspNetUserRoles` plus the auxiliary tables (`AspNetUserClaims`, `AspNetRoleClaims`, `AspNetUserLogins`, `AspNetUserTokens`) with the custom columns `LegacyUdaanUserId`/`LegacyRegistrationId`/`AgentId` in `src/VisaFusion.Identity/Persistence/VisaFusionIdentityDbContext.cs` (spec §16, data-model.md §1) — delivered 2026-08-11
+- [x] T004 [P] Extend `IdentityImporter.EnsureIdentitySchemaAsync` DDL idempotently with the four standard auxiliary Identity tables so the full store contract exists in the target `VisaFusion` database — `src/VisaFusion.Migration/Identity/IdentityImporter.cs` (spec §16; keep the identity step re-runnable) — delivered 2026-08-11 (tables added inside the same `IF OBJECT_ID('AspNetUsers','U') IS NULL` guard; step stays re-runnable)
+- [x] T005 [P] Create the auth request/response contracts `LoginRequest.cs`, `LoginResponse.cs`, `RegisterRequest.cs`, `ChangePasswordRequest.cs` in `src/VisaFusion.Api/Contracts/` (reuse `ApiError.cs`; spec §15, contracts/auth-api.md) — delivered 2026-08-11
 
 **Checkpoint**: Foundation ready — user story implementation can now begin in parallel.
 
@@ -64,19 +64,19 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T006 [P] [US1] Unit tests for claim resolution — role/`AgentId`/`SuperUser` claim types and the AgentId-from-claims helper (FR-007/FR-008) in `tests/UnitTests`
-- [ ] T007 [P] [US1] Functional test for 5-role login + token claims (AC-001/TS-001; hermetic `WebApplicationFactory`, `ISecurityGateService` stubbed open-day, token-minted with test-config key) in `tests/FunctionalTests`
-- [ ] T008 [P] [US1] Integration tests: inactive account cannot sign in (AC-010/TS-010) and no plaintext password retrievable in DB (AC-002/TS-002; self-skipping when SQL Server is unreachable) in `tests/IntegrationTests`
+- [x] T006 [P] [US1] Unit tests for claim resolution — role/`AgentId`/`SuperUser` claim types and the AgentId-from-claims helper (FR-007/FR-008) in `tests/UnitTests` — delivered 2026-08-11 (`tests/UnitTests/IdentityClaimsTests.cs`, 11 tests, all green)
+- [x] T007 [P] [US1] Functional test for 5-role login + token claims (AC-001/TS-001; hermetic `WebApplicationFactory`, `ISecurityGateService` stubbed open-day, token-minted with test-config key) in `tests/FunctionalTests` — delivered 2026-08-11 (`tests/FunctionalTests/AuthLoginTests.cs`, 9 tests incl. malformed-JSON→400, all green; EF InMemory store in `VisaFusionWebApplicationFactory`, test-only package deviation — see deviation log §4). NOTE: the day-gate is wired in US2, so no `ISecurityGateService` stub is needed yet — the `emp` login case passes through the gate-free path (stub arrives with T019)
+- [x] T008 [P] [US1] Integration tests: inactive account cannot sign in (AC-010/TS-010) and no plaintext password retrievable in DB (AC-002/TS-002; self-skipping when SQL Server is unreachable) in `tests/IntegrationTests` — delivered 2026-08-11 (`tests/IntegrationTests/IdentityLockoutTests.cs`, 6 tests + 2 `IdentityActive` parse-rule unit tests, all green against the live `VisaFusion` DB; rows cleaned up after each test)
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Register `AddIdentityCore<VisaFusionUser>` + roles + `VisaFusionIdentityDbContext` + password options (min 8, no complexity) in `src/VisaFusion.Web/Program.cs` (FR-017, spec §12)
-- [ ] T010 [P] [US1] Create `IdentityClaims` claim types + AgentId resolution helper in `src/VisaFusion.Api/Authorization/IdentityClaims.cs` (FR-007/FR-008)
-- [ ] T011 [US1] Implement `POST /api/v1/auth/login` (validates against the migrated store, returns JWT with role claims + claim-bound `AgentId` + `SuperUser` claim; 401 bad credentials) and `POST /api/v1/auth/logout` in `src/VisaFusion.Api/Endpoints/AuthEndpoint.cs` (depends on T010; FR-017, contracts/auth-api.md §1–2)
-- [ ] T012 [US1] Implement `POST /api/v1/public/register` (role fixed server-side to `guest`, password policy min 8, unique username/email, never assigns a privileged role — FR-012) with rate limiting configured per the R7 decision (configuration-driven only, no invented thresholds) in `src/VisaFusion.Api/Endpoints/PublicEndpoint.cs` (depends on T005, T009)
-- [ ] T013 [P] [US1] Create Web `/Auth/Login` Razor Page (cookie sign-in; renders `rsn` reason inline; legacy `relogin.asp?rsn=` mirror) in `src/VisaFusion.Web/Pages/Auth/Login.cshtml` + `.cs` (spec §14)
-- [ ] T014 [P] [US1] Create Web `/Auth/AccessDenied` Razor Page in `src/VisaFusion.Web/Pages/Auth/AccessDenied.cshtml` + `.cs` (spec §14)
-- [ ] T015 [US1] Align the identity importer with §7: read `active` from all three legacy sources, set `LockoutEnabled = !active` and a past `LockoutEnd` for inactive accounts (fixes the hardcoded `LockoutEnabled=1` deviation at `IdentityImporter.cs` line 188) in `src/VisaFusion.Migration/Identity/IdentityImporter.cs` (FR-009, data-model.md §4.3; sequential with T004 — same file)
+- [x] T009 [US1] Register `AddIdentityCore<VisaFusionUser>` + roles + `VisaFusionIdentityDbContext` + password options (min 8, no complexity) in `src/VisaFusion.Web/Program.cs` (FR-017, spec §12) — delivered 2026-08-11 (IdentityConstants.ApplicationScheme cookie scheme, LoginPath/AccessDeniedPath, config-driven cookie lifetime CHK040)
+- [x] T010 [P] [US1] Create `IdentityClaims` claim types + AgentId resolution helper in `src/VisaFusion.Api/Authorization/IdentityClaims.cs` (FR-007/FR-008) — delivered 2026-08-11
+- [x] T011 [US1] Implement `POST /api/v1/auth/login` (validates against the migrated store, returns JWT with role claims + claim-bound `AgentId` + `SuperUser` claim; 401 bad credentials) and `POST /api/v1/auth/logout` in `src/VisaFusion.Api/Endpoints/AuthEndpoint.cs` (depends on T010; FR-017, contracts/auth-api.md §1–2) — delivered 2026-08-11 (JwtBearer 8.0.20 added to `VisaFusion.Api.csproj` — deviation log §4; GET auth stub superseded, `ApiSurfaceTests` updated)
+- [x] T012 [US1] Implement `POST /api/v1/public/register` (role fixed server-side to `guest`, password policy min 8, unique username/email, never assigns a privileged role — FR-012) with rate limiting configured per the R7 decision (configuration-driven only, no invented thresholds) in `src/VisaFusion.Api/Endpoints/PublicEndpoint.cs` (depends on T005, T009) — delivered 2026-08-11 (rate limiter registered + `UseRateLimiter` wired only when the owner supplies thresholds; orphaned-user rollback on role-assignment failure)
+- [x] T013 [P] [US1] Create Web `/Auth/Login` Razor Page (cookie sign-in; renders `rsn` reason inline; legacy `relogin.asp?rsn=` mirror) in `src/VisaFusion.Web/Pages/Auth/Login.cshtml` + `.cs` (spec §14) — delivered 2026-08-11 (local-only returnUrl redirect)
+- [x] T014 [P] [US1] Create Web `/Auth/AccessDenied` Razor Page in `src/VisaFusion.Web/Pages/Auth/AccessDenied.cshtml` + `.cs` (spec §14) — delivered 2026-08-11
+- [x] T015 [US1] Align the identity importer with §7: read `active` from all three legacy sources, set `LockoutEnabled = !active` and a FAR-FUTURE `LockoutEnd` for inactive accounts (fixes the hardcoded `LockoutEnabled=1` deviation at `IdentityImporter.cs` line 188; the 2026-08-11 correction supersedes the earlier "past LockoutEnd" draft — a past `LockoutEnd` does NOT block `IsLockedOutAsync`) in `src/VisaFusion.Migration/Identity/IdentityImporter.cs` (FR-009, data-model.md §4.3; sequential with T004 — same file) — delivered 2026-08-11 (`IdentityActive.cs` parse rule: only explicit `'N'` is inactive; NULL/`'Y'` active — verified live, data-model.md §4.3)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently (5-role login works).
 

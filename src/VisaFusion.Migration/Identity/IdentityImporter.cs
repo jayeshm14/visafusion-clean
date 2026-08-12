@@ -20,12 +20,20 @@ public sealed class IdentityImportResult
 public sealed record IdentityReportSkipped(string Source, string? Username, string? Email);
 
 /// <summary>
-/// Identity import pipeline (SPEC-0004 T038, FR-004). Reads the three legacy
-/// identity sources in priority order — `agents` → `registration` →
-/// `Udaan_users` — and creates hashed ASP.NET Core Identity users with the
-/// mapped roles. First-source-wins on duplicate username/email; skipped
-/// duplicates are listed in the report. Passwords are hashed on import
+/// Identity import pipeline (SPEC-0004 T038, FR-004; SPEC-0005 T015, FR-009).
+/// Reads the three legacy identity sources in priority order — `agents` →
+/// `registration` → `Udaan_users` — and creates hashed ASP.NET Core Identity
+/// users with the mapped roles. First-source-wins on duplicate username/email;
+/// skipped duplicates are listed in the report. Passwords are hashed on import
 /// (never plaintext, BR-002/AC-004).
+///
+/// Lockout alignment (SPEC-0005 T015, FR-009, spec §16): the legacy `active`
+/// flag is read from all three sources via <see cref="IdentityActive"/> and an
+/// inactive account (`active = 'N'`) is imported with `LockoutEnabled = 1` and
+/// a FAR-FUTURE `LockoutEnd` — `IsLockedOutAsync` (installed 8.0.29 shared
+/// framework) blocks only when `LockoutEnd >= UtcNow`, so a past date would
+/// not block (corrected 2026-08-11; replaces the hardcoded `LockoutEnabled=1`
+/// deviation). Active accounts import with `LockoutEnabled = 0`.
 /// </summary>
 public sealed class IdentityImporter
 {
@@ -56,13 +64,13 @@ public sealed class IdentityImporter
             await legacy.OpenAsync(ct);
             await foreach (var row in ReadAgentsAsync(legacy, ct))
             {
-                var (userName, email, agentId) = row;
+                var (userName, email, agentId, inactive) = row;
                 if (!TryTake(userName, email, seenUsernames, seenEmails))
                 {
                     result.SkippedDuplicates.Add(new IdentityReportSkipped("agents", userName, email));
                     continue;
                 }
-                await InsertUserAsync(target, userName, email, null, IdentityIntegration.Roles.Agent, agentId, ct);
+                await InsertUserAsync(target, userName, email, null, IdentityIntegration.Roles.Agent, agentId, inactive, ct);
                 result.Agents++;
             }
         }
@@ -73,14 +81,14 @@ public sealed class IdentityImporter
             await legacy.OpenAsync(ct);
             await foreach (var row in ReadRegistrationAsync(legacy, ct))
             {
-                var (userName, email, password) = row;
+                var (userName, email, password, inactive) = row;
                 if (!TryTake(userName, email, seenUsernames, seenEmails))
                 {
                     result.SkippedDuplicates.Add(new IdentityReportSkipped("registration", userName, email));
                     continue;
                 }
                 var hash = PasswordHasher.Hash(password);
-                await InsertUserAsync(target, userName, email, hash, IdentityIntegration.Roles.Guest, null, ct);
+                await InsertUserAsync(target, userName, email, hash, IdentityIntegration.Roles.Guest, null, inactive, ct);
                 result.Registration++;
             }
         }
@@ -93,7 +101,7 @@ public sealed class IdentityImporter
             var agentByDescription = await LoadAgentByDescriptionAsync(legacy, ct);
             await foreach (var row in ReadUdaanUsersAsync(legacy, ct))
             {
-                var (userName, email, password, role, udaanId) = row;
+                var (userName, email, password, role, udaanId, inactive) = row;
                 int? agentId = role == IdentityIntegration.Roles.Agent
                     && !string.IsNullOrEmpty(userName)
                     && agentByDescription.TryGetValue(userName.Trim(), out var aid)
@@ -105,7 +113,7 @@ public sealed class IdentityImporter
                     continue;
                 }
                 var hash = PasswordHasher.Hash(password);
-                await InsertUserAsync(target, userName, email, hash, role, agentId, ct);
+                await InsertUserAsync(target, userName, email, hash, role, agentId, inactive, ct);
                 result.UdaanUsers++;
             }
         }
@@ -169,6 +177,55 @@ public sealed class IdentityImporter
                     FOREIGN KEY (UserId) REFERENCES AspNetUsers(Id) ON DELETE CASCADE,
                     FOREIGN KEY (RoleId) REFERENCES AspNetRoles(Id) ON DELETE CASCADE
                 );
+            END
+            -- Four standard auxiliary Identity tables (SPEC-0005 T004) so the
+            -- runtime store contract is complete; schema matches the shared
+            -- framework's IdentityDbContext model. Each table has its OWN
+            -- existence guard (not nested in the AspNetUsers guard): the
+            -- identity step is re-runnable, and a target DB that already has
+            -- AspNetUsers (e.g. from a pre-T004 run) must still get the
+            -- auxiliary tables.
+            IF OBJECT_ID('AspNetUserClaims', 'U') IS NULL
+            BEGIN
+                CREATE TABLE AspNetUserClaims (
+                    Id         int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+                    UserId     nvarchar(450) NOT NULL,
+                    ClaimType  nvarchar(max) NULL,
+                    ClaimValue nvarchar(max) NULL,
+                    FOREIGN KEY (UserId) REFERENCES AspNetUsers(Id) ON DELETE CASCADE
+                );
+            END
+            IF OBJECT_ID('AspNetRoleClaims', 'U') IS NULL
+            BEGIN
+                CREATE TABLE AspNetRoleClaims (
+                    Id         int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+                    RoleId     nvarchar(450) NOT NULL,
+                    ClaimType  nvarchar(max) NULL,
+                    ClaimValue nvarchar(max) NULL,
+                    FOREIGN KEY (RoleId) REFERENCES AspNetRoles(Id) ON DELETE CASCADE
+                );
+            END
+            IF OBJECT_ID('AspNetUserLogins', 'U') IS NULL
+            BEGIN
+                CREATE TABLE AspNetUserLogins (
+                    LoginProvider        nvarchar(450) NOT NULL,
+                    ProviderKey          nvarchar(450) NOT NULL,
+                    ProviderDisplayName  nvarchar(max) NULL,
+                    UserId               nvarchar(450) NOT NULL,
+                    PRIMARY KEY (LoginProvider, ProviderKey),
+                    FOREIGN KEY (UserId) REFERENCES AspNetUsers(Id) ON DELETE CASCADE
+                );
+            END
+            IF OBJECT_ID('AspNetUserTokens', 'U') IS NULL
+            BEGIN
+                CREATE TABLE AspNetUserTokens (
+                    UserId        nvarchar(450) NOT NULL,
+                    LoginProvider nvarchar(450) NOT NULL,
+                    Name          nvarchar(450) NOT NULL,
+                    Value         nvarchar(max) NULL,
+                    PRIMARY KEY (UserId, LoginProvider, Name),
+                    FOREIGN KEY (UserId) REFERENCES AspNetUsers(Id) ON DELETE CASCADE
+                );
             END";
         await using var cmd = target.CreateCommand();
         cmd.CommandText = sql;
@@ -176,16 +233,22 @@ public sealed class IdentityImporter
     }
 
     private static async Task InsertUserAsync(SqlConnection target, string? userName, string? email,
-        string? passwordHash, string role, int? agentId, CancellationToken ct)
+        string? passwordHash, string role, int? agentId, bool inactive, CancellationToken ct)
     {
         var userId = Guid.NewGuid().ToString("N");
+        // FR-009 (SPEC-0005 T015): inactive accounts import with
+        // LockoutEnabled = 1 and a FAR-FUTURE LockoutEnd — IsLockedOutAsync
+        // blocks only when LockoutEnd >= UtcNow (verified against the installed
+        // 8.0.29 shared framework; a past LockoutEnd would NOT block).
+        var lockoutEnabled = inactive ? 1 : 0;
+        var lockoutEnd = inactive ? (object)DateTimeOffset.UtcNow.AddYears(100) : DBNull.Value;
         var sql = @"
             INSERT INTO AspNetUsers (Id, UserName, NormalizedUserName, Email, NormalizedEmail,
                 EmailConfirmed, PasswordHash, SecurityStamp, ConcurrencyStamp,
                 PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, LockoutEnd,
                 LockoutEnabled, AccessFailedCount, LegacyUdaanUserId, LegacyRegistrationId, AgentId)
             VALUES (@id, @userName, @normUser, @email, @normEmail, 0, @hash,
-                NEWID(), NEWID(), NULL, 0, 0, NULL, 1, 0, NULL, NULL, @agent);
+                NEWID(), NEWID(), NULL, 0, 0, @lockoutEnd, @lockoutEnabled, 0, NULL, NULL, @agent);
             INSERT INTO AspNetUserRoles (UserId, RoleId) VALUES (@id, @role);";
         await using var cmd = target.CreateCommand();
         cmd.CommandText = sql;
@@ -195,6 +258,8 @@ public sealed class IdentityImporter
         cmd.Parameters.AddWithValue("@email", (object?)email ?? DBNull.Value);
         cmd.Parameters.AddWithValue("@normEmail", (object?)email?.Trim().ToUpperInvariant() ?? DBNull.Value);
         cmd.Parameters.AddWithValue("@hash", (object?)passwordHash ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@lockoutEnd", lockoutEnd);
+        cmd.Parameters.AddWithValue("@lockoutEnabled", lockoutEnabled);
         cmd.Parameters.AddWithValue("@agent", (object?)agentId ?? DBNull.Value);
         cmd.Parameters.AddWithValue("@role", role);
         await cmd.ExecuteNonQueryAsync(ct);
@@ -212,42 +277,44 @@ public sealed class IdentityImporter
         return map;
     }
 
-    private static async IAsyncEnumerable<(string? UserName, string? Email, int? AgentId)> ReadAgentsAsync(
+    private static async IAsyncEnumerable<(string? UserName, string? Email, int? AgentId, bool Inactive)> ReadAgentsAsync(
         SqlConnection legacy, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken ct)
     {
         await using var cmd = legacy.CreateCommand();
-        cmd.CommandText = "SELECT [Description], [Emailid], [agentsID] FROM [agents] ORDER BY [agentsID]";
+        cmd.CommandText = "SELECT [Description], [Emailid], [agentsID], [active] FROM [agents] ORDER BY [agentsID]";
         await using var r = await cmd.ExecuteReaderAsync(ct);
         while (await r.ReadAsync(ct))
         {
             var name = r.IsDBNull(0) ? null : r.GetString(0);
             var email = r.IsDBNull(1) ? null : r.GetString(1);
             int? agentId = r.IsDBNull(2) ? (int?)null : r.GetInt32(2);
-            yield return (name, email, agentId);
+            var inactive = IdentityActive.IsInactive(r.IsDBNull(3) ? null : r.GetString(3));
+            yield return (name, email, agentId, inactive);
         }
     }
 
-    private static async IAsyncEnumerable<(string? UserName, string? Email, string? Password)> ReadRegistrationAsync(
+    private static async IAsyncEnumerable<(string? UserName, string? Email, string? Password, bool Inactive)> ReadRegistrationAsync(
         SqlConnection legacy, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken ct)
     {
         await using var cmd = legacy.CreateCommand();
-        cmd.CommandText = "SELECT [uid], [emailid], [pwd] FROM [registration] ORDER BY [registID]";
+        cmd.CommandText = "SELECT [uid], [emailid], [pwd], [active] FROM [registration] ORDER BY [registID]";
         await using var r = await cmd.ExecuteReaderAsync(ct);
         while (await r.ReadAsync(ct))
         {
             var name = r.IsDBNull(0) ? null : r.GetString(0);
             var email = r.IsDBNull(1) ? null : r.GetString(1);
             var pwd = r.IsDBNull(2) ? null : r.GetString(2);
-            yield return (name, email, pwd);
+            var inactive = IdentityActive.IsInactive(r.IsDBNull(3) ? null : r.GetString(3));
+            yield return (name, email, pwd, inactive);
         }
     }
 
-    private static async IAsyncEnumerable<(string? UserName, string? Email, string? Password, string Role, int? UdaanId)> ReadUdaanUsersAsync(
+    private static async IAsyncEnumerable<(string? UserName, string? Email, string? Password, string Role, int? UdaanId, bool Inactive)> ReadUdaanUsersAsync(
         SqlConnection legacy, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken ct)
     {
         await using var cmd = legacy.CreateCommand();
         cmd.CommandText = """
-            SELECT [username], [emailid], [Password], [privilege]
+            SELECT [username], [emailid], [Password], [privilege], [active]
               FROM [Udaan_users]
              ORDER BY [username]
             """;
@@ -265,7 +332,8 @@ public sealed class IdentityImporter
                 "agt" => IdentityIntegration.Roles.Agent,
                 _ => IdentityIntegration.Roles.Employee
             };
-            yield return (name, email, pwd, role, null);
+            var inactive = IdentityActive.IsInactive(r.IsDBNull(4) ? null : r.GetString(4));
+            yield return (name, email, pwd, role, null, inactive);
         }
     }
 }

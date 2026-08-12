@@ -1,0 +1,26 @@
+@page
+@model VisaFusion.Web.Pages.Auth.LoginModel
+@{
+    ViewData["Title"] = "Log in";
+}
+
+<h1>Log in</h1>
+
+@if (Model.ReasonMessage is not null)
+{
+    <p role="alert">@Model.ReasonMessage</p>
+}
+
+<form method="post">
+    <div asp-validation-summary="ModelOnly"></div>
+    <div>
+        <label asp-for="UserName"></label>
+        <input asp-for="UserName" autocomplete="username" />
+    </div>
+    <div>
+        <label asp-for="Password"></label>
+        <input asp-for="Password" type="password" autocomplete="current-password" />
+    </div>
+    <button type="submit">Log in</button>
+    <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
+</form>

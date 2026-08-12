@@ -1,7 +1,8 @@
 using System.Text;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry.Metrics;
@@ -14,6 +15,8 @@ using VisaFusion.Api.Errors;
 using VisaFusion.Core;
 using VisaFusion.Core.Application;
 using VisaFusion.Data.Persistence;
+using VisaFusion.Identity;
+using VisaFusion.Identity.Persistence;
 using VisaFusion.Web.Middleware;
 
 namespace VisaFusion.Web;
@@ -55,13 +58,49 @@ public partial class Program
             .AddApplicationPart(typeof(ApiMarker).Assembly);
         builder.Services.AddRazorPages();
 
-        // ---- Cookie authentication for the Web UI (T029, FR-010) ----
+        // ---- ASP.NET Core Identity + cookie auth for the Web UI (T009, FR-017) ----
+        // AddIdentityCore registers the consolidated store against the existing
+        // AspNetUsers/AspNetRoles/AspNetUserRoles tables (SPEC-0005 T003/T004)
+        // so UserManager/SignInManager authenticate the migrated credentials.
+        // The password policy (spec §12/§17, CHK044): minimum 8 characters, no
+        // forced complexity — applied to NEW credentials only; migrated legacy
+        // hashes are unaffected.
         builder.Services
-            .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie(options =>
+            .AddIdentityCore<IdentityIntegration.VisaFusionUser>(options =>
+            {
+                options.Password.RequiredLength = 8;
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.User.RequireUniqueEmail = true;
+            })
+            .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<VisaFusionIdentityDbContext>()
+            .AddSignInManager();
+
+        // The identity store maps the migration-tool DDL (schema source of
+        // truth, plan.md §Constraints); connection comes from configuration.
+        builder.Services.AddDbContext<VisaFusionIdentityDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Services.AddHttpContextAccessor();
+
+        // Cookie scheme = IdentityConstants.ApplicationScheme so SignInManager
+        // issues the Web login cookie; the /api/v1 surface keeps JWT bearer
+        // (SPEC-0003 FR-010). Cookie lifetime is read from configuration ONLY
+        // (CHK040, spec §15) — no hard-coded value; the owner confirms before
+        // go-live.
+        builder.Services
+            .AddAuthentication(IdentityConstants.ApplicationScheme)
+            .AddCookie(IdentityConstants.ApplicationScheme, options =>
             {
                 options.LoginPath = "/Auth/Login";
                 options.AccessDeniedPath = "/Auth/AccessDenied";
+                if (double.TryParse(builder.Configuration["Auth:Cookie:ExpireMinutes"], out var cookieMinutes)
+                    && cookieMinutes > 0)
+                {
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(cookieMinutes);
+                }
             });
 
         // ---- JWT bearer authentication for the /api/v1 surface (T043, FR-010) ----
@@ -122,6 +161,33 @@ public partial class Program
             options.UseSqlServer(
                 builder.Configuration.GetConnectionString("DefaultConnection")));
 
+        // ---- Public-write rate limiting (spec §17, Risk R7, CHK026) ----
+        // The built-in fixed-window limiter is registered for the register
+        // route ONLY when the owner supplies configuration values
+        // (`RateLimiting:Register:PermitLimit` / `:WindowSeconds`) — no
+        // threshold is hard-coded or invented; the owner confirms before
+        // go-live.
+        var registerPermitLimit = builder.Configuration["RateLimiting:Register:PermitLimit"];
+        var registerWindowSeconds = builder.Configuration["RateLimiting:Register:WindowSeconds"];
+        var permitLimit = 0;
+        var windowSeconds = 0;
+        var registerLimiterConfigured = int.TryParse(registerPermitLimit, out permitLimit)
+            && int.TryParse(registerWindowSeconds, out windowSeconds)
+            && permitLimit > 0 && windowSeconds > 0;
+        if (registerLimiterConfigured)
+        {
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+                options.AddFixedWindowLimiter("register", limiter =>
+                {
+                    limiter.PermitLimit = permitLimit;
+                    limiter.Window = TimeSpan.FromSeconds(windowSeconds);
+                    limiter.QueueLimit = 0;
+                });
+            });
+        }
+
         var app = builder.Build();
 
         // Centralized exception handling (T015, spec §18) before any other middleware
@@ -137,6 +203,18 @@ public partial class Program
         app.UseStaticFiles();
 
         app.UseRouting();
+
+        // Rate limiting (spec §17, Risk R7, CHK026): the middleware is only
+        // added when the owner supplied the register thresholds (the limiter
+        // registration above is conditional); without this call the
+        // RequireRateLimiting metadata on the register route would never be
+        // enforced. Placed after UseRouting (needs endpoint metadata) and
+        // before auth so anonymous endpoints are throttled too. Conditional
+        // because UseRateLimiter throws if AddRateLimiter was not registered.
+        if (registerLimiterConfigured)
+        {
+            app.UseRateLimiter();
+        }
 
         app.UseAuthentication();
         app.UseAuthorization();
@@ -203,10 +281,29 @@ public partial class Program
         // Public area is anonymous-allowed by design (migration plan §4.2).
         app.MapGet("/api/v1/public", (HttpContext ctx) => RepresentativeEndpoint.Handle(ctx));
 
-        // Auth area is anonymous-allowed by design (T070, HG-1): the legacy Auth
-        // module is the anonymous login/registration entry point, so requiring a
-        // token to reach the auth representative contradicts its purpose.
-        app.MapGet("/api/v1/auth", (HttpContext ctx) => AuthEndpoint.Handle(ctx));
+        // ---- Auth + public write surface (T011/T012, FR-017/FR-012, contracts/auth-api.md) ----
+        // Login is anonymous — the legacy Auth module is the anonymous
+        // login/registration entry point; logout is bearer-authenticated
+        // (stateless JWT — the client discards the token, §2). The old GET
+        // representative stub is superseded by the POST login/logout contract.
+        app.MapPost("/api/v1/auth/login", (HttpContext ctx, UserManager<IdentityIntegration.VisaFusionUser> userManager, IConfiguration config) =>
+            AuthEndpoint.LoginAsync(ctx, userManager, config));
+
+        app.MapPost("/api/v1/auth/logout", (HttpContext ctx) => AuthEndpoint.LogoutAsync(ctx))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        // Public registration (FR-012): anonymous by design, role fixed
+        // server-side to `guest`; rate-limited per the R7 configuration when
+        // the owner supplies thresholds (no invented values).
+        var registerRoute = app.MapPost("/api/v1/public/register", (HttpContext ctx, UserManager<IdentityIntegration.VisaFusionUser> userManager) =>
+            PublicEndpoint.RegisterAsync(ctx, userManager));
+        if (registerLimiterConfigured)
+        {
+            registerRoute.RequireRateLimiting("register");
+        }
 
         app.Run();
     }

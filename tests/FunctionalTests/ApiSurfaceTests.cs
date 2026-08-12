@@ -75,17 +75,14 @@ public class ApiSurfaceTests : IClassFixture<VisaFusionWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Auth_Endpoint_Is_Anonymous_Allowed_And_Returns_Empty_Stub()
+    public async Task Auth_Get_Stub_Is_Superseded_By_The_Post_Contract()
     {
-        // T064/T070 (HG-1): the eighth area endpoint must resolve. The legacy Auth
-        // module is the anonymous login/registration entry point, so /api/v1/auth
-        // is anonymous-allowed and returns the standard stub { items: [], count: 0 }.
+        // SPEC-0005 T011: the anonymous GET auth representative stub is
+        // replaced by POST /api/v1/auth/login + /logout (contracts/auth-api.md);
+        // a GET to the auth base path no longer resolves.
         var response = await _client.GetAsync("/api/v1/auth");
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        var body = await response.Content.ReadFromJsonAsync<RepresentativeListResponse>();
-        Assert.NotNull(body);
-        Assert.Equal(0, body.Count);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     private string CreateTestToken(string role)

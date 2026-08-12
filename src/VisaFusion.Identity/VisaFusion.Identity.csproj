@@ -8,9 +8,15 @@
     ASP.NET Core Identity (Microsoft.AspNetCore.Identity) is provided by the
     ASP.NET Core shared framework via FrameworkReference (T050). The
     Microsoft.Extensions.Identity.Stores package supplies the store abstractions.
+    Microsoft.AspNetCore.Identity.EntityFrameworkCore (IdentityDbContext and the
+    EF store types) is NOT part of the shared framework on .NET 8 — verified
+    2026-08-11 against the installed 8.0.29 shared framework — so it is referenced
+    explicitly (SPEC-0005 T002 deviation; version aligned with the EF Core 8.0.20
+    and Identity.Stores 8.0.20 already in use).
   -->
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.20" />
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.20" />
   </ItemGroup>
 

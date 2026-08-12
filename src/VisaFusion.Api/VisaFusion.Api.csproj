@@ -15,6 +15,18 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
+  <!--
+    Microsoft.AspNetCore.Authentication.JwtBearer (8.0.20) — SPEC-0005 T011
+    deviation: the login endpoint mints the JWT (JwtSecurityTokenHandler,
+    System.IdentityModel.Tokens.Jwt), which is NOT part of the .NET 8 shared
+    framework (verified 2026-08-11). Version aligned with the Web host's
+    existing JwtBearer 8.0.20 reference (T002 established the package-alignment
+    precedent).
+  -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.20" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

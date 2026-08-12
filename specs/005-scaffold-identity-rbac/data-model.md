@@ -26,7 +26,7 @@ Created by `IdentityImporter.EnsureIdentitySchemaAsync` (SPEC-0004 T040, verifie
 | `SecurityStamp` / `ConcurrencyStamp` | nvarchar(max) | |
 | `PhoneNumber` / `PhoneNumberConfirmed` | nvarchar(max) / bit | |
 | `TwoFactorEnabled` | bit | 0 |
-| `LockoutEnd` | datetimeoffset | past date for inactive accounts (this feature: `active`→lockout alignment, FR-009) |
+| `LockoutEnd` | datetimeoffset | far-future date for inactive accounts so the framework actually blocks them (corrected 2026-08-11 — `IsLockedOutAsync` blocks only when `LockoutEnd >= UtcNow`, a past date does not block; this feature: `active`→lockout alignment, FR-009) |
 | `LockoutEnabled` | bit | **`!active`** after alignment (currently hardcoded `1` — verified `IdentityImporter.cs` line 188) |
 | `AccessFailedCount` | int | 0 |
 | `LegacyUdaanUserId` | int? | source link |
@@ -90,7 +90,9 @@ Note: the legacy `elseif` branch (`rsAdm("closingtime")<>""`) is unreachable giv
 - **Day-gate** (FR-018): applies to `emp` logins only; `rsn=O` rejection / success
   outcomes as above (`rsn=C` never produced).
 - **Lockout** (FR-009): inactive legacy accounts (`active = false`) are locked out
-  (`LockoutEnabled = true` + past `LockoutEnd`) and cannot sign in.
+  (`LockoutEnabled = true` + far-future `LockoutEnd`) and cannot sign in (corrected
+  2026-08-11: `IsLockedOutAsync` requires `LockoutEnd >= UtcNow`, so the block uses a
+  future date — a past date would NOT block).
 
 ## 4. State Transitions
 
@@ -121,8 +123,22 @@ authenticated
 
 ```
 active = true  → LockoutEnabled = false → can sign in
-active = false → LockoutEnabled = true  + LockoutEnd (past) → blocked at sign-in
+active = false → LockoutEnabled = true  + LockoutEnd (far future) → blocked at sign-in
+<!-- Corrected 2026-08-11: IsLockedOutAsync (shared framework 8.0.29) returns true only when
+     LockoutEnabled AND LockoutEnd >= UtcNow — a past LockoutEnd does NOT block. -->
 ```
+
+**`active` parse rule (VERIFIED live 2026-08-11)**: `active` is `varchar(1)` in all
+three sources. The legacy login never checks it (`authenticate.asp`), and the only
+filter in the codebase is `where Active = 'Y'` (dropdown population). An account is
+therefore INACTIVE only when the value is explicitly `'N'` — the deactivation value
+the legacy writes (`addnewagents.asp` line 57 sets `active="Y"` on creation). `'Y'`
+and NULL (never-set) both mean active: locking out NULL rows would change login
+behavior for the 1436 NULL `Udaan_users` rows (including 47 adm and 9 emp of the
+currently logging-in base) and all 43 registration guest accounts. Live counts:
+`agents` 3468 Y / 729 N / 21 NULL; `registration` 43 NULL (all); `Udaan_users`
+929 Y / 0 N / 1436 NULL. Implemented by `IdentityActive.IsInactive`
+(`src/VisaFusion.Migration/Identity/IdentityActive.cs`, T015; deviation log #3).
 
 ## 5. Relationships
 

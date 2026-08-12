@@ -103,8 +103,10 @@ all 5 roles against migrated (hashed) credentials, before any module feature is 
   Razor Pages (cookie sign-in) that the existing `LoginPath`/`AccessDeniedPath` already
   reference but which do not exist today.
 - Align the import with §7: read `active` from all three legacy sources and set
-  `LockoutEnabled = !active` (with `LockoutEnd` for inactive accounts so they are
-  actually blocked), resolving the current hardcoded `LockoutEnabled=1` deviation.
+  `LockoutEnabled = !active` (with a far-future `LockoutEnd` for inactive accounts so
+  they are actually blocked — corrected 2026-08-11: the framework blocks only when
+  `LockoutEnd >= UtcNow`, see §16), resolving the current hardcoded `LockoutEnabled=1`
+  deviation.
 - Enforce the legacy **employee day-gate** in login (clarified): both the Web cookie
   login and the API login apply the gate for `emp` logins per `authenticate.asp`
   lines 62–79 — login succeeds iff a `security` row exists for today with
@@ -205,7 +207,11 @@ remediation targets are the documented legacy findings.
 - **FR-003**: Legacy `.asp` entry URLs MUST be rewritten to their new routes (login,
   registration, `Default.asp`) so bookmarked legacy links continue to resolve during
   the transition window; unknown `.asp` URLs MUST produce a clear 404, never a silent
-  redirect (NFR-005).
+  redirect (NFR-005). Matching is case-insensitive (legacy IIS/ASP matched
+  case-insensitively); query strings on the source URL are preserved and carried to
+  the target; trailing-slash variants of a mapped path resolve to the same target
+  (default ASP.NET Core routing behavior). `relogin.asp?rsn=*` is deliberately NOT
+  mapped — the modernized login renders the reason inline (contracts/web-ui.md §2).
 - **FR-004**: Static assets (`forms/`, `updateimg/`, `images/`, `css/`, `js/`, `fonts/`)
   MUST be served self-hosted from the app (no CDN), per §9. (Copied by SPEC-0003/0004;
   verified here.)
@@ -414,7 +420,10 @@ remediation targets are the documented legacy findings.
   the default ASP.NET Core Identity schema; the custom columns
   `LegacyUdaanUserId`, `LegacyRegistrationId`, `AgentId` are mapped on `AspNetUsers`.
 - Identity import: aligned with §7 — read `active` from all three legacy sources,
-  set `LockoutEnabled = !active` (and a past `LockoutEnd` for inactive accounts), hash
+  set `LockoutEnabled = !active` (and a far-future `LockoutEnd` for inactive accounts —
+  corrected 2026-08-11: `UserManager.IsLockedOutAsync` in the installed 8.0.29 shared
+  framework blocks only when `LockoutEnd >= UtcNow`, so a PAST `LockoutEnd` does not
+  block sign-in; the permanent-lockout mechanism is a future `LockoutEnd`), hash
   passwords with the platform password hasher in the same transaction as the import
   (§6 step 9), assign roles per §7, first-source-wins dedup (existing behavior).
 - The legacy `Udaan_users` / `registration` tables are NOT dropped; they remain as the
@@ -508,7 +517,11 @@ remediation targets are the documented legacy findings.
   password is not the stored lowercase form cannot sign in after hashing. This is
   handled by hashing exactly the stored value (the only value that works today),
   preserving current behavior; flagged in the import report so the business can
-  reset affected accounts.
+  reset affected accounts. In Phase 0 no reset endpoint is implemented: an affected
+  user cannot self-reset (change-password requires sign-in) and the admin/for-agent
+  password-set endpoints are deferred to the Agent/User-management module features
+  (Phase 3, §15). Affected accounts are therefore reset through the Phase 3
+  admin/for-agent path; Phase 0 delivers no invented reset capability.
 - **R4**: A re-secured endpoint blocks a legitimate workflow that §4.3 did not
   enumerate — mitigated by the test matrix (§8) and the golden-file comparison before
   cutover.
