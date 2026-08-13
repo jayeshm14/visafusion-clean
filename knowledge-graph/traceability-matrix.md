@@ -213,7 +213,7 @@ contracts/web-ui.md, tasks.md (T001–T039)
 
 | Scenario | Test artifact |
 |----------|--------------|
-| TS-001 5-role login | `tests/FunctionalTests/AuthLoginTests.cs` (JWT role claims, AgentId for agt, SuperUser for su) |
+| TS-001 5-role login | `tests/FunctionalTests/AuthLoginTests.cs` (JWT role claims, AgentId for agt, SuperUser for su) + `tests/FunctionalTests/WebLoginPageTests.cs` (cookie-scheme `/Auth/Login` page: valid POST → cookie + redirect to `/`, bad creds → generic error with no cookie) |
 | TS-002 No plaintext | `tests/IntegrationTests/IdentityImportTests.cs` (self-skip w/o SQL Server) + `tests/FunctionalTests/SecuritySpotCheckTests.cs` (no password material in any response surface) |
 | TS-003 Agent isolation | `tests/FunctionalTests/BackdoorAndIsolationTests.cs` (agent A id 999 → 403, own id → 501) |
 | TS-004 RBAC matrix | `tests/FunctionalTests/SecuredWriteRoutesTests.cs` (11 §4.3 routes × 401/403/501) + `tests/UnitTests/AuthorizationPoliciesTests.cs` (11-policy catalog) |
@@ -224,9 +224,23 @@ contracts/web-ui.md, tasks.md (T001–T039)
 | TS-009 Import idempotency | `tests/IntegrationTests/IdentityImportTests.cs` (self-skip w/o SQL Server) |
 | TS-010 Inactive account | `tests/IntegrationTests/IdentityLockoutTests.cs` (self-skip w/o SQL Server) |
 | TS-011 SQLi regression | `tests/FunctionalTests/Phase0E2ETests.cs` (payloads → 401/400, never 500) + `tests/IntegrationTests/NoStringConcatenatedSqlTests.cs` |
-| TS-012 Golden-file parity | `AuthLoginTests` + `ChangePasswordTests` (legacy changepassword.asp flag 2/3 outcomes mirrored) — "where applicable" per migration plan §10 |
-| TS-013 Employee day-gate | `tests/IntegrationTests/SecurityGateIntegrationTests.cs` (self-skip w/o SQL Server) |
-| TS-014 Change-password | `tests/FunctionalTests/ChangePasswordTests.cs` (204 + 3× 400 + 401) |
+| TS-012 Golden-file parity | `AuthLoginTests` + `ChangePasswordTests` (legacy changepassword.asp flag 2/3 outcomes mirrored) — "where applicable" per migration plan §10 + `tests/FunctionalTests/ChangePasswordPageTests.cs` (web page: flag 2/3 messages, policy message, success) |
+| TS-013 Employee day-gate | `tests/IntegrationTests/SecurityGateIntegrationTests.cs` (self-skip w/o SQL Server) + `tests/FunctionalTests/WebLoginPageTests.cs` (endpoint-level: emp rejected → 302 `/Auth/Login?rsn=O` with no cookie; API 403 `rsn=O`; non-emp never gated) |
+| TS-014 Change-password | `tests/FunctionalTests/ChangePasswordTests.cs` (204 + 3× 400 + 401) + `tests/FunctionalTests/ChangePasswordPageTests.cs` (web page: unauthenticated → login redirect, cookie-scheme flow) |
+
+### Rigorous-testing additions (2026-08-13, SPEC-0005)
+
+Gap-closing tests written during the rigorous-testing pass (all suites green —
+see release notes §2):
+
+| Scenario | Test artifact |
+|----------|--------------|
+| Web login page (cookie scheme) | `tests/FunctionalTests/WebLoginPageTests.cs` (8 tests: GET form, `?rsn=O` reason, valid POST, bad creds, day-gate rejection, non-emp not gated) |
+| Access-denied page | `tests/FunctionalTests/AccessDeniedPageTests.cs` (GET `/Auth/AccessDenied` → 200) |
+| Change-password page | `tests/FunctionalTests/ChangePasswordPageTests.cs` (5 tests: unauthenticated redirect, flag 2/3 messages, policy message, success) |
+| Logout API | `tests/FunctionalTests/LogoutApiTests.cs` (bearer → 204, anonymous → 401) |
+| Rate limiting (FR-012, spec §17/R7) | `tests/FunctionalTests/RateLimitTests.cs` (no config → not throttled; owner thresholds → 3rd request 429) |
+| NFR-006 denial logging | `tests/UnitTests/AuthorizationDenialLoggingTests.cs` (denial template carries subject/endpoint/outcome; no password placeholder in any log call) |
 
 ### Module → Legacy Mapping (this feature)
 

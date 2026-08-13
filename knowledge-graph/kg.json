@@ -388,7 +388,7 @@
                   {
                       "id":  "TEST-AUTH",
                       "type":  "Test Case",
-                      "label":  "auth/RBAC/backdoor/rewrite/static-asset functional suite"
+                      "label":  "auth/RBAC/backdoor/rewrite/static-asset functional suite (incl. web login/change-password pages, logout, rate limit, denial logging)"
                   }
               ],
     "edges":  [
@@ -940,6 +940,16 @@
                   {
                       "from":  "TEST-AUTH",
                       "to":  "UI-REGISTER",
+                      "type":  "tests"
+                  },
+                  {
+                      "from":  "TEST-AUTH",
+                      "to":  "UI-LOGIN",
+                      "type":  "tests"
+                  },
+                  {
+                      "from":  "TEST-AUTH",
+                      "to":  "UI-CHANGEPASSWORD",
                       "type":  "tests"
                   }
               ]

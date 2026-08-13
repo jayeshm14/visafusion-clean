@@ -58,11 +58,37 @@ consolidation & RBAC enforcement (SPEC-0003, SPEC-0004, SPEC-0005).
 
 | Suite | Result |
 |-------|--------|
-| `tests/UnitTests` | 107/107 passed |
-| `tests/FunctionalTests` | 110/110 passed |
-| `tests/IntegrationTests` | self-skip without SQL Server (identity lockout, day-gate, import idempotency, no-concatenated-SQL) |
+| `tests/UnitTests` | 109/109 passed |
+| `tests/FunctionalTests` | 128/128 passed |
+| `tests/IntegrationTests` | SPEC-0005-relevant classes 12/12 passed (identity lockout, day-gate, import idempotency, no-concatenated-SQL) against a live SQL Server; SPEC-0004 Snapshot/Validation checksum classes fail with `Execution Timeout Expired` (SHA2_256 over 271k+ `Mainentry` rows exceeds the 30 s command timeout — pre-existing, files last touched by `3db83b8`, out of SPEC-0005 scope) |
 
 Build: `VisaFusion.sln` — 0 warnings / 0 errors.
+
+## 2a. Rigorous-testing pass (SPEC-0005, all phases)
+
+Requirement→test coverage sweep across spec.md, plan.md, tasks.md and the three
+contracts; every FR/AC/TS mapped to a test and the gaps below closed with new
+tests (18 functional + 2 unit):
+
+- **Web login page** (`WebLoginPageTests`, 8 tests): GET form, `?rsn=O` reason
+  text, valid POST → cookie + redirect to `/`, bad creds → generic error with
+  **no** cookie, emp day-gate rejection → 302 `/Auth/Login?rsn=O` with no
+  cookie, API 403 `rsn=O`, non-emp never gated (stub mirrors the real
+  emp-only rule).
+- **Access-denied page** (`AccessDeniedPageTests`): GET `/Auth/AccessDenied` → 200.
+- **Change-password page** (`ChangePasswordPageTests`, 5 tests): unauthenticated
+  → login redirect with `ReturnUrl`, flag 2/3 messages, policy message, success
+  (cookie-scheme flow via the login page).
+- **Logout API** (`LogoutApiTests`): bearer → 204, anonymous → 401.
+- **Rate limiting** (`RateLimitTests`): with no `RateLimiting:*` config the
+  register route is not throttled; with owner-supplied thresholds (2/60 s) the
+  third request is rejected with 429. Thresholds are injected via environment
+  variables because `Program.Main` reads the keys before `builder.Build()` and
+  `WebApplicationFactory`'s `ConfigureAppConfiguration`/`UseSetting` are only
+  applied at Build time.
+- **NFR-006 denial logging** (`AuthorizationDenialLoggingTests`, 2 unit tests):
+  the denial template carries subject/endpoint/outcome; no password placeholder
+  in any `Log*` call under `src/`.
 
 ## 3. Review fixes (post-`150ca7c`)
 
