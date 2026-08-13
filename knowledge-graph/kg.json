@@ -333,6 +333,62 @@
                       "id":  "GAP-0003",
                       "label":  "Target database strategy (in-place VisaEntry vs separate VisaFusion target) - RESOLVED Option A",
                       "type":  "Risk"
+                  },
+                  {
+                      "id":  "SPEC-0005",
+                      "type":  "Requirement",
+                      "label":  "Solution Scaffold Completion, Identity Consolidation & RBAC",
+                      "status":  "Accepted"
+                  },
+                  {
+                      "id":  "AUTH-API",
+                      "type":  "API",
+                      "label":  "POST /api/v1/auth/login|logout|change-password"
+                  },
+                  {
+                      "id":  "AUTH-REGISTER",
+                      "type":  "API",
+                      "label":  "POST /api/v1/public/register (guest-only, FR-012)"
+                  },
+                  {
+                      "id":  "SEC-RBAC-POLICIES",
+                      "type":  "Permission",
+                      "label":  "11-policy catalog from the §4.2 role matrix"
+                  },
+                  {
+                      "id":  "SEC-ROUTES",
+                      "type":  "API",
+                      "label":  "11 §4.3 secured write routes (501 placeholders)"
+                  },
+                  {
+                      "id":  "SEC-BACKDOOR-FIXED",
+                      "type":  "Risk",
+                      "label":  "connection.asp backdoor params inert (verified, AC-006)"
+                  },
+                  {
+                      "id":  "URL-REWRITE",
+                      "type":  "API",
+                      "label":  "Legacy .asp URL rewrite (301 map + 404, NFR-005)"
+                  },
+                  {
+                      "id":  "UI-LOGIN",
+                      "type":  "Page",
+                      "label":  "Web /Auth/Login"
+                  },
+                  {
+                      "id":  "UI-REGISTER",
+                      "type":  "Page",
+                      "label":  "Web /Auth/Register"
+                  },
+                  {
+                      "id":  "UI-CHANGEPASSWORD",
+                      "type":  "Page",
+                      "label":  "Web /Auth/ChangePassword (legacy flag 1/2/3 outcomes)"
+                  },
+                  {
+                      "id":  "TEST-AUTH",
+                      "type":  "Test Case",
+                      "label":  "auth/RBAC/backdoor/rewrite/static-asset functional suite"
                   }
               ],
     "edges":  [
@@ -770,6 +826,111 @@
                       "from":  "GAP-0003",
                       "to":  "ADR-0003",
                       "type":  "references"
+                  },
+                  {
+                      "from":  "SPEC-0005",
+                      "to":  "AUTH-API",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0005",
+                      "to":  "AUTH-REGISTER",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0005",
+                      "to":  "SEC-RBAC-POLICIES",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0005",
+                      "to":  "SEC-ROUTES",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0005",
+                      "to":  "URL-REWRITE",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0005",
+                      "to":  "UI-CHANGEPASSWORD",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0005",
+                      "to":  "TEST-AUTH",
+                      "type":  "tested_by"
+                  },
+                  {
+                      "from":  "SPEC-0005",
+                      "to":  "SPEC-0004",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "SPEC-0005",
+                      "to":  "SEC-BACKDOOR-FIXED",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "MOD-006",
+                      "to":  "SEC-RBAC-POLICIES",
+                      "type":  "secures"
+                  },
+                  {
+                      "from":  "MOD-006",
+                      "to":  "SEC-BACKDOOR-FIXED",
+                      "type":  "replaces"
+                  },
+                  {
+                      "from":  "SEC-RBAC-POLICIES",
+                      "to":  "SEC-ROUTES",
+                      "type":  "secures"
+                  },
+                  {
+                      "from":  "AUTH-API",
+                      "to":  "SEC-RBAC-POLICIES",
+                      "type":  "secures"
+                  },
+                  {
+                      "from":  "UI-LOGIN",
+                      "to":  "AUTH-API",
+                      "type":  "calls"
+                  },
+                  {
+                      "from":  "UI-REGISTER",
+                      "to":  "AUTH-REGISTER",
+                      "type":  "calls"
+                  },
+                  {
+                      "from":  "UI-CHANGEPASSWORD",
+                      "to":  "AUTH-API",
+                      "type":  "calls"
+                  },
+                  {
+                      "from":  "URL-REWRITE",
+                      "to":  "UI-LOGIN",
+                      "type":  "redirects_to"
+                  },
+                  {
+                      "from":  "URL-REWRITE",
+                      "to":  "UI-REGISTER",
+                      "type":  "redirects_to"
+                  },
+                  {
+                      "from":  "TEST-AUTH",
+                      "to":  "AUTH-API",
+                      "type":  "tests"
+                  },
+                  {
+                      "from":  "TEST-AUTH",
+                      "to":  "SEC-ROUTES",
+                      "type":  "tests"
+                  },
+                  {
+                      "from":  "TEST-AUTH",
+                      "to":  "URL-REWRITE",
+                      "type":  "tests"
                   }
               ]
 }

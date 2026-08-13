@@ -175,3 +175,65 @@ ADR-0003 / SPEC-0004; "in-place" means the same SQL Server instance — the lega
 `VisaEntry` database stays read-only (FR-008) and is never written to. Recorded
 in `findings/gap-0003-inplace-vs-target-db.md`; constitution v1.3.1 and
 ADR-0001 (Amendment 2026-08-11) reflect the clarification.
+
+---
+
+## SPEC-0005 — Solution Scaffold Completion, Identity Consolidation & RBAC
+
+Generated: 2026-08-13 | Source: `specs/005-scaffold-identity-rbac/spec.md`,
+plan.md, contracts/auth-api.md, contracts/secured-write-routes.md,
+contracts/web-ui.md, tasks.md (T001–T039)
+
+| Requirement | Architecture | Domain | Database | API | UI | Test | Migration |
+|-------------|--------------|--------|----------|-----|----|------|-----------|
+| FR-001 | §2 | — | — | — | — | TS-001 | — |
+| FR-002 | §2 | Data | SPEC-0004 schema | — | — | TS-011 | — |
+| FR-003 | §2 | — | — | — | Web | TS-007 | — |
+| FR-004 | §9 | — | — | — | Web | TS-008 | §9 |
+| FR-005 | §7 | Identity | AspNetUsers | — | — | TS-001 | §7 |
+| FR-006 | §7, §12 | Identity | AspNetUsers.PasswordHash | — | Web | TS-002 | §6.9 |
+| FR-007 | §7, §12 | Identity | AspNetUsers.AgentId | Api | — | TS-003 | §7 |
+| FR-008 | §4.1 | Identity | AspNetUserClaims | Api | — | TS-005 | §7 |
+| FR-009 | §7 | Identity | AspNetUsers.LockoutEnabled | — | — | TS-010 | §7 |
+| FR-010 | §4.2 | SecurityGate | — | Api | Web | TS-004 | — |
+| FR-011 | §4.3 | — | — | Api | — | TS-004 | — |
+| FR-012 | §4.3 | — | — | Api | Web | TS-005 | — |
+| FR-013 | §4.3 | Identity | — | Api | Web | TS-005 | — |
+| FR-014 | §4.3 | Identity | — | Api | — | TS-005 | — |
+| FR-015 | §2.7 | SecurityGate | — | — | Web | TS-006 | — |
+| FR-016 | §4.2, §2.3 | SecurityGate | — | Api | Web | TS-003 | — |
+| FR-017 | §7, §10 | Identity | AspNetUsers | Api | Web | TS-001 | §7 |
+| FR-018 | §5, §7 | SecurityGate | security (SPEC-0004 §3.1) | Api | Web | TS-013 | mod-plan §3.8/§5.2 |
+| FR-019 | §7 | Identity | AspNetUsers.PasswordHash | Api | Web | TS-014 | mod-plan §5.4 |
+| NFR-002 | §10 | Identity | — | Api | Web | TS-001 | §7 |
+| NFR-007 | §18 | — | AspNetUsers | — | — | TS-009 | §7 |
+| AC-004 | §4.3 | — | — | Api | — | TS-004 | — |
+
+### Test → Artifact map (TS-001..TS-014)
+
+| Scenario | Test artifact |
+|----------|--------------|
+| TS-001 5-role login | `tests/FunctionalTests/AuthLoginTests.cs` (JWT role claims, AgentId for agt, SuperUser for su) |
+| TS-002 No plaintext | `tests/IntegrationTests/IdentityImportTests.cs` (self-skip w/o SQL Server) + `tests/FunctionalTests/SecuritySpotCheckTests.cs` (no password material in any response surface) |
+| TS-003 Agent isolation | `tests/FunctionalTests/BackdoorAndIsolationTests.cs` (agent A id 999 → 403, own id → 501) |
+| TS-004 RBAC matrix | `tests/FunctionalTests/SecuredWriteRoutesTests.cs` (11 §4.3 routes × 401/403/501) + `tests/UnitTests/AuthorizationPoliciesTests.cs` (11-policy catalog) |
+| TS-005 Registration escalation | `tests/FunctionalTests/RegistrationEscalationTests.cs` (role=su ignored → guest; under-8 password → 400) |
+| TS-006 Backdoor params | `tests/FunctionalTests/BackdoorAndIsolationTests.cs` (byte-identical health; identical login outcome) |
+| TS-007 URL rewrite | `tests/UnitTests/LegacyUrlRewriteTests.cs` + `tests/FunctionalTests/LegacyUrlRewriteTests.cs` (301 map + 404) |
+| TS-008 Static assets | `tests/FunctionalTests/Phase0E2ETests.cs` (forms/css/js/images/fonts/updateimg → 200) |
+| TS-009 Import idempotency | `tests/IntegrationTests/IdentityImportTests.cs` (self-skip w/o SQL Server) |
+| TS-010 Inactive account | `tests/IntegrationTests/IdentityLockoutTests.cs` (self-skip w/o SQL Server) |
+| TS-011 SQLi regression | `tests/FunctionalTests/Phase0E2ETests.cs` (payloads → 401/400, never 500) + `tests/IntegrationTests/NoStringConcatenatedSqlTests.cs` |
+| TS-012 Golden-file parity | `AuthLoginTests` + `ChangePasswordTests` (legacy changepassword.asp flag 2/3 outcomes mirrored) — "where applicable" per migration plan §10 |
+| TS-013 Employee day-gate | `tests/IntegrationTests/SecurityGateIntegrationTests.cs` (self-skip w/o SQL Server) |
+| TS-014 Change-password | `tests/FunctionalTests/ChangePasswordTests.cs` (204 + 3× 400 + 401) |
+
+### Module → Legacy Mapping (this feature)
+
+Identity & Security (MOD-006, legacy `connection.asp`): the backdoor and its
+query parameters are inert (AC-006, `BackdoorAndIsolationTests`); the 13
+anonymous write endpoints are re-secured behind the §4.2 policy matrix
+(`AuthorizationPolicies`, `SecuredPlaceholderEndpoint`); legacy entry URLs
+(`Default.asp`, `authenticate.asp`, `logon.asp`, `regsub*.asp`) redirect to
+their modern counterparts (`LegacyUrlRewriteMiddleware`). No legacy business
+behavior changes (Constitution Principle II).

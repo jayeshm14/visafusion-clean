@@ -68,3 +68,4 @@ dbBackup/
 
 # ---- CodeGraph local index (regenerable via `codegraph init`) ----
 .codegraph/
+.aider*

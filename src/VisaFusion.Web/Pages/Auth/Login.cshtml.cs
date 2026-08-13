@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using VisaFusion.Core.Application;
 using VisaFusion.Identity;
 
 namespace VisaFusion.Web.Pages.Auth;
@@ -15,15 +16,21 @@ namespace VisaFusion.Web.Pages.Auth;
 /// expired, `V` relogin, `usb` register/login first). On success the post-login
 /// redirect defaults to the existing home page (CHK011: per-role landing
 /// routes land with each module feature). The employee day-gate rejection
-/// (`/Auth/Login?rsn=O`) is wired by US2 (T020, FR-018).
+/// redirects to `/Auth/Login?rsn=O` (T020, FR-018).
 /// </summary>
 [AllowAnonymous]
 public class LoginModel : PageModel
 {
     private readonly SignInManager<IdentityIntegration.VisaFusionUser> _signInManager;
+    private readonly ISecurityGateService _securityGateService;
 
-    public LoginModel(SignInManager<IdentityIntegration.VisaFusionUser> signInManager)
-        => _signInManager = signInManager;
+    public LoginModel(
+        SignInManager<IdentityIntegration.VisaFusionUser> signInManager,
+        ISecurityGateService securityGateService)
+    {
+        _signInManager = signInManager;
+        _securityGateService = securityGateService;
+    }
 
     [BindProperty]
     public string? UserName { get; set; }
@@ -64,19 +71,37 @@ public class LoginModel : PageModel
             return Page();
         }
 
-        var result = await _signInManager.PasswordSignInAsync(
-            userName, Password, isPersistent: false, lockoutOnFailure: false);
-
-        if (result.Succeeded)
+        // Credential validation first, then the day-gate, then the cookie —
+        // mirroring the legacy order (authenticate.asp lines 62–79 checks the
+        // gate only after the credential query matches). A rejected emp login
+        // redirects to /Auth/Login?rsn=O WITHOUT an authenticated session.
+        var user = await _signInManager.UserManager.FindByNameAsync(userName);
+        if (user is null
+            || await _signInManager.UserManager.IsLockedOutAsync(user)
+            || !await _signInManager.UserManager.CheckPasswordAsync(user, Password))
         {
-            // Phase 0 default landing (CHK011) — the per-role landings land
-            // with each module feature. Only local return URLs are honored:
-            // LocalRedirect throws on a non-local value, and an external URL
-            // must never be used as an open-redirect target.
-            return LocalRedirect(Url.IsLocalUrl(returnUrl) ? returnUrl : "/");
+            // Single generic message (no account-state disclosure) — the same
+            // collapse as the previous PasswordSignInAsync failure path.
+            ModelState.AddModelError(string.Empty, "Invalid username or password.");
+            return Page();
         }
 
-        ModelState.AddModelError(string.Empty, "Invalid username or password.");
-        return Page();
+        // Day-gate (T020, FR-018, AC-011; contracts/web-ui.md §1.1): emp logins
+        // require an open security day for today; rejection redirects with the
+        // legacy reason code rsn=O (rsn=C is never produced).
+        var roles = await _signInManager.UserManager.GetRolesAsync(user);
+        if (await _securityGateService.EvaluateAsync(roles, DateTime.Today)
+            == SecurityGateDecision.RejectedNotOpened)
+        {
+            return RedirectToPage("/Auth/Login", new { rsn = "O" });
+        }
+
+        await _signInManager.SignInAsync(user, isPersistent: false);
+
+        // Phase 0 default landing (CHK011) — the per-role landings land
+        // with each module feature. Only local return URLs are honored:
+        // LocalRedirect throws on a non-local value, and an external URL
+        // must never be used as an open-redirect target.
+        return LocalRedirect(Url.IsLocalUrl(returnUrl) ? returnUrl : "/");
     }
 }

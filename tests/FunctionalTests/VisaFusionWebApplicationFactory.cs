@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using VisaFusion.Core.Application;
 using VisaFusion.Identity;
 using VisaFusion.Identity.Persistence;
 using VisaFusion.Web;
@@ -54,6 +55,14 @@ public class VisaFusionWebApplicationFactory : WebApplicationFactory<Program>
             services.AddDbContext<VisaFusionIdentityDbContext>(options =>
                 options.UseInMemoryDatabase(_identityDatabaseName));
 
+            // US2 (T019/T020): the real day-gate implementation reads the
+            // `security` table via VisaEntryDbContext, which points at a
+            // non-routable placeholder connection here. Stub the shared Core
+            // rule as an open day so the hermetic emp-login success path
+            // (AC-001) is proven without a database (plan.md "Testing").
+            services.RemoveAll<ISecurityGateService>();
+            services.AddScoped<ISecurityGateService, OpenDaySecurityGateStub>();
+
             services.AddSingleton<IHostedService, IdentityRoleSeeder>();
         });
     }
@@ -99,5 +108,17 @@ public class VisaFusionWebApplicationFactory : WebApplicationFactory<Program>
         }
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Open-day stub for the shared day-gate rule (US2, plan.md "Testing"):
+    /// hermetic functional tests must not touch the `security` table, so the
+    /// gate always allows the login. The rejection paths are covered by the
+    /// unit tests (evaluation) and the integration tests (real SQL Server).
+    /// </summary>
+    private sealed class OpenDaySecurityGateStub : ISecurityGateService
+    {
+        public Task<SecurityGateDecision> EvaluateAsync(IEnumerable<string> roles, DateTime date)
+            => Task.FromResult(SecurityGateDecision.Allowed);
     }
 }

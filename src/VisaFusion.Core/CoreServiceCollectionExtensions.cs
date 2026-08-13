@@ -23,7 +23,10 @@ public static class CoreServiceCollectionExtensions
         services.AddScoped<IBillingService, BillingService>();
         services.AddScoped<ISmsService, SmsService>();
         services.AddScoped<IEmailService, EmailService>();
-        services.AddScoped<ISecurityGateService, SecurityGateService>();
+        // ISecurityGateService is NOT registered here: its implementation
+        // queries VisaEntryDbContext and therefore lives in VisaFusion.Data
+        // (approved deviation, deviation log §5). It is registered at the
+        // composition root in VisaFusion.Web/Program.cs.
         services.AddScoped<IHolidayService, HolidayService>();
 
         return services;

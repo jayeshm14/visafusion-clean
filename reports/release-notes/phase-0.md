@@ -1,0 +1,76 @@
+# VisaFusion Phase 0 Release Notes
+
+**Date**: 2026-08-13
+**Scope**: Phase 0 — solution scaffold, complete data-model migration, identity
+consolidation & RBAC enforcement (SPEC-0003, SPEC-0004, SPEC-0005).
+
+---
+
+## 1. What Phase 0 delivers
+
+### Solution scaffold (SPEC-0003)
+- Single-process ASP.NET Core host (`src/VisaFusion.Web`): Razor Pages back-office
+  + `/api/v1` surface, Serilog + OpenTelemetry (NFR-006), centralized
+  problem-details exception handling, configuration-driven rate limiting.
+- Six-project solution (`Web`, `Api`, `Core`, `Data`, `Identity`, `Jobs`) per
+  ADR-0001; `ProductionSecretsGuard` fails fast in Production with dev-only
+  config (NFR-004).
+
+### Data-model migration (SPEC-0004)
+- `VisaFusion.Migration` console: 8 fixed-order commands (snapshot → schema →
+  copy → cleanse → identity → validate → report), exit codes 0–5, run-state
+  idempotency (NFR-001), append-only audit tables, approved-cleansing sign-off
+  gating (BR-005), duplicate-key fail-fast (GAP-0002).
+- 52-table disposition migrated to the target `VisaFusion` database; legacy
+  `VisaEntry` stays read-only (FR-008).
+
+### Identity consolidation & RBAC (SPEC-0005)
+- **Auth API**: `POST /api/v1/auth/login` (5-role JWT, `AgentId` claim for agt,
+  `SuperUser` claim for su), `POST /api/v1/auth/logout`, `POST
+  /api/v1/auth/change-password` (204/400/401; legacy `changepassword.asp`
+  flag 1/2/3 outcomes mirrored).
+- **Public register**: `POST /api/v1/public/register` — guest-only account,
+  privileged roles in the payload are never read (fixes the §2.2 escalation
+  finding); under-8 passwords rejected.
+- **RBAC enforcement**: 11-policy catalog derived from the §4.2 role matrix;
+  all 11 §4.3 secured write routes registered (anonymous → 401, wrong role →
+  403, correct role → 501 placeholder); representative endpoints switched to
+  policies; authorization denials logged (subject/endpoint/outcome, no
+  password material).
+- **Legacy URL rewrite**: `Default.asp` → `/`, `authenticate.asp`/`logon.asp`
+  → `/Auth/Login`, `regsub*.asp` → `/Auth/Register` (301); any other `.asp`
+  → clear 404 (NFR-005).
+- **Static assets**: all legacy asset directories (`forms/`, `css/`, `js/`,
+  `images/`, `fonts/`, `updateimg/`) self-hosted from wwwroot (no CDN).
+- **Security fixes**: `connection.asp` backdoor and its query parameters
+  inert (verified); no plaintext password material in logs, responses, or
+  config; identity import hashes on migration (PBKDF2).
+
+## 2. Test status (2026-08-13)
+
+| Suite | Result |
+|-------|--------|
+| `tests/UnitTests` | 106/106 passed |
+| `tests/FunctionalTests` | 92/92 passed |
+| `tests/IntegrationTests` | self-skip without SQL Server (identity lockout, day-gate, import idempotency, no-concatenated-SQL) |
+
+Build: `VisaFusion.sln` — 0 warnings / 0 errors.
+
+## 3. Known limitations / deferred (per contracts)
+
+- Admin user-management and agent password-set routes are **deferred** and do
+  not exist yet (`contracts/secured-write-routes.md` §3) — they 404.
+- The 11 §4.3 secured write routes are authorization placeholders returning
+  501; business implementations land in later phases.
+- `POST /api/v1/public/queries` is a 501 placeholder (search endpoints land in
+  later phases).
+- GAP-0001 (FK DEFER disposition) and GAP-0002 (`agents.agentsID` 4114
+  duplicate) require owner decisions before the migration copy step can
+  complete end-to-end.
+
+## 4. Phase 0 exit criterion
+
+"App boots; login works for all 5 roles against migrated (hashed) credentials;
+backdoor query params confirmed inert" (`complete_migration_plan.md` §10) —
+proven by TS-001 (AuthLoginTests), TS-002 (IdentityImportTests +
+SecuritySpotCheckTests), and TS-006 (BackdoorAndIsolationTests).

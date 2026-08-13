@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using VisaFusion.Api.Authorization;
 using VisaFusion.Api.Contracts;
 using VisaFusion.Api.Errors;
+using VisaFusion.Core.Application;
 using VisaFusion.Identity;
 
 namespace VisaFusion.Api.Endpoints;
@@ -31,7 +32,8 @@ public static class AuthEndpoint
     public static async Task LoginAsync(
         HttpContext context,
         UserManager<IdentityIntegration.VisaFusionUser> userManager,
-        IConfiguration config)
+        IConfiguration config,
+        ISecurityGateService securityGateService)
     {
         var request = await TryReadJsonAsync<LoginRequest>(context);
         if (request is null) return;
@@ -63,6 +65,22 @@ public static class AuthEndpoint
         }
 
         var roles = await userManager.GetRolesAsync(user);
+
+        // Day-gate (T019, FR-018, AC-011; contracts/auth-api.md §1): emp logins
+        // require an open security day for today. Evaluated AFTER credential
+        // validation (legacy authenticate.asp lines 62–79 checks the gate only
+        // after the credential query matches), so 401 stays the generic
+        // bad-credentials response and 403 is the day-gate rejection.
+        if (await securityGateService.EvaluateAsync(roles, DateTime.Today)
+            == SecurityGateDecision.RejectedNotOpened)
+        {
+            await WriteProblemAsync(
+                context, StatusCodes.Status403Forbidden, "Day Not Opened",
+                "The office has not been opened for today.",
+                new Dictionary<string, object?> { ["rsn"] = "O" });
+            return;
+        }
+
         var claims = IdentityClaims.FromUser(user, roles);
         var token = CreateToken(config, claims);
 
@@ -89,6 +107,92 @@ public static class AuthEndpoint
         // token; there is nothing server-side to revoke.
         context.Response.StatusCode = StatusCodes.Status204NoContent;
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Self-service change-password (SPEC-0005 T023, US3, FR-019, AC-012/TS-014;
+    /// contracts/auth-api.md §3). Authenticated (any role).
+    ///
+    /// The current user is resolved from the bearer principal's `name` claim
+    /// (the JWT carries `name`/`sub` = username, IdentityClaims.FromUser) —
+    /// never from a request parameter. The new password is stored hashed via
+    /// UserManager.ChangePasswordAsync with NO legacy lowercasing; the single
+    /// shared Identity password validator (RequiredLength = 8, registered in
+    /// Program.cs) enforces the policy — the same rule the Web UI uses
+    /// (spec §17/CHK044).
+    ///
+    /// Outcomes: 204 success; 400 wrong current password (mirrors legacy
+    /// changepassword.asp?flag=3), new ≠ confirm (flag=2), or policy violation
+    /// (new password under 8 characters); 401 unauthenticated.
+    /// </summary>
+    public static async Task ChangePasswordAsync(
+        HttpContext context,
+        UserManager<IdentityIntegration.VisaFusionUser> userManager)
+    {
+        var request = await TryReadJsonAsync<ChangePasswordRequest>(context);
+        if (request is null) return;
+
+        var currentPassword = request.CurrentPassword;
+        var newPassword = request.NewPassword;
+        var confirmPassword = request.ConfirmPassword;
+
+        if (string.IsNullOrEmpty(currentPassword)
+            || string.IsNullOrEmpty(newPassword)
+            || string.IsNullOrEmpty(confirmPassword))
+        {
+            await WriteProblemAsync(
+                context, StatusCodes.Status400BadRequest, "Validation Failed",
+                "currentPassword, newPassword and confirmPassword are required");
+            return;
+        }
+
+        // The bearer principal's name claim is the username (IdentityClaims
+        // mints `name` = username); the user row is resolved from it.
+        var userName = context.User.Identity?.Name;
+        var user = string.IsNullOrEmpty(userName)
+            ? null
+            : await userManager.FindByNameAsync(userName);
+        if (user is null)
+        {
+            // No resolvable identity on an authenticated route: treat as
+            // unauthenticated (the token is valid but names no store user).
+            await WriteProblemAsync(
+                context, StatusCodes.Status401Unauthorized, "Unauthorized",
+                "The authenticated principal does not resolve to a user.");
+            return;
+        }
+
+        // flag=2: "PLEASE ENTER THE SAME VALUES FOR NEW AND CONFIRM PASSWORD."
+        if (!string.Equals(newPassword, confirmPassword, StringComparison.Ordinal))
+        {
+            await WriteProblemAsync(
+                context, StatusCodes.Status400BadRequest, "Validation Failed",
+                "newPassword and confirmPassword must match");
+            return;
+        }
+
+        // flag=3: "PLEASE CHECK USERNAME OR PASSWORD." — the current password
+        // must verify before any change is attempted.
+        if (!await userManager.CheckPasswordAsync(user, currentPassword))
+        {
+            await WriteProblemAsync(
+                context, StatusCodes.Status400BadRequest, "Validation Failed",
+                "currentPassword is incorrect");
+            return;
+        }
+
+        // Policy + storage: ChangePasswordAsync runs the shared Identity
+        // password validators (RequiredLength = 8) and stores the hash.
+        var result = await userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+        if (!result.Succeeded)
+        {
+            await WriteProblemAsync(
+                context, StatusCodes.Status400BadRequest, "Validation Failed",
+                string.Join("; ", result.Errors.Select(e => e.Description)));
+            return;
+        }
+
+        context.Response.StatusCode = StatusCodes.Status204NoContent;
     }
 
     /// <summary>
@@ -141,12 +245,22 @@ public static class AuthEndpoint
         }
     }
 
-    private static async Task WriteProblemAsync(HttpContext context, int statusCode, string title, string detail)
+    private static async Task WriteProblemAsync(
+        HttpContext context, int statusCode, string title, string detail,
+        IDictionary<string, object?>? extensions = null)
     {
         context.Response.StatusCode = statusCode;
         context.Response.ContentType = "application/problem+json";
         var problem = ApiError.Create(statusCode, title, context);
         problem.Detail = detail;
+        if (extensions is not null)
+        {
+            foreach (var (key, value) in extensions)
+            {
+                problem.Extensions[key] = value;
+            }
+        }
+
         await context.Response.WriteAsync(JsonSerializer.Serialize(problem, JsonOptions));
     }
 

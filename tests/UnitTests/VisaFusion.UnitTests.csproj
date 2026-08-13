@@ -11,13 +11,33 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.20" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="xunit" Version="2.5.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
   </ItemGroup>
+  <!--
+    Microsoft.EntityFrameworkCore.InMemory (8.0.20, test-only) — SPEC-0005 T016
+    deviation: the day-gate unit tests exercise the real SecurityGateService
+    (VisaFusion.Data) over a hermetic VisaEntryDbContext; the InMemory provider
+    is the standard hermetic EF test backing store (same precedent as the
+    FunctionalTests T007 deviation, deviation log §2).
+  -->
 
   <ItemGroup>
     <Using Include="Xunit" />
+  </ItemGroup>
+
+  <!--
+    Microsoft.AspNetCore.App shared framework — SPEC-0005 T024: the policy-catalog
+    unit tests assert AuthorizationOptions/RolesAuthorizationRequirement/
+    ClaimsAuthorizationRequirement (Microsoft.AspNetCore.Authorization), which
+    live in the ASP.NET Core shared framework. The transitive FrameworkReference
+    from VisaFusion.Web does not surface these types to the test project, so the
+    reference is declared explicitly (test-only; no new package).
+  -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
