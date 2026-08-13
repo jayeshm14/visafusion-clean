@@ -51,13 +51,16 @@ public static class AuthEndpoint
 
         var user = await userManager.FindByNameAsync(userName);
         if (user is null
-            || await userManager.IsLockedOutAsync(user)
-            || !await userManager.CheckPasswordAsync(user, password))
+            || !await userManager.CheckPasswordAsync(user, password)
+            || await userManager.IsLockedOutAsync(user))
         {
             // Single generic 401 (contracts/auth-api.md §1): the caller is never
             // told whether the account is locked out or the credentials are
             // wrong (no account-state disclosure). Inactive accounts
             // (LockoutEnabled + far-future LockoutEnd, FR-009) land here.
+            // The password hash is always computed before the lockout check so
+            // the response timing does not reveal lockout state (review finding
+            // 2026-08-13; deviation log §7).
             await WriteProblemAsync(
                 context, StatusCodes.Status401Unauthorized, "Invalid Credentials",
                 "Invalid username or password.");

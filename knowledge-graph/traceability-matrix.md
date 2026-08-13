@@ -217,9 +217,9 @@ contracts/web-ui.md, tasks.md (T001–T039)
 | TS-002 No plaintext | `tests/IntegrationTests/IdentityImportTests.cs` (self-skip w/o SQL Server) + `tests/FunctionalTests/SecuritySpotCheckTests.cs` (no password material in any response surface) |
 | TS-003 Agent isolation | `tests/FunctionalTests/BackdoorAndIsolationTests.cs` (agent A id 999 → 403, own id → 501) |
 | TS-004 RBAC matrix | `tests/FunctionalTests/SecuredWriteRoutesTests.cs` (11 §4.3 routes × 401/403/501) + `tests/UnitTests/AuthorizationPoliciesTests.cs` (11-policy catalog) |
-| TS-005 Registration escalation | `tests/FunctionalTests/RegistrationEscalationTests.cs` (role=su ignored → guest; under-8 password → 400) |
+| TS-005 Registration escalation | `tests/FunctionalTests/RegistrationEscalationTests.cs` (role=su ignored → guest; under-8 password → 400) + `tests/FunctionalTests/RegisterPageTests.cs` (page posts through the shared `RegistrationFlow` — same rules, no divergence) |
 | TS-006 Backdoor params | `tests/FunctionalTests/BackdoorAndIsolationTests.cs` (byte-identical health; identical login outcome) |
-| TS-007 URL rewrite | `tests/UnitTests/LegacyUrlRewriteTests.cs` + `tests/FunctionalTests/LegacyUrlRewriteTests.cs` (301 map + 404) |
+| TS-007 URL rewrite | `tests/UnitTests/LegacyUrlRewriteTests.cs` + `tests/FunctionalTests/LegacyUrlRewriteTests.cs` (301 map + 404; redirect targets asserted to return 200) |
 | TS-008 Static assets | `tests/FunctionalTests/Phase0E2ETests.cs` (forms/css/js/images/fonts/updateimg → 200) |
 | TS-009 Import idempotency | `tests/IntegrationTests/IdentityImportTests.cs` (self-skip w/o SQL Server) |
 | TS-010 Inactive account | `tests/IntegrationTests/IdentityLockoutTests.cs` (self-skip w/o SQL Server) |

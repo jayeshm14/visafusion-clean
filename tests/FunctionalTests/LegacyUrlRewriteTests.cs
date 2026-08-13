@@ -39,6 +39,13 @@ public class LegacyUrlRewriteTests : IClassFixture<VisaFusionWebApplicationFacto
 
         Assert.Equal(HttpStatusCode.MovedPermanently, response.StatusCode);
         Assert.Equal(expectedTarget, response.Headers.Location?.OriginalString);
+
+        // AC-007: the bookmarked URL must RESOLVE — the redirect target itself
+        // must return 200 (a 301 to a dead page would fail the acceptance
+        // criterion). Followed explicitly because the client disables
+        // auto-redirect to observe the 301.
+        var target = await _client.GetAsync(expectedTarget);
+        Assert.Equal(HttpStatusCode.OK, target.StatusCode);
     }
 
     [Theory]

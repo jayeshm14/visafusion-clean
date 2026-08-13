@@ -31,7 +31,15 @@ consolidation & RBAC enforcement (SPEC-0003, SPEC-0004, SPEC-0005).
   flag 1/2/3 outcomes mirrored).
 - **Public register**: `POST /api/v1/public/register` — guest-only account,
   privileged roles in the payload are never read (fixes the §2.2 escalation
-  finding); under-8 passwords rejected.
+  finding); under-8 passwords rejected. The register rules live in the shared
+  `RegistrationFlow` (`src/VisaFusion.Api/Registration/RegistrationFlow.cs`)
+  used by both the API endpoint and the Web page, so the two surfaces can
+  never diverge.
+- **Register page**: `/Auth/Register` (Razor Page, T040) — the `regsub*.asp`
+  rewrite target now resolves to a real page (review finding #1): guest-only
+  form posting through the shared `RegistrationFlow`, success mirrors the
+  legacy `regsubdone.asp` confirmation, errors render the API problem-details
+  inline.
 - **RBAC enforcement**: 11-policy catalog derived from the §4.2 role matrix;
   all 11 §4.3 secured write routes registered (anonymous → 401, wrong role →
   403, correct role → 501 placeholder); representative endpoints switched to
@@ -50,13 +58,28 @@ consolidation & RBAC enforcement (SPEC-0003, SPEC-0004, SPEC-0005).
 
 | Suite | Result |
 |-------|--------|
-| `tests/UnitTests` | 106/106 passed |
-| `tests/FunctionalTests` | 92/92 passed |
+| `tests/UnitTests` | 107/107 passed |
+| `tests/FunctionalTests` | 110/110 passed |
 | `tests/IntegrationTests` | self-skip without SQL Server (identity lockout, day-gate, import idempotency, no-concatenated-SQL) |
 
 Build: `VisaFusion.sln` — 0 warnings / 0 errors.
 
-## 3. Known limitations / deferred (per contracts)
+## 3. Review fixes (post-`150ca7c`)
+
+1. **`/Auth/Register` page** (finding #1): created to satisfy the
+   `regsub*.asp` → `/Auth/Register` 301 contract (`contracts/web-ui.md` §1.3,
+   `plan.md` line 197); task T040 added.
+2. **Lockout timing** (finding #2): login now checks the password before the
+   lockout state, eliminating the account-existence timing side-channel
+   (`deviation-log.md` §7; matches SignInManager's own ordering).
+3. **AWB `agt (own)` qualifier** (finding #3): the 501 placeholder cannot
+   enforce it yet — tracked in `Program.cs` route comment + tasks.
+4. **`IdentityImporter.TryTake` dedup** (finding #4): a row rejected for a
+   duplicate email no longer claims its username, so a later row with the same
+   username and a fresh email can import (`deviation-log.md` §8; new unit test).
+5. **Tasks board hygiene** (finding #5): T030/T031 checkboxes corrected.
+
+## 4. Known limitations / deferred (per contracts)
 
 - Admin user-management and agent password-set routes are **deferred** and do
   not exist yet (`contracts/secured-write-routes.md` §3) — they 404.
@@ -68,7 +91,7 @@ Build: `VisaFusion.sln` — 0 warnings / 0 errors.
   duplicate) require owner decisions before the migration copy step can
   complete end-to-end.
 
-## 4. Phase 0 exit criterion
+## 5. Phase 0 exit criterion
 
 "App boots; login works for all 5 roles against migrated (hashed) credentials;
 backdoor query params confirmed inert" (`complete_migration_plan.md` §10) —

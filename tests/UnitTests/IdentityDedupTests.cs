@@ -49,6 +49,22 @@ public class IdentityDedupTests
     }
 
     [Fact]
+    public void Row_Rejected_For_Duplicate_Email_Does_Not_Claim_Its_Username()
+    {
+        // Review finding 2026-08-13 (deviation log §8): a row with a fresh
+        // username but a duplicate email must not block a later row that
+        // shares the username and has a fresh email — otherwise a legitimate
+        // account is omitted from the import.
+        var (users, emails) = FreshSets();
+
+        Assert.True(TryTake("agent1", "a@x.com", users, emails));
+        // Row A: fresh username "agent2", duplicate email → rejected.
+        Assert.False(TryTake("agent2", "a@x.com", users, emails));
+        // Row B: same username "agent2", fresh email → must be taken.
+        Assert.True(TryTake("agent2", "b@x.com", users, emails));
+    }
+
+    [Fact]
     public void Dedup_Is_Case_Insensitive_And_Trims_Whitespace()
     {
         var (users, emails) = FreshSets();

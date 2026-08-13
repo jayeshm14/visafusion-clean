@@ -1,10 +1,10 @@
-using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using VisaFusion.Api.Contracts;
 using VisaFusion.Api.Errors;
+using VisaFusion.Api.Registration;
 using VisaFusion.Identity;
 
 namespace VisaFusion.Api.Endpoints;
@@ -29,71 +29,14 @@ public static class PublicEndpoint
         var request = await TryReadJsonAsync<RegisterRequest>(context);
         if (request is null) return;
 
-        var userName = request.UserName?.Trim();
-        var email = request.Email?.Trim();
-        var password = request.Password;
+        // The register rules live in the shared RegistrationFlow (T040) so the
+        // Web /Auth/Register page and this endpoint can never diverge.
+        var outcome = await RegistrationFlow.RegisterAsync(
+            userManager, request.UserName, request.Email, request.Password);
 
-        if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+        if (!outcome.Created)
         {
-            await WriteProblemAsync(
-                context, StatusCodes.Status400BadRequest, "Validation Failed",
-                "username, email and password are required");
-            return;
-        }
-
-        if (!new EmailAddressAttribute().IsValid(email))
-        {
-            await WriteProblemAsync(
-                context, StatusCodes.Status400BadRequest, "Validation Failed",
-                "email must be a valid email address");
-            return;
-        }
-
-        var existingByName = await userManager.FindByNameAsync(userName);
-        if (existingByName is not null)
-        {
-            await WriteProblemAsync(
-                context, StatusCodes.Status409Conflict, "Conflict",
-                $"username '{userName}' is already registered");
-            return;
-        }
-
-        var existingByEmail = await userManager.FindByEmailAsync(email);
-        if (existingByEmail is not null)
-        {
-            await WriteProblemAsync(
-                context, StatusCodes.Status409Conflict, "Conflict",
-                $"email '{email}' is already registered");
-            return;
-        }
-
-        var user = new IdentityIntegration.VisaFusionUser { UserName = userName, Email = email };
-        var createResult = await userManager.CreateAsync(user, password);
-        if (!createResult.Succeeded)
-        {
-            // Duplicate race outcomes map to 409; validation/policy failures to
-            // 400 (contracts/auth-api.md §4).
-            var isDuplicate = createResult.Errors.Any(e => e.Code is "DuplicateUserName" or "DuplicateEmail");
-            await WriteProblemAsync(
-                context,
-                isDuplicate ? StatusCodes.Status409Conflict : StatusCodes.Status400BadRequest,
-                isDuplicate ? "Conflict" : "Validation Failed",
-                string.Join("; ", createResult.Errors.Select(e => e.Description)));
-            return;
-        }
-
-        // FR-012/BR-004: the role is fixed server-side to `guest`; no caller
-        // input influences it.
-        var roleResult = await userManager.AddToRoleAsync(user, IdentityIntegration.Roles.Guest);
-        if (!roleResult.Succeeded)
-        {
-            // Roll back the created user so the failure is recoverable: a
-            // half-registered account (no role) could never sign in and would
-            // block re-registration with a 409 on username/email.
-            await userManager.DeleteAsync(user);
-            await WriteProblemAsync(
-                context, StatusCodes.Status500InternalServerError, "Internal Server Error",
-                string.Join("; ", roleResult.Errors.Select(e => e.Description)));
+            await WriteProblemAsync(context, outcome.StatusCode, outcome.Title, outcome.Detail);
             return;
         }
 

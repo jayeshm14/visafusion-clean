@@ -129,7 +129,14 @@ public sealed class IdentityImporter
         var u = userName?.Trim().ToLowerInvariant();
         var e = email?.Trim().ToLowerInvariant();
         if (!string.IsNullOrEmpty(u) && !usernames.Add(u)) return false;
-        if (!string.IsNullOrEmpty(e) && !emails.Add(e)) return false;
+        if (!string.IsNullOrEmpty(e) && !emails.Add(e))
+        {
+            // Roll back the username claim: a row rejected for a duplicate
+            // email must not block a later row that shares its username but
+            // has a fresh email (review finding 2026-08-13; deviation log §8).
+            if (!string.IsNullOrEmpty(u)) usernames.Remove(u);
+            return false;
+        }
         return true;
     }
 

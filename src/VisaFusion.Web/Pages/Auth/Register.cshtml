@@ -1,0 +1,36 @@
+@page
+@model VisaFusion.Web.Pages.Auth.RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h1>Register</h1>
+
+@if (Model.Registered)
+{
+    <p role="status">@Model.OutcomeMessage</p>
+    <p><a asp-page="/Auth/Login">Log in</a></p>
+}
+else
+{
+    <form method="post">
+        <div asp-validation-summary="ModelOnly"></div>
+        <div>
+            <label asp-for="UserName"></label>
+            <input asp-for="UserName" autocomplete="username" />
+        </div>
+        <div>
+            <label asp-for="Email"></label>
+            <input asp-for="Email" type="email" autocomplete="email" />
+        </div>
+        <div>
+            <label asp-for="Password"></label>
+            <input asp-for="Password" type="password" autocomplete="new-password" />
+        </div>
+        <div>
+            <label asp-for="ConfirmPassword"></label>
+            <input asp-for="ConfirmPassword" type="password" autocomplete="new-password" />
+        </div>
+        <button type="submit">Register</button>
+    </form>
+}

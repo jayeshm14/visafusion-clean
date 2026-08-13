@@ -908,6 +908,11 @@
                       "type":  "calls"
                   },
                   {
+                      "from":  "UI-REGISTER",
+                      "to":  "AUTH-REGISTER",
+                      "type":  "calls"
+                  },
+                  {
                       "from":  "URL-REWRITE",
                       "to":  "UI-LOGIN",
                       "type":  "redirects_to"
@@ -930,6 +935,11 @@
                   {
                       "from":  "TEST-AUTH",
                       "to":  "URL-REWRITE",
+                      "type":  "tests"
+                  },
+                  {
+                      "from":  "TEST-AUTH",
+                      "to":  "UI-REGISTER",
                       "type":  "tests"
                   }
               ]

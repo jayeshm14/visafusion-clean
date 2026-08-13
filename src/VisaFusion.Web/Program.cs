@@ -421,6 +421,11 @@ public partial class Program
                 AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             });
 
+        // NOTE (review 2026-08-13): contracts/secured-write-routes.md §1
+        // qualifies `agt` on this route as `agt (own)` — the FR-016 own-record
+        // check (SecuredPlaceholderEndpoint.HandleOwnAgent) must be applied
+        // when the Entry lifecycle module lands. Today the route returns 501
+        // for every caller, so no data exposure exists.
         app.MapPost("/api/v1/entries/{refno}/awb", (HttpContext ctx) => SecuredPlaceholderEndpoint.Handle(ctx))
             .RequireAuthorization(new AuthorizeAttribute
             {

@@ -77,11 +77,14 @@ public class LoginModel : PageModel
         // redirects to /Auth/Login?rsn=O WITHOUT an authenticated session.
         var user = await _signInManager.UserManager.FindByNameAsync(userName);
         if (user is null
-            || await _signInManager.UserManager.IsLockedOutAsync(user)
-            || !await _signInManager.UserManager.CheckPasswordAsync(user, Password))
+            || !await _signInManager.UserManager.CheckPasswordAsync(user, Password)
+            || await _signInManager.UserManager.IsLockedOutAsync(user))
         {
             // Single generic message (no account-state disclosure) — the same
-            // collapse as the previous PasswordSignInAsync failure path.
+            // collapse as the previous PasswordSignInAsync failure path. The
+            // password hash is always computed before the lockout check so the
+            // response timing does not reveal lockout state (review finding
+            // 2026-08-13; deviation log §7).
             ModelState.AddModelError(string.Empty, "Invalid username or password.");
             return Page();
         }
