@@ -16,10 +16,16 @@ namespace VisaFusion.FunctionalTests;
 /// §4.3 re-secured write routes matrix test (SPEC-0005 T025, US4, AC-004/TS-004,
 /// FR-011; contracts/secured-write-routes.md §1).
 ///
-/// For each of the 11 role-secured routes: anonymous → 401, wrong role → 403,
-/// correct role → 501 (the standardized placeholder until the module feature
-/// delivers the business payload). The 2 public-by-design routes stay
-/// anonymous: register → 201, queries → 501.
+/// For each of the 8 role-secured routes still on the standardized placeholder:
+/// anonymous → 401, wrong role → 403, correct role → 501 (the placeholder until
+/// the module feature delivers the business payload). The 2 public-by-design
+/// routes stay anonymous: register → 201, queries → 501.
+///
+/// The three `/api/v1/entries*` rows from the original 11-route matrix were
+/// removed when SPEC-0006 T027/T028 implemented the Entries endpoints — those
+/// routes now return real payloads and their 5-role matrix is covered by
+/// EntriesRbacTests (T024). The remaining 8 routes (agents, billing, holidays,
+/// reports, security-day) are still placeholders.
 ///
 /// Tokens are minted locally with the same development key the host uses
 /// (test-only; production keys come from configuration, NFR-004).
@@ -109,11 +115,10 @@ public class SecuredWriteRoutesTests : IClassFixture<VisaFusionWebApplicationFac
     public static IEnumerable<object[]> SecuredRoutes()
     {
         // Routes + minimum roles verbatim from contracts/secured-write-routes.md §1.
+        // The three /api/v1/entries* rows were removed on SPEC-0006 T027/T028
+        // (implemented; covered by EntriesRbacTests T024).
         yield return new object[] { HttpMethod.Put, "/api/v1/agents/5771", new[] { "adm", "su" }, false };
         yield return new object[] { HttpMethod.Put, "/api/v1/agents/5771/self", new[] { "agt" }, true };
-        yield return new object[] { HttpMethod.Post, "/api/v1/entries", new[] { "emp", "adm", "su" }, false };
-        yield return new object[] { HttpMethod.Post, "/api/v1/entries/TEST123/status", new[] { "emp", "adm", "su" }, false };
-        yield return new object[] { HttpMethod.Post, "/api/v1/entries/TEST123/awb", new[] { "emp", "adm", "su", "agt" }, false };
         yield return new object[] { HttpMethod.Post, "/api/v1/billing/entries", new[] { "emp", "adm", "su" }, false };
         yield return new object[] { HttpMethod.Post, "/api/v1/holidays", new[] { "adm", "su" }, false };
         yield return new object[] { HttpMethod.Delete, "/api/v1/holidays/5", new[] { "adm", "su" }, false };

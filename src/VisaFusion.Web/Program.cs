@@ -189,6 +189,22 @@ public partial class Program
         // here at the composition root instead of in CoreServiceCollectionExtensions.
         builder.Services.AddScoped<ISecurityGateService, SecurityGateService>();
 
+        // Entry-aggregate service (SPEC-0006 T010, US1, FR-002; deviation log §5):
+        // the shared IEntryService interface lives in Core, but the implementation
+        // queries VisaEntryDbContext and calls the owner-supplied stored procedures
+        // (Data), so it is registered here at the composition root instead of in
+        // CoreServiceCollectionExtensions (mirror of the ISecurityGateService
+        // precedent).
+        builder.Services.AddScoped<IEntryService, EntryService>();
+
+        // Authoritative bookable-date rule (SPEC-0006 T020, US4, FR-006, BR-003;
+        // deviation log §1): the shared IHolidayService interface lives in Core,
+        // but the implementation queries VisaEntryDbContext (Holiday/WeeklyOff),
+        // so it is registered here at the composition root instead of in
+        // CoreServiceCollectionExtensions (mirror of the ISecurityGateService
+        // precedent).
+        builder.Services.AddScoped<IHolidayService, HolidayService>();
+
         // ---- EF Core over the legacy VisaEntry database (T035, FR-006) ----
         builder.Services.AddDbContext<VisaEntryDbContext>(options =>
             options.UseSqlServer(
@@ -407,29 +423,43 @@ public partial class Program
                 AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             });
 
-        app.MapPost("/api/v1/entries", (HttpContext ctx) => SecuredPlaceholderEndpoint.Handle(ctx))
+        // EntryOperations routes (SPEC-0006 T028, US6, FR-008/009; contracts/entries-api.md
+        // "General"): the named policy enforces the emp/adm/su role set; the scheme is
+        // explicitly JwtBearer so API requests challenge with a 401 (problem-details)
+        // instead of the default cookie redirect to /Auth/Login (same convention as the
+        // other /api/v1 routes below).
+        app.MapPost("/api/v1/entries", (HttpContext ctx, IEntryService entries) => EntriesEndpoint.CreateAsync(ctx, entries))
             .RequireAuthorization(new AuthorizeAttribute
             {
-                Roles = "emp,adm,su",
+                Policy = AuthorizationPolicies.EntryOperations,
                 AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             });
 
-        app.MapPost("/api/v1/entries/{refno}/status", (HttpContext ctx) => SecuredPlaceholderEndpoint.Handle(ctx))
+        app.MapGet("/api/v1/entries/{refno:int}", (HttpContext ctx, IEntryService entries, int refno) => EntriesEndpoint.GetAsync(ctx, entries, refno))
             .RequireAuthorization(new AuthorizeAttribute
             {
-                Roles = "emp,adm,su",
+                Policy = AuthorizationPolicies.EntryOperations,
                 AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             });
 
-        // NOTE (review 2026-08-13): contracts/secured-write-routes.md §1
-        // qualifies `agt` on this route as `agt (own)` — the FR-016 own-record
-        // check (SecuredPlaceholderEndpoint.HandleOwnAgent) must be applied
-        // when the Entry lifecycle module lands. Today the route returns 501
-        // for every caller, so no data exposure exists.
-        app.MapPost("/api/v1/entries/{refno}/awb", (HttpContext ctx) => SecuredPlaceholderEndpoint.Handle(ctx))
+        app.MapPut("/api/v1/entries/{refno:int}", (HttpContext ctx, IEntryService entries, int refno) => EntriesEndpoint.UpdateAsync(ctx, entries, refno))
             .RequireAuthorization(new AuthorizeAttribute
             {
-                Roles = "emp,adm,su,agt",
+                Policy = AuthorizationPolicies.EntryOperations,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapPost("/api/v1/entries/{refno:int}/status", (HttpContext ctx, IEntryService entries, UserManager<IdentityIntegration.VisaFusionUser> userManager, int refno) => EntriesEndpoint.ChangeStatusAsync(ctx, entries, userManager, refno))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.EntryOperations,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapPost("/api/v1/entries/{refno:int}/awb", (HttpContext ctx, IEntryService entries, int refno) => EntriesEndpoint.RecordAwbAsync(ctx, entries, refno))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.EntryOperations,
                 AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             });
 

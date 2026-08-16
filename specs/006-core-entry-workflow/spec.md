@@ -35,7 +35,7 @@ The legacy Classic ASP Visa system manages visa entry processing through a compl
 
 - Migrate the 52-table disposition from §3 into the target `VisaFusion` database schema (M / M-RO / COND / ARCH / DROP)
 - Implement the `Mainentry` → `Entry` aggregate, `entryDetails` → `EntryPassenger`, and `PaxStatus` → `PaxCountryStatus` domain entities
-- Implement stored procedures/functions per owner-supplied scripts in `scripts/` (01-06): `RefnoSeq`/`usp_AllocateNextRefno`, `fn_IsEmbassyClosed`, `usp_RecordEntryStatusChange`, `usp_ProvisionSuperUser`, plus report/cleansing/normalization objects (see Gap Reports GR-0001/GR-0002/GR-0003; procedure prefixes standardized to `usp_` per GR-0003 item 2)
+- Implement stored procedures/functions per owner-supplied scripts in `scripts/` (01-08): `RefnoSeq`/`usp_AllocateNextRefno`, `fn_IsEmbassyClosed`, `usp_RecordEntryStatusChange`, `usp_ProvisionSuperUser`, plus report/cleansing/normalization objects (see Gap Reports GR-0001/GR-0002/GR-0003; procedure prefixes standardized to `usp_` per GR-0003 item 2)
 - Create Web API controllers (one set per module) under `/api/v1` with Phase-0 authorization policies
 - Preserve all production data; legacy `VisaEntry` database remains read-only
 - Map all work to legacy pages per `@findings/modernization_plan.md` §6 and §13
@@ -63,7 +63,7 @@ Per `@findings/modernization_plan.md` §6 (module map) and §13 (legacy pages):
 - `Mainentry` table → `Entry` aggregate (disposition M)
 - `entryDetails` table → `EntryPassenger` entity (disposition M)
 - `PaxStatus` table → `PaxCountryStatus` entity (disposition M)
-- Stored procedures/functions are supplied by the owner in `scripts/` (01-06), run in order at cutover; canonical object names confirmed 2026-08-14 (`RefnoSeq`, `usp_AllocateNextRefno`, `fn_IsEmbassyClosed`, `usp_RecordEntryStatusChange`, `usp_ProvisionSuperUser`) — see Gap Reports GR-0001/GR-0002; all procedure prefixes standardized to `usp_` per GR-0003 item 2; the new `SuperUserProvisioningAudit` table signed off per GR-0003 item 1; `usp_ProvisionSuperUser` key types contradicted the real Identity schema and are corrected per GR-0003 item 3 / GR-0004
+- Stored procedures/functions are supplied by the owner in `scripts/` (01-08), run in order at cutover; canonical object names confirmed 2026-08-14 (`RefnoSeq`, `usp_AllocateNextRefno`, `fn_IsEmbassyClosed`, `usp_RecordEntryStatusChange`, `usp_ProvisionSuperUser`) — see Gap Reports GR-0001/GR-0002; all procedure prefixes standardized to `usp_` per GR-0003 item 2; the new `SuperUserProvisioningAudit` table signed off per GR-0003 item 1; `usp_ProvisionSuperUser` key types contradicted the real Identity schema and are corrected per GR-0003 item 3 / GR-0004
 - Reference number generation logic from `RefnoSeq`/`usp_AllocateNextRefno` (per `scripts/01_sequences_and_allocation.sql`)
 
 ## 9. Functional Requirements
@@ -74,11 +74,13 @@ Per `@findings/modernization_plan.md` §6 (module map) and §13 (legacy pages):
 - **FR-004**: System MUST provide `usp_AllocateNextRefno` for atomic next-reference-number allocation (T-SQL per owner-supplied script `scripts/01_sequences_and_allocation.sql`; GR-0001; prefix standardized per GR-0003 item 2)
 - **FR-005**: System MUST provide `usp_RecordEntryStatusChange` for audited status transitions, called explicitly by `VisaFusion.Core.EntryService` (not a trigger); atomically updates `PaxStatus.statusID` and writes `StatusHistory` + `bighistory` rows in one transaction (T-SQL per owner-supplied script `scripts/08_finalize_entry_status_change_updatedby.sql`, which supersedes files 06/07; GR-0002/GR-0004). `UpdatedBy` = `{role}:{username}` composed by the proc from the authenticated `@ActorUserId` (the caller passes the Identity user Id, never a formatted actor string — anti-spoofing per GR-0004)
 - **FR-006**: System MUST provide `fn_IsEmbassyClosed` as the read-only reporting/BI mirror of the holiday/weekly-off/Sunday rule; the authoritative transactional check lives in `VisaFusion.Core.HolidayService` (T-SQL per owner-supplied script `scripts/02_fn_IsEmbassyClosed.sql`; GR-0001; confirmed intentional by owner 2026-08-14)
-- **FR-007**: System MUST provide `usp_ProvisionSuperUser` for super-user account creation — dedicated su-only procedure (no `@Role` parameter), password passed pre-hashed, caller must enforce `SuperUserOnly` policy; also creates an audit row in the new `SuperUserProvisioningAudit` table (T-SQL per owner-supplied script `scripts/06_status_change_and_superuser_provisioning.sql`; GR-0002)
+- **FR-007**: System MUST provide `usp_ProvisionSuperUser` for super-user account creation — dedicated su-only procedure (no `@Role` parameter), password passed pre-hashed with ASP.NET Core Identity's PBKDF2 (`PasswordHasher<T>`, same hasher as `IdentityImporter`/`PasswordHasher.cs:8`), caller must enforce `SuperUserOnly` policy; also creates an audit row in the new `SuperUserProvisioningAudit` table (T-SQL per owner-supplied script `scripts/06_status_change_and_superuser_provisioning.sql`; GR-0002)
 - **FR-008**: System MUST expose Web API endpoints under `/api/v1` organized by module (one controller set per module)
 - **FR-009**: System MUST reuse Phase-0 authorization policies (10 role-based policies + the claim-based SuperUserOnly) for all write endpoints
 - **FR-010**: System MUST preserve all production data; legacy `VisaEntry` database remains read-only
 - **FR-011**: System MUST NOT drop any business tables (only `dtproperties` may be removed)
+- **FR-005b**: System MUST default the 100%-NULL `entrytype` column per cleansing rule (b) (verified: `entrytype` is NULL in 100% of source rows; data-model.md §2 line 28)
+- **FR-005c**: System MUST migrate 6,517 orphaned `Mainentry` rows (missing `agent`) with NULL `agent`, and handle NULL `agent` on entry read/update (data-model.md §2 line 23; legacy `VisaEntry` rows preserved as-is)
 
 ## 10. Business Rules
 
@@ -112,13 +114,22 @@ Per `@findings/modernization_plan.md` §6 (module map) and §13 (legacy pages):
 - Reference number allocation (`usp_AllocateNextRefno`) < 50ms
 - Status change recording (`usp_RecordEntryStatusChange`) < 100ms
 - Bookable date check (`fn_IsEmbassyClosed` / `HolidayService`) < 10ms
-- API list endpoints support pagination (default 50, max 200)
+- API list endpoints support pagination (default 50, max 200) - applies to list endpoints delivered by future module features; the Core Entry Workflow feature exposes no list endpoint (contracts/entries-api.md §1-§5 deliver create/get/update/status-change/bookable-date only)
 - Data volume baseline for sizing and load tests (verified in findings): `Mainentry` ≈ 271,724 rows, `entryDetails` ≈ 312,655, `bighistory` ≈ 1.4M rows for history reads (`modernization_plan.md` §4.6; `exiting_architecture.md` §Table inventory) — NFR-003 "normal load" anchored to these figures
 
 ## 14. UI Requirements
 
 - Not in scope for this feature (separate UI feature)
 - API contracts defined here will drive future Razor Pages
+
+## 14.1. User Stories (story labels used by tasks.md)
+
+- **US1** — Entry aggregate service: create entry with ≥1 passenger + valid refno, load aggregate with passengers/paxStatuses (FR-002, BR-005)
+- **US2** — Reference number allocation: atomic max+1 via `usp_AllocateNextRefno`, `EntryService.AllocateRefnoAsync` (FR-004, BR-001)
+- **US3** — Audited status change via `usp_RecordEntryStatusChange` (FR-005, BR-002)
+- **US4** — Bookable-date rule: authoritative `HolidayService` + read-only `fn_IsEmbassyClosed` mirror (FR-006, BR-003)
+- **US5** — Super-user provisioning via `usp_ProvisionSuperUser` (FR-007, BR-004; endpoint deferred, spec §15)
+- **US6** — Entries-module API surface under `/api/v1` (FR-008, FR-009; AC-007/008/011)
 
 ## 15. API Contracts
 
@@ -142,7 +153,7 @@ All endpoints return problem-details JSON on error (Phase-0 exception handling).
 - Create `EntryPassenger` entity (mapped via `ToTable` to physical table `entryDetails` — legacy name preserved; migration lines 735, 1058)
 - Create `PaxCountryStatus` entity (mapped via `ToTable` to physical table `PaxStatus` — legacy name preserved; migration lines 759, 1010)
 - Create the remaining tables per §3 disposition (M / M-RO / COND / ARCH / DROP; DROP applies only to `Results`, `country`, `hits`, `adcount`, `dtproperties`)
-- Create sequence `RefnoSeq` for reference number generation (per `scripts/01_sequences_and_allocation.sql`)
+- Create sequence `RefnoSeq` for reference number generation (per `scripts/01_sequences_and_allocation.sql`); **initial value is a cutover requirement, not a default**: at cutover `START WITH` MUST be set to `(SELECT MAX(refno) FROM dbo.Mainentry) + 1` (computed and applied during T013; replaces the script's `START WITH 1` TODO — deterministic per BR-001)
 - Create sequence `InvoiceNumberSeq` + `usp_AllocateInvoiceNumber` (per `scripts/01_sequences_and_allocation.sql`; Billing-gated, Risk #1)
 - Create stored procedure: `usp_AllocateNextRefno` (per `scripts/01_sequences_and_allocation.sql`)
 - Create function: `fn_IsEmbassyClosed` (read-only reporting mirror; per `scripts/02_fn_IsEmbassyClosed.sql`)
@@ -161,7 +172,7 @@ All endpoints return problem-details JSON on error (Phase-0 exception handling).
 - Status is free-form per legacy (any status code writable at any time; no transition validation — clarification Q3)
 - Bookable date: not holiday, not weekly-off, not Sunday
 - Passenger data: required fields per legacy `entryDetails` schema
-- Super-user email unique, password meets policy (8+ chars, hashed)
+- Super-user username unique (proc guards on `UserName`, script 06:189), password meets policy (8+ chars, hashed)
 
 ## 18. Error Handling
 
@@ -178,7 +189,7 @@ All endpoints return problem-details JSON on error (Phase-0 exception handling).
 ## 19. Audit Requirements
 
 - All entry create/update/delete operations audited (subject, endpoint, outcome)
-- Reference number allocations audited
+- Reference number allocations audited — each allocation records refno, agent, timestamp, updatedby (JWT identity), remark in `bighistory` (legacy behavior: `insertEntry.asp:233` inserts the same shape; verified this session)
 - Status changes audited via `usp_RecordEntryStatusChange` (timestamp, actor, old/new status, reason) — `StatusHistory` + `bighistory`, one transaction
 - Super-user provisioning audited via `usp_ProvisionSuperUser` + the dedicated `SuperUserProvisioningAudit` table (new table, GR-0003)
 - No password material in any audit log (NFR-006, Constitution Principle V)
@@ -187,13 +198,13 @@ All endpoints return problem-details JSON on error (Phase-0 exception handling).
 
 - **AC-001**: All 52 tables migrated per §3 disposition (M / M-RO / COND / ARCH / DROP); row counts and checksums match legacy `VisaEntry`
 - **AC-002**: `Entry` aggregate with `EntryPassenger` and `PaxCountryStatus` chain persists and retrieves correctly
-- **AC-003**: `usp_AllocateNextRefno` returns unique, monotonic max+1 values that are atomic under concurrent load (gaps permitted; no duplicates, no collisions) (clarification Q2, option A)
+- **AC-003**: `usp_AllocateNextRefno` returns unique, monotonic max+1 values that are atomic under concurrent load — verified with N = 50 parallel callers (T012), no duplicates, no collisions (gaps permitted; clarification Q2, option A)
 - **AC-004**: `usp_RecordEntryStatusChange` atomically updates `PaxStatus.statusID` and writes both `StatusHistory` and `bighistory` rows with correct timestamp, actor, old/new status, and reason (one commit; rollback on any error) (per `scripts/08_finalize_entry_status_change_updatedby.sql`; GR-0004)
 - **AC-005**: `fn_IsEmbassyClosed` returns 1 for holidays, weekly-off, Sundays; 0 otherwise; and `HolidayService` (C#) enforces the same rule transactionally
 - **AC-006**: `usp_ProvisionSuperUser` creates an `su` user with `su`+`adm` roles, rejects non-su callers, refuses duplicate usernames, and writes the `SuperUserProvisioningAudit` row; password is never passed or stored in plaintext (per `scripts/06_status_change_and_superuser_provisioning.sql`)
 - **AC-007**: All API endpoints return correct status codes and problem-details on error
 - **AC-011**: `PUT /api/v1/entries/{refno}` rejects stale writes via If-Match (ETag from `Entry.RowVersion`) with 409 Conflict; a fresh ETag succeeds (clarify session 2026-08-14 Q1)
-- **AC-008**: All write endpoints enforce Phase-0 authorization policies (401/403/501 as appropriate)
+- **AC-008**: All write endpoints enforce Phase-0 authorization policies (401/403 as appropriate; success codes per contract §1-§5 — create 201, get/update/status 200, awb 204)
 - **AC-009**: Zero data loss; legacy `VisaEntry` database unchanged and read-only
 - **AC-010**: Migration scripts are idempotent and reversible (except `dtproperties`)
 
@@ -218,7 +229,7 @@ All endpoints return problem-details JSON on error (Phase-0 exception handling).
 
 - **Unit**: `Entry` aggregate invariants, `EntryPassenger` validation, free-form status recording (no transition validation), `HolidayService`/`fn_IsEmbassyClosed` rule parity, reference number allocation
 - **Integration**: Stored procedure execution against real SQL Server, migration script idempotency, checksum validation
-- **API**: All endpoints with 5-role matrix (anonymous→401, wrong role→403, correct role→200/201/501), problem-details format, optimistic-concurrency test (stale If-Match → 409, fresh ETag → 200; AC-011)
+- **API**: All endpoints with 5-role matrix (anonymous→401, wrong role→403, correct role→200/201/204 per contract §1-§5; the deferred superuser endpoint is NOT registered — T023, so 501 is never returned), problem-details format, optimistic-concurrency test (stale If-Match → 409, fresh ETag → 200; AC-011)
 - **Migration**: Row count parity, checksum parity, `dtproperties` only dropped, legacy `VisaEntry` untouched
 - **Regression**: Legacy page behavior parity for entry workflow (where applicable per migration plan §10)
 
@@ -242,7 +253,7 @@ All endpoints return problem-details JSON on error (Phase-0 exception handling).
 ## Assumptions
 
 - The §3 52-table disposition is documented in `library/complete_migration_plan.md` §3 (verified 2026-08-13; legend includes M / M-RO / COND / ARCH / DROP)
-- The six owner-supplied T-SQL scripts are stored in `specs/006-core-entry-workflow/scripts/` (01-06, run in order at cutover). Canonical object names confirmed by owner 2026-08-14: `RefnoSeq`, `usp_AllocateNextRefno`, `fn_IsEmbassyClosed`, `usp_RecordEntryStatusChange`, `usp_ProvisionSuperUser` (see Gap Reports GR-0001/GR-0002; all procedure prefixes standardized to `usp_` per GR-0003 item 2)
+- The owner-supplied T-SQL scripts are stored in `specs/006-core-entry-workflow/scripts/` (01-08, run in order at cutover). Canonical object names confirmed by owner 2026-08-14: `RefnoSeq`, `usp_AllocateNextRefno`, `fn_IsEmbassyClosed`, `usp_RecordEntryStatusChange`, `usp_ProvisionSuperUser` (see Gap Reports GR-0001/GR-0002; all procedure prefixes standardized to `usp_` per GR-0003 item 2)
 - `fn_IsEmbassyClosed` is intentionally a read-only reporting/BI mirror; the authoritative holiday/weekly-off/Sunday check lives in `VisaFusion.Core.HolidayService` (owner-confirmed semantic design, 2026-08-14)
 - `usp_ProvisionSuperUser` targets the actual VisaFusion Identity schema: `nvarchar(450)` string keys (`AspNetUsers.Id`/`AspNetRoles.Id`/`AspNetUserRoles.UserId`/`RoleId`), role Id = role name, user Ids as 32-char GUID strings (`Guid.NewGuid().ToString("N")`); the `su`/`adm` role seed is confirmed present (verified against `IdentityImporter.cs` `EnsureIdentitySchemaAsync` and `VisaFusionIdentityDbContext.cs`; GR-0003 item 3 / GR-0004)
 - Legacy `VisaEntry` database is accessible for migration reads
@@ -274,7 +285,7 @@ All endpoints return problem-details JSON on error (Phase-0 exception handling).
 
 ### Gap Report GR-0001 — Stored proc/function source definitions
 
-- **Status**: **RESOLVED (2026-08-14)** — owner supplied six T-SQL scripts, stored in `specs/006-core-entry-workflow/scripts/` (01-06, run in order at cutover). Implementation recreates them verbatim; no behavior may be invented. *(File 07 `07_gr0004_corrected_entry_status_change.sql` superseded the file-06 `usp_RecordEntryStatusChange` with verified column mappings; file 08 `08_finalize_entry_status_change_updatedby.sql` finalized the `UpdatedBy` format and superseded file 07. The script set is now 01-08, run in order at cutover.)*
+- **Status**: **RESOLVED (2026-08-14)** — owner supplied T-SQL scripts, stored in `specs/006-core-entry-workflow/scripts/` (01-08, run in order at cutover). Implementation recreates them verbatim; no behavior may be invented. *(File 07 `07_gr0004_corrected_entry_status_change.sql` superseded the file-06 `usp_RecordEntryStatusChange` with verified column mappings; file 08 `08_finalize_entry_status_change_updatedby.sql` finalized the `UpdatedBy` format and superseded file 07. The script set is now 01-08, run in order at cutover.)*
 - **Artifacts**: `01_sequences_and_allocation.sql` (RefnoSeq, InvoiceNumberSeq, sp_AllocateNextRefno, sp_AllocateInvoiceNumber) · `02_fn_IsEmbassyClosed.sql` (fn_IsEmbassyClosed, read-only mirror) · `03_report_procedures.sql` (sp_Report_PendingList, sp_Report_DailyAgentStatus, sp_Report_TodayCollection) · `04_migration_cleansing_procedures.sql` (sp_Migrate_CleanseStatus508, sp_Migrate_QuarantineJunkDates, sp_Migrate_ReconcileOrphanAgents) · `05_normalization_ddl.sql` (LegacyEmailListArchive, LegacyChangeLogArchive, PK/FK templates). *(Names as-supplied; all procedure prefixes later standardized to `usp_` per GR-0003 item 2.)*
 - **Owner caveat (carried forward)**: every column name in the scripts is inferred from the documented naming convention and marked `-- TODO: confirm column name`; must be verified against the live schema (`sp_help` / `INFORMATION_SCHEMA.COLUMNS`) before execution. This is a pre-cutover verification task, not a spec blocker.
 - **Evidence**: The five names appear only in `library/ExecutionPlan.md:9`. Absent from `database.sql` (no CREATE PROC/FUNCTION/SEQUENCE matches), all 585 legacy `.asp` files, `findings/modernization_plan.md`, `findings/deepanalysis.md`, and `findings/exiting_architecture.md`. No document in the repo has a §15.

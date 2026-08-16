@@ -15,7 +15,7 @@ namespace VisaFusion.FunctionalTests;
 public class JobsHostTests
 {
     [Fact]
-    public async Task Jobs_Host_Registers_All_Workers()
+    public Task Jobs_Host_Registers_All_Workers()
     {
         var builder = Host.CreateApplicationBuilder();
         builder.Services.AddVisaFusionCore();
@@ -32,6 +32,8 @@ public class JobsHostTests
         Assert.Contains(hostedServices, s => s is SmsQueueWorker);
         Assert.Contains(hostedServices, s => s is EmailQueueWorker);
         Assert.Contains(hostedServices, s => s is ReportWorker);
+
+        return Task.CompletedTask;
     }
 
     [Fact]

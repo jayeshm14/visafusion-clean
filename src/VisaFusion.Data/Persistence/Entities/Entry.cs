@@ -41,4 +41,11 @@ public class Entry
     public string? Enteredby { get; set; }
     public DateTime? Entrydatetime { get; set; }
     public string? Bill { get; set; }
+
+    /// <summary>
+    /// Optimistic-concurrency token (SPEC-0006 T006, spec §16, AC-011). Maps a
+    /// SQL Server `rowversion` column added by this feature; surfaced as the
+    /// ETag for `If-Match` on PUT (contracts/entries-api.md §2–§3).
+    /// </summary>
+    public byte[]? RowVersion { get; set; }
 }
