@@ -555,17 +555,33 @@ public partial class Program
                 AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             });
 
-        app.MapPost("/api/v1/admin/security-day/open", (HttpContext ctx) => SecuredPlaceholderEndpoint.Handle(ctx))
+        // ---- Security-day gate (SPEC-0007 T025, US3, FR-008, BR-003; contracts/admin-api.md §1-§3) ----
+        // The SecurityGate policy (adm/su) enforces the §4.2 matrix server-side
+        // (legacy openForDay.asp/closeForDay.asp were anonymous — BR-003); the
+        // shared ISecurityGateService (Core interface, Data implementation —
+        // deviation log §5) carries all business behavior. The audit actor is
+        // resolved from the validated JWT claims inside the handler (GR-0004).
+        app.MapPost("/api/v1/admin/security-day/open", (HttpContext ctx, ISecurityGateService securityGate) =>
+            AdminEndpoint.OpenDayAsync(ctx, securityGate))
             .RequireAuthorization(new AuthorizeAttribute
             {
-                Roles = "adm,su",
+                Policy = AuthorizationPolicies.SecurityGate,
                 AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             });
 
-        app.MapPost("/api/v1/admin/security-day/close", (HttpContext ctx) => SecuredPlaceholderEndpoint.Handle(ctx))
+        app.MapPost("/api/v1/admin/security-day/close", (HttpContext ctx, ISecurityGateService securityGate) =>
+            AdminEndpoint.CloseDayAsync(ctx, securityGate))
             .RequireAuthorization(new AuthorizeAttribute
             {
-                Roles = "adm,su",
+                Policy = AuthorizationPolicies.SecurityGate,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapGet("/api/v1/admin/security-day/today", (HttpContext ctx, ISecurityGateService securityGate) =>
+            AdminEndpoint.GetTodayAsync(ctx, securityGate))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.SecurityGate,
                 AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             });
 

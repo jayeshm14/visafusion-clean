@@ -61,7 +61,7 @@ public class VisaFusionWebApplicationFactory : WebApplicationFactory<Program>
             // rule as an open day so the hermetic emp-login success path
             // (AC-001) is proven without a database (plan.md "Testing").
             services.RemoveAll<ISecurityGateService>();
-            services.AddScoped<ISecurityGateService, OpenDaySecurityGateStub>();
+            services.AddSingleton<ISecurityGateService, OpenDaySecurityGateStub>();
 
             // SPEC-0006 (T024-T026): the real entry service calls the
             // owner-supplied stored procedures via VisaEntryDbContext, which
@@ -146,21 +146,48 @@ public class VisaFusionWebApplicationFactory : WebApplicationFactory<Program>
     /// hermetic functional tests must not touch the `security` table, so the
     /// gate always allows the login. The rejection paths are covered by the
     /// unit tests (evaluation) and the integration tests (real SQL Server).
+    ///
+    /// SPEC-0007 (T023/T026): the open/close/today write surface is stateful —
+    /// a faithful in-memory mirror of the real service's
+    /// SecurityDayOpenResult/SecurityDayCloseResult semantics (already-open →
+    /// AlreadyOpen, no-open-row → NotFound) — so the security-day page
+    /// functional tests prove the open → status → close flow hermetically.
+    /// <see cref="EvaluateAsync"/> remains always-Allowed: the login-gate
+    /// rejection paths stay owned by the unit and integration tests.
     /// </summary>
     private sealed class OpenDaySecurityGateStub : ISecurityGateService
     {
+        private readonly Dictionary<DateTime, SecurityDayStatus> _days = new();
+
         public Task<SecurityGateDecision> EvaluateAsync(IEnumerable<string> roles, DateTime date)
             => Task.FromResult(SecurityGateDecision.Allowed);
 
-        // SPEC-0007 T005: open/close/today surface is a no-op in the hermetic
-        // stub (the write paths are covered by the unit and integration tests).
         public Task<SecurityDayOpenResult> OpenDayAsync(DateTime date, string openedBy)
-            => Task.FromResult(SecurityDayOpenResult.Opened);
+        {
+            var key = date.Date;
+            if (_days.TryGetValue(key, out var existing) && existing.ClosingTime is null)
+            {
+                return Task.FromResult(SecurityDayOpenResult.AlreadyOpen);
+            }
+
+            _days[key] = new SecurityDayStatus(key, DateTime.Now, openedBy, null, null);
+            return Task.FromResult(SecurityDayOpenResult.Opened);
+        }
 
         public Task<SecurityDayCloseResult> CloseDayAsync(DateTime date, string closedBy)
-            => Task.FromResult(SecurityDayCloseResult.Closed);
+        {
+            var key = date.Date;
+            if (!_days.TryGetValue(key, out var existing) || existing.ClosingTime is not null)
+            {
+                return Task.FromResult(SecurityDayCloseResult.NotFound);
+            }
 
-        public Task<SecurityDayStatus?> GetTodayAsync(DateTime date) => Task.FromResult<SecurityDayStatus?>(null);
+            _days[key] = existing with { ClosingTime = DateTime.Now, ClosedBy = closedBy };
+            return Task.FromResult(SecurityDayCloseResult.Closed);
+        }
+
+        public Task<SecurityDayStatus?> GetTodayAsync(DateTime date)
+            => Task.FromResult(_days.GetValueOrDefault(date.Date));
     }
 
     /// <summary>

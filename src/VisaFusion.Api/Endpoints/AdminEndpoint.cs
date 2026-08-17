@@ -9,23 +9,94 @@ using VisaFusion.Identity;
 namespace VisaFusion.Api.Endpoints;
 
 /// <summary>
-/// Admin module endpoints — user management (SPEC-0007 T020, US2, FR-005..007,
-/// FR-023, BR-004; AC-003/AC-018; contracts/admin-api.md §4/§5/§6). Backs the
-/// legacy pages <c>addNewUser.asp</c>, <c>editdonetest.asp</c>,
+/// Admin module endpoints — security-day + user management (SPEC-0007 T020/
+/// T025, US2/US3, FR-005..008/FR-023, BR-003/BR-004; AC-003/AC-004/AC-018;
+/// contracts/admin-api.md §1-§6). Backs the legacy pages
+/// <c>openForDay.asp</c>, <c>closeForDay.asp</c>, <c>securityHome.asp</c>,
+/// <c>addNewUser.asp</c>, <c>editdonetest.asp</c>,
 /// <c>deleteUser.asp</c>/<c>deleteSubmit.asp</c>.
 ///
-/// Routes are gated by the policies wired in the host (<c>UserManagement</c>
-/// = adm/emp — DP-001; <c>SuperUserOnly</c> = claim-based su). Handlers follow
-/// the existing <c>AgentsEndpoint</c> pattern: <see cref="TryReadJsonAsync{T}"/>
-/// for the body, <see cref="WriteProblemAsync"/> for standardized problem-details
-/// errors, and the shared Core <see cref="IUserManagementService"/> for all
-/// business behavior (never the DbContext). The audit actor AND the actor's
-/// effective roles are resolved from the validated JWT principal — never from
-/// the request body (anti-spoofing, GR-0004; spec §19). The su-role rules
-/// (FR-006/FR-007) are enforced by the policy and re-checked by the service.
+/// Routes are gated by the policies wired in the host (<c>SecurityGate</c> =
+/// adm/su; <c>UserManagement</c> = adm/emp — DP-001; <c>SuperUserOnly</c> =
+/// claim-based su). Handlers follow the existing <c>AgentsEndpoint</c> pattern:
+/// <see cref="TryReadJsonAsync{T}"/> for the body, <see cref="WriteProblemAsync"/>
+/// for standardized problem-details errors, and the shared Core services
+/// (<see cref="ISecurityGateService"/>, <see cref="IUserManagementService"/>)
+/// for all business behavior (never the DbContext). The audit actor AND the
+/// actor's effective roles are resolved from the validated JWT principal —
+/// never from the request body (anti-spoofing, GR-0004; spec §19). The su-role
+/// rules (FR-006/FR-007) are enforced by the policy and re-checked by the
+/// service.
 /// </summary>
 public static class AdminEndpoint
 {
+    /// <summary>
+    /// POST /api/v1/admin/security-day/open — open the working day (contract
+    /// §1, FR-008, BR-003, CHK022). The date defaults to the server-local
+    /// today; the day being already open maps to 409.
+    /// </summary>
+    public static async Task OpenDayAsync(
+        HttpContext context, ISecurityGateService securityGate)
+    {
+        var request = await TryReadJsonAsync<OpenDayRequest>(context);
+        if (request is null) return;
+
+        var actorName = await ResolveActorNameAsync(context);
+        if (actorName is null) return;
+
+        var date = request.Date ?? DateTime.Now;
+
+        var result = await securityGate.OpenDayAsync(date, actorName);
+        if (result == SecurityDayOpenResult.AlreadyOpen)
+        {
+            await WriteProblemAsync(
+                context, StatusCodes.Status409Conflict, "Conflict",
+                $"the working day {date:yyyy-MM-dd} is already open");
+            return;
+        }
+
+        await WriteDayAsync(context, securityGate, date);
+    }
+
+    /// <summary>
+    /// POST /api/v1/admin/security-day/close — close the working day (contract
+    /// §2, FR-008, BR-003, CHK021). The date defaults to the server-local
+    /// today; no open row for the date maps to 404.
+    /// </summary>
+    public static async Task CloseDayAsync(
+        HttpContext context, ISecurityGateService securityGate)
+    {
+        var request = await TryReadJsonAsync<CloseDayRequest>(context);
+        if (request is null) return;
+
+        var actorName = await ResolveActorNameAsync(context);
+        if (actorName is null) return;
+
+        var date = request.Date ?? DateTime.Now;
+
+        var result = await securityGate.CloseDayAsync(date, actorName);
+        if (result == SecurityDayCloseResult.NotFound)
+        {
+            await WriteProblemAsync(
+                context, StatusCodes.Status404NotFound, "Not Found",
+                $"no open working day exists for {date:yyyy-MM-dd}");
+            return;
+        }
+
+        await WriteDayAsync(context, securityGate, date);
+    }
+
+    /// <summary>
+    /// GET /api/v1/admin/security-day/today — current day status (contract §3,
+    /// FR-008; legacy <c>securityHome.asp</c>). 200 with the open/closed state
+    /// for the server-local today.
+    /// </summary>
+    public static async Task GetTodayAsync(
+        HttpContext context, ISecurityGateService securityGate)
+    {
+        await WriteDayAsync(context, securityGate, DateTime.Now);
+    }
+
     /// <summary>POST /api/v1/admin/users — create user with a whitelisted role (contract §4).</summary>
     public static async Task CreateUserAsync(
         HttpContext context, IUserManagementService users,
@@ -165,6 +236,51 @@ public static class AdminEndpoint
         Roles = u.Roles,
         Active = u.Active,
     };
+
+    /// <summary>
+    /// Writes the current security-day state for the date as the 200 response
+    /// (contract §1-§3). A day with no row serializes as a null body — the
+    /// caller (page or client) renders the "not opened" state.
+    /// </summary>
+    private static async Task WriteDayAsync(
+        HttpContext context, ISecurityGateService securityGate, DateTime date)
+    {
+        var status = await securityGate.GetTodayAsync(date);
+        context.Response.StatusCode = StatusCodes.Status200OK;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(status is null
+            ? null
+            : new SecurityDayResponse
+            {
+                Date = status.Date,
+                OpeningTime = status.OpeningTime,
+                OpenedBy = status.OpenedBy,
+                ClosingTime = status.ClosingTime,
+                ClosedBy = status.ClosedBy,
+            });
+    }
+
+    /// <summary>
+    /// Resolves the actor username from the validated JWT principal — never
+    /// from the request body (anti-spoofing, GR-0004). The security-day audit
+    /// events record the actor username only (the service writes
+    /// <c>ActorUserId = string.Empty</c>), so no UserManager lookup is needed.
+    /// A principal with no name is answered with a defensive 401 (unreachable
+    /// for policy-secured routes).
+    /// </summary>
+    private static async Task<string?> ResolveActorNameAsync(HttpContext context)
+    {
+        var actorName = context.User.Identity?.Name;
+        if (string.IsNullOrEmpty(actorName))
+        {
+            await WriteProblemAsync(
+                context, StatusCodes.Status401Unauthorized, "Unauthorized",
+                "The authenticated principal does not resolve to a user.");
+            return null;
+        }
+
+        return actorName;
+    }
 
     private static async Task<T?> TryReadJsonAsync<T>(HttpContext context)
         where T : class

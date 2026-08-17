@@ -1,0 +1,61 @@
+@page
+@model VisaFusion.Web.Areas.Admin.Pages.SecurityDay.IndexModel
+@{
+    ViewData["Title"] = "Security day";
+    ViewData["UseSidebar"] = true;
+}
+
+@section SidebarNav {
+    <a asp-area="Admin" asp-page="/SecurityDay/Index" aria-current="page">Security day</a>
+}
+
+<div class="vf-content">
+    <h1>Security day</h1>
+
+    @if (!string.IsNullOrWhiteSpace(Model.OutcomeMessage))
+    {
+        <div class="vf-alert vf-alert-success" role="status">@Model.OutcomeMessage</div>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.OutcomeError))
+    {
+        <div class="vf-alert vf-alert-danger" role="alert">@Model.OutcomeError</div>
+    }
+
+    <div class="vf-card">
+        @if (Model.Today is null)
+        {
+            <p>Today has not been opened.</p>
+        }
+        else if (Model.Today.ClosingTime is not null)
+        {
+            <p>
+                Today was opened at <strong>@Model.Today.OpeningTime?.ToString("HH:mm")</strong>
+                by @Model.Today.OpenedBy and closed at
+                <strong>@Model.Today.ClosingTime.Value.ToString("HH:mm")</strong>
+                by @Model.Today.ClosedBy.
+            </p>
+        }
+        else
+        {
+            <p>
+                Today is open (opened at <strong>@Model.Today.OpeningTime?.ToString("HH:mm")</strong>
+                by @Model.Today.OpenedBy).
+            </p>
+        }
+    </div>
+
+    <p>
+        @if (Model.Today is not null && Model.Today.ClosingTime is null)
+        {
+            <form method="post" asp-page-handler="Close" class="vf-inline">
+                <button type="submit" class="vf-btn vf-btn-primary">Close the day</button>
+            </form>
+        }
+        else
+        {
+            <form method="post" asp-page-handler="Open" class="vf-inline">
+                <button type="submit" class="vf-btn vf-btn-primary">Open the day</button>
+            </form>
+        }
+    </p>
+</div>

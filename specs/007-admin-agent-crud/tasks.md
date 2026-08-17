@@ -105,13 +105,13 @@
 ### Tests for User Story 3 ⚠️
 
 - [x] T022 [P] [US3] Unit tests for open/close day in `tests/UnitTests/SecurityDayTests.cs` (extends T010) — DONE 2026-08-17 (open/close/409/404 + concurrency CHK022 covered)
-- [ ] T023 [P] [US3] Integration tests for security-day endpoints in `tests/IntegrationTests/SecurityDayIntegrationTests.cs`
+- [x] T023 [P] [US3] Integration tests for security-day endpoints in `tests/IntegrationTests/SecurityDayIntegrationTests.cs` — DONE 2026-08-17 (real `SecurityGateService` over real SQL Server: open→Opened + §19 audit, re-open→AlreadyOpen (409), close→Closed + audit, close-no-row→NotFound (404), gate follows open/close state, concurrent opens→single winner CHK022; marker-based cleanup, skip-on-unreachable convention)
 
 ### Implementation for User Story 3
 
-- [ ] T024 [P] [US3] Create security-day contracts in `src/VisaFusion.Api/Contracts/` (`OpenDayRequest`, `CloseDayRequest`, `SecurityDayResponse`) per `contracts/admin-api.md` §1-§3
-- [ ] T025 [US3] Implement security-day endpoints in `src/VisaFusion.Api/Endpoints/AdminEndpoint.cs`: `POST /api/v1/admin/security-day/open`, `POST /api/v1/admin/security-day/close`, `GET /api/v1/admin/security-day/today` (SecurityGate policy) — depends on T005, T024
-- [ ] T026 [US3] Implement the security-day page in `src/VisaFusion.Web/Areas/Admin/Pages/SecurityDay/` (today status + open/close actions, `securityHome.asp` parity) on the new shell (T009)
+- [x] T024 [P] [US3] Create security-day contracts in `src/VisaFusion.Api/Contracts/` (`OpenDayRequest`, `CloseDayRequest`, `SecurityDayResponse`) per `contracts/admin-api.md` §1-§3 — DONE 2026-08-17 (`AdminContracts.cs`; date defaults to server-local today)
+- [x] T025 [US3] Implement security-day endpoints in `src/VisaFusion.Api/Endpoints/AdminEndpoint.cs`: `POST /api/v1/admin/security-day/open`, `POST /api/v1/admin/security-day/close`, `GET /api/v1/admin/security-day/today` (SecurityGate policy) — depends on T005, T024 — DONE 2026-08-17 (actor resolved from validated JWT claims, GR-0004; 409/404 problem-details; routes wired in `src/VisaFusion.Web/Program.cs` replacing the 501 placeholders)
+- [x] T026 [US3] Implement the security-day page in `src/VisaFusion.Web/Areas/Admin/Pages/SecurityDay/` (today status + open/close actions, `securityHome.asp` parity) on the new shell (T009) — DONE 2026-08-17 (`Index.cshtml(.cs)` over the shared `ISecurityGateService`; inline 409/404 parity messages; `SecurityGate` policy adm/su; `SecurityDayPagesTests` 7 cases; factory stub made stateful)
 
 **Checkpoint**: At this point, User Stories 1, 2 AND 3 should all work independently
 

@@ -62,3 +62,47 @@ public sealed record UserResponse
     public IReadOnlyList<string> Roles { get; init; } = Array.Empty<string>();
     public bool Active { get; init; }
 }
+
+/// <summary>
+/// Request body for POST /api/v1/admin/security-day/open (SPEC-0007 US3,
+/// FR-008, BR-003; contracts/admin-api.md §1). Backs the legacy
+/// <c>openForDay.asp</c> (anonymous INSERT — now <c>adm</c>/<c>su</c> only).
+///
+/// The <c>date</c> defaults to the server-local today when omitted; the open
+/// is atomic per date (unique <c>date1</c> index, CHK022) — a concurrent open
+/// for the same date loses the race and receives 409.
+/// </summary>
+public sealed record OpenDayRequest
+{
+    /// <summary>The working day to open — defaults to the server-local today.</summary>
+    public DateTime? Date { get; init; }
+}
+
+/// <summary>
+/// Request body for POST /api/v1/admin/security-day/close (SPEC-0007 US3,
+/// FR-008, BR-003; contracts/admin-api.md §2). Backs the legacy
+/// <c>closeForDay.asp</c> (anonymous UPDATE — now <c>adm</c>/<c>su</c> only).
+///
+/// The <c>date</c> defaults to the server-local today when omitted; closing a
+/// day with no open row yields 404 (CHK021).
+/// </summary>
+public sealed record CloseDayRequest
+{
+    /// <summary>The working day to close — defaults to the server-local today.</summary>
+    public DateTime? Date { get; init; }
+}
+
+/// <summary>
+/// Security-day response body (SPEC-0007 US3, FR-008, AC-004; contracts/
+/// admin-api.md §1-§3). Backs the legacy <c>securityHome.asp</c> status view.
+/// A <c>null</c> <c>OpeningTime</c> means no row exists for the date (the day
+/// was never opened); a non-null <c>ClosingTime</c> means the day was closed.
+/// </summary>
+public sealed record SecurityDayResponse
+{
+    public DateTime Date { get; init; }
+    public DateTime? OpeningTime { get; init; }
+    public string? OpenedBy { get; init; }
+    public DateTime? ClosingTime { get; init; }
+    public string? ClosedBy { get; init; }
+}
