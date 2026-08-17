@@ -57,7 +57,7 @@ Generated: 2026-08-06 | Source: `specs/001-ai-environment-validation/spec.md`, A
 ### Module → Legacy Mapping (this feature)
 
 This is a cross-cutting governance feature with no legacy page mapping (spec §8);
-it does not alter legacy business behavior (Constitution Principle II).
+it does not alter legacy business behavior (Constitution Mission §2 item 4 — preserve legacy business behaviour).
 
 ---
 
@@ -82,7 +82,7 @@ Generated: 2026-08-06 | Source: `specs/002-repository-inventory/spec.md`
 
 Documentation-only feature: `INV-Legacy` documents legacy modules MOD-001..MOD-006;
 `INV-Config` documents the SEC-Backdoor finding. No legacy business behavior
-changes (Constitution Principle II). Deliverable location fixed by spec §5 as
+changes (Constitution Mission §2 item 4 — preserve legacy business behaviour). Deliverable location fixed by spec §5 as
 `reports/repository-inventory/` (CHK004 remediation).
 
 ---
@@ -116,7 +116,7 @@ research.md, data-model.md, contracts/, tasks.md (54 tasks)
 
 Migration-only feature: reads the legacy `VisaEntry` database (52 tables, read-only)
 and writes the target `VisaFusion` database. No legacy page behavior changes
-(Constitution Principle II). Blocking decisions recorded: CountryID target reference
+(Constitution Mission §2 item 4 — preserve legacy business behaviour). Blocking decisions recorded: CountryID target reference
 (data-model.md §4), COND-table owner confirmations, `invoice`/`invoicedetail`
 disposition (migration plan §12). ADR-0003 (migration tooling) accepted 2026-08-10 (T052).
 
@@ -250,4 +250,69 @@ anonymous write endpoints are re-secured behind the §4.2 policy matrix
 (`AuthorizationPolicies`, `SecuredPlaceholderEndpoint`); legacy entry URLs
 (`Default.asp`, `authenticate.asp`, `logon.asp`, `regsub*.asp`) redirect to
 their modern counterparts (`LegacyUrlRewriteMiddleware`). No legacy business
-behavior changes (Constitution Principle II).
+behavior changes (Constitution Mission §2 item 4 — preserve legacy business behaviour).
+
+---
+
+## SPEC-0006 — Core Entry Workflow
+
+Generated: 2026-08-16 | Source: `specs/006-core-entry-workflow/spec.md`,
+plan.md, research.md, data-model.md, contracts/entries-api.md, tasks.md
+(T001–T038)
+
+| Requirement | Architecture | Domain | Database | API | UI | Test | Migration |
+|-------------|--------------|--------|----------|-----|----|------|-----------|
+| FR-001 Entry aggregate | §2, deviation log §1 | CTX-Visa, EntryService | Mainentry, entryDetails | /api/v1/entries | — | EntryAggregateTests, EntryPassengerValidationTests | scripts 01-08 |
+| FR-002 Aggregate read | §2 | EntryService | Mainentry, entryDetails, PaxStatus | GET /entries/{refno} | — | EntriesRbacTests, EntriesErrorTests | — |
+| FR-003 Refno preservation | §2 | EntryService | Mainentry.refno | POST /entries | — | RefnoAllocationTests | script 01 |
+| FR-004 Refno allocation | §2 | EntryService.AllocateRefnoAsync | RefnoSeq, usp_AllocateNextRefno | POST /entries | — | RefnoAllocationTests (unit + integration) | script 01 |
+| FR-005 Status change | §2 | EntryService.RecordStatusChangeAsync | PaxStatus, StatusHistory, bighistory, usp_RecordEntryStatusChange | POST /entries/{refno}/status | — | StatusChangeTests, StatusChangeIntegrationTests | script 08 (supersedes 06/07) |
+| FR-005b entrytype cleansing default | §2 (data-model §6 rule b) | CopyTransform (SPEC-0004) | Mainentry.entrytype | — | — | SPEC-0004 FR-005 row (T028-T035); no dedicated test yet | MIG-0001 |
+| FR-005c orphaned-Mainentry NULL agent | §2 (data-model §6 rule c) | CopyTransform (SPEC-0004) | Mainentry.agent | — | — | SPEC-0004 FR-005 row (T028-T035); no dedicated test yet | MIG-0001 |
+| FR-006 Bookable-date rule | §2 | HolidayService (C#, authoritative) + fn_IsEmbassyClosed (reporting mirror) | holidaylist, weeklyoff | — | — | HolidayServiceTests, EmbassyClosedTests | script 02 |
+| FR-007 Super-user provisioning | §2 | usp_ProvisionSuperUser | SuperUserProvisioningAudit | deferred (documented-only) | — | SuperUserProvisioningTests | script 06 |
+| FR-008 Entries API | §2 | EntryService | Mainentry, entryDetails, PaxStatus | POST/GET/PUT /entries, /status, /awb | — | EntriesRbacTests, EntriesConcurrencyTests, EntriesErrorTests | — |
+| FR-009 EntryOperations policy | §2 | SEC-RBAC-POLICIES | — | all 5 Entries endpoints | — | EntriesRbacTests (5-role matrix) | — |
+| FR-010 Legacy untouched | §2 | — | VisaEntry (read-only) | — | — | T038 validation | — |
+| FR-011 No business drop | §2 | — | only dtproperties removed | — | — | T038 validation | — |
+| BR-001 Refno max+1 atomic | §2 | EntryService | RefnoSeq, usp_AllocateNextRefno | POST /entries | — | RefnoAllocationTests | script 01 |
+| BR-002 Audited status change | §2 | EntryService | StatusHistory, bighistory | POST /entries/{refno}/status | — | StatusChangeIntegrationTests | script 08 |
+| BR-003 Bookable-date rule | §2 | HolidayService | holidaylist, weeklyoff | — | — | HolidayServiceTests, EmbassyClosedTests | script 02 |
+| BR-004 Super-user audited | §2 | usp_ProvisionSuperUser | SuperUserProvisioningAudit | deferred | — | SuperUserProvisioningTests | script 06 |
+| BR-005 ≥1 passenger invariant | §2 | EntryService | entryDetails | POST/PUT /entries | — | EntryAggregateTests | — |
+| AC-002 Aggregate invariants | §2 | EntryService | — | — | — | EntryAggregateTests | — |
+| AC-003 Refno concurrency | §2 | EntryService | usp_AllocateNextRefno | — | — | RefnoAllocationTests (50 parallel) | script 01 |
+| AC-004 Status atomicity | §2 | EntryService | PaxStatus, StatusHistory, bighistory | — | — | StatusChangeIntegrationTests | script 08 |
+| AC-005 Rule parity | §2 | HolidayService + fn_IsEmbassyClosed | holidaylist, weeklyoff | — | — | HolidayServiceTests, EmbassyClosedTests | script 02 |
+| AC-006 Super-user audit | §2 | usp_ProvisionSuperUser | SuperUserProvisioningAudit | deferred | — | SuperUserProvisioningTests | script 06 |
+| AC-007 Create entry | §2 | EntryService | Mainentry, entryDetails | POST /entries | — | EntriesRbacTests, EntriesErrorTests | — |
+| AC-008 RBAC matrix | §2 | SEC-RBAC-POLICIES | — | all 5 Entries endpoints | — | EntriesRbacTests | — |
+| AC-011 Optimistic concurrency | §2 | EntryService.UpdateAsync | Entry.RowVersion | PUT /entries (If-Match/ETag) | — | EntriesConcurrencyTests | T006 migration |
+| AC-001 52-table disposition | MIG-Plan | TableCatalog (SPEC-0004) | DB-VisaFusion (52 tables) | — | — | T041/T043: SnapshotTests, ValidationTests | MIG-0001 |
+| AC-009 Zero data loss | MIG-Plan | LegacyReader (read-only, FR-008) | VisaEntry (unchanged) | — | — | T038 validation | — |
+| AC-010 Idempotent/reversible scripts | MIG-Plan | — | scripts 01-08 (only dtproperties dropped) | — | — | T033 GR-0001 sign-off | scripts 01-08 |
+
+### Test → Artifact map (SPEC-0006)
+
+| Scenario | Test artifact |
+|----------|--------------|
+| Entry aggregate invariants (AC-002, BR-005) | `tests/UnitTests/EntryAggregateTests.cs` (≥1 passenger, valid refno, free-form status) |
+| Passenger validation | `tests/UnitTests/EntryPassengerValidationTests.cs` |
+| Refno allocation semantics (BR-001) | `tests/UnitTests/RefnoAllocationTests.cs` (max+1, monotonic, gaps) |
+| Refno concurrency (AC-003) | `tests/IntegrationTests/RefnoAllocationTests.cs` (50 parallel, self-skip w/o SQL Server) |
+| Status-change atomicity (AC-004) | `tests/IntegrationTests/StatusChangeTests.cs` + `StatusChangeIntegrationTests.cs` (PaxStatus + StatusHistory + bighistory one commit, rollback, 3 RAISERROR paths) |
+| Bookable-date rule (AC-005) | `tests/UnitTests/HolidayServiceTests.cs` + `tests/IntegrationTests/EmbassyClosedTests.cs` (parity 1/1/1/0) |
+| Super-user provisioning (AC-006) | `tests/IntegrationTests/SuperUserProvisioningTests.cs` (su+adm roles, audit row, duplicate refused, non-su rejected) |
+| RBAC 5-role matrix (AC-008) | `tests/FunctionalTests/EntriesRbacTests.cs` (anonymous→401, agt/guest→403, emp/adm/su→200/201/204) |
+| Optimistic concurrency (AC-011) | `tests/FunctionalTests/EntriesConcurrencyTests.cs` (stale If-Match→409, fresh→200) |
+| Problem-details errors (AC-007) | `tests/FunctionalTests/EntriesErrorTests.cs` (404/400/401/403, deferred superuser route→404) |
+
+### Module → Legacy Mapping (this feature)
+
+Visa Processing (MOD-001): the Entries module API backs the legacy pages
+`makeEntry`, `insertEntry`, `editentry*`, `editdone`, `sendawbgo`
+(`complete_migration_plan.md` §5 line 189). The owner-supplied T-SQL scripts
+(01-08) are applied verbatim (GR-0001); `usp_RecordEntryStatusChange` is the
+final script-08 definition (supersedes 06/07 per GR-0004); the super-user
+endpoint is a documented-only deferred contract (spec §15). No legacy business
+behavior changes (Constitution Mission §2 item 4 — preserve legacy business behaviour).

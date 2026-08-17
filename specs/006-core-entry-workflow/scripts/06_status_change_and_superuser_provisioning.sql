@@ -38,9 +38,21 @@
    an explicit, application-initiated write, not an implicit one fired
    by a raw UPDATE from somewhere else.
 
-   TODO: every StatusHistory/bighistory column name below is inferred
-   from the documented naming convention and MUST be verified against
-   the live schema before deployment (same caveat as files 01-05).
+   GR-0001 RESOLVED 2026-08-16 (T033): StatusHistory/bighistory column
+   names verified against the live VisaFusion schema:
+     - StatusHistory: Id (bigint PK), PaxID (int), Date (datetime2),
+       CountryID (int), StatusID (int), Remarks (nvarchar(max)),
+       UpdatedBy (nvarchar(max)) — NO refno column, NO ChangedByUserId,
+       NO Remark (singular). The draft INSERTs below were corrected to
+       the verified names; the proc itself is SUPERSEDED by
+       07_gr0004_corrected_entry_status_change.sql and finally by
+       08_finalize_entry_status_change_updatedby.sql (authoritative at
+       cutover — @ActorUserId resolves UpdatedBy = '{role}:{username}'
+       server-side). Running 01-08 in order leaves the 08 definition in
+       place.
+     - bighistory: bighistoryid (int PK), refno (int), agent (int),
+       Date (datetime2), UpdatedBy (nvarchar(max)), Remarks
+       (nvarchar(max)) — NO Description, NO ChangedByUserId.
    ------------------------------------------------------------------- */
 CREATE OR ALTER PROCEDURE dbo.usp_RecordEntryStatusChange
     @Refno            BIGINT,
@@ -85,20 +97,26 @@ BEGIN
         RETURN;
     END
 
-    INSERT INTO dbo.StatusHistory (refno, CountryID, statusID, Date, ChangedByUserId, Remark)
-        -- TODO: confirm exact StatusHistory column names/types
-        VALUES (@Refno, @CountryId, @NewStatusId, @ChangeDate, @ChangedByUserId, @Remark);
+    -- SUPERSEDED by files 07/08 (see header) — column names corrected to
+    -- the verified schema (GR-0001) so this draft is not left with
+    -- non-existent columns; StatusHistory keys on PaxID (no refno column).
+    INSERT INTO dbo.StatusHistory (PaxID, Date, CountryID, StatusID, Remarks, UpdatedBy)
+        VALUES (
+            (SELECT PaxID FROM dbo.PaxStatus WHERE refno = @Refno AND CountryID = @CountryId),
+            @ChangeDate, @CountryId, @NewStatusId, @Remark,
+            CONVERT(NVARCHAR(MAX), @ChangedByUserId)
+        );
 
     SET @NewStatusHistoryId = SCOPE_IDENTITY();
 
-    INSERT INTO dbo.bighistory (refno, Description, ChangedByUserId, Date)
-        -- TODO: confirm exact bighistory column names/types
+    INSERT INTO dbo.bighistory (refno, agent, Date, UpdatedBy, Remarks)
         VALUES (
             @Refno,
+            (SELECT agent FROM dbo.Mainentry WHERE refno = @Refno),
+            @ChangeDate,
+            CONVERT(NVARCHAR(MAX), @ChangedByUserId),
             CONCAT('Status changed to ', @NewStatusId,
-                   CASE WHEN @Remark IS NOT NULL THEN CONCAT(' — ', @Remark) ELSE '' END),
-            @ChangedByUserId,
-            @ChangeDate
+                   CASE WHEN @Remark IS NOT NULL THEN CONCAT(' — ', @Remark) ELSE '' END)
         );
 
     COMMIT TRANSACTION;
@@ -128,13 +146,18 @@ GO
    it assumes it already happened, and instead focuses on making the
    provisioning event itself atomic and audited.
 
-   TODO: AspNetUsers/AspNetRoles/AspNetUserRoles below use the standard
-   ASP.NET Core Identity schema shape (these are normally created by EF
-   Core's Identity scaffolding via `dotnet ef database update`, not by
-   this script — the IF NOT EXISTS guards below are a documentation/
-   fallback safety net, not a replacement for running the EF Identity
-   migration). Confirm no naming customization was applied to the
-   generated Identity schema before relying on these column names.
+   GR-0001 RESOLVED 2026-08-16 (T033): the Identity schema shape is
+   CONFIRMED standard — no naming customization. Verified against
+   src/VisaFusion.Identity/Persistence/VisaFusionIdentityDbContext.cs
+   (IdentityDbContext<VisaFusionUser, IdentityRole, string> — the
+   standard eight AspNet* tables) and src/VisaFusion.Migration/Identity/
+   IdentityImporter.cs (EnsureIdentitySchemaAsync creates AspNetUsers.Id
+   nvarchar(450) NOT NULL PRIMARY KEY, AspNetRoles.Id nvarchar(450) with
+   role Id = role name, user Ids = Guid.NewGuid().ToString("N")). The
+   column list below matches that schema exactly. The IF NOT EXISTS
+   guards remain a documentation/fallback safety net — the Identity
+   tables are created by the identity import step (SPEC-0004 T040),
+   which must run before this proc is executed.
    ------------------------------------------------------------------- */
 
 IF OBJECT_ID('dbo.SuperUserProvisioningAudit') IS NULL

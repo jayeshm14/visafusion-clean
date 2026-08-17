@@ -12,14 +12,20 @@
    pick an efficient plan for this exact query shape. Called from
    VisaFusion.Data via FromSqlInterpolated (parameterized).
 
-   TODO: every column name below is inferred from the documented
-   naming convention and status taxonomy (statusID 401-family =
-   Pending, 601 = Sent, 501 = Collected — deepanalysis.md §4.4) and
-   MUST be verified against the live schema (sp_help / INFORMATION_
-   SCHEMA.COLUMNS) before first deployment. Nothing here invents a
-   new business rule — the three reports themselves are the specific,
-   already-documented pages named above; only the exact column
-   spelling is a placeholder pending schema verification.
+   GR-0001 RESOLVED 2026-08-16 (T033): every column name below verified
+   against the live VisaFusion schema (INFORMATION_SCHEMA.COLUMNS):
+     - agents.agentsID / agents.Description CONFIRMED
+     - status.statusID / status.Description CONFIRMED
+     - Mainentry.refno / Mainentry.subdate / Mainentry.agent CONFIRMED —
+       the owning-agent FK column is `agent` (int), NOT `agentid`; the
+       EF-migrated schema enforces FK_Mainentry_agents_agent (same
+       correction GR-0004 applied to files 07/08). All `m.agentid`
+       references below were corrected to `m.agent`.
+     - PaxStatus.CountryID / PaxStatus.statusID / PaxStatus.coldate /
+       PaxStatus.visafee CONFIRMED (visafee is decimal).
+   Nothing here invents a new business rule — the three reports themselves
+   are the specific, already-documented pages named above; only the exact
+   column spelling was a placeholder pending schema verification.
    ===================================================================== */
 
 /* ---------- usp_Report_PendingList --------------------------------------
@@ -36,18 +42,18 @@ BEGIN
 
     SELECT
         m.refno,
-        m.agentid,
-        a.Description   AS AgentName,          -- TODO: confirm agents column name
+        m.agent,
+        a.Description   AS AgentName,
         ps.CountryID,
         ps.statusID,
-        s.Description   AS StatusDescription,   -- TODO: confirm status column name
+        s.Description   AS StatusDescription,
         m.subdate
     FROM dbo.Mainentry AS m
         INNER JOIN dbo.PaxStatus AS ps ON ps.refno = m.refno
         INNER JOIN dbo.status    AS s  ON s.statusID = ps.statusID
-        LEFT JOIN  dbo.agents    AS a  ON a.agentsID = m.agentid
+        LEFT JOIN  dbo.agents    AS a  ON a.agentsID = m.agent
     WHERE ps.statusID BETWEEN 401 AND 411
-      AND (@AgentId IS NULL OR m.agentid = @AgentId)
+      AND (@AgentId IS NULL OR m.agent = @AgentId)
     ORDER BY m.subdate ASC;
 END
 GO
@@ -65,13 +71,13 @@ BEGIN
 
     SELECT
         a.agentsID,
-        a.Description        AS AgentName,      -- TODO: confirm column
+        a.Description        AS AgentName,
         COUNT(DISTINCT m.refno)                   AS TotalEntries,
         SUM(CASE WHEN ps.statusID BETWEEN 401 AND 411 THEN 1 ELSE 0 END) AS PendingCount,
         SUM(CASE WHEN ps.statusID = 601 THEN 1 ELSE 0 END)               AS SentCount,
         SUM(CASE WHEN ps.statusID = 501 THEN 1 ELSE 0 END)               AS CollectedCount
     FROM dbo.agents AS a
-        LEFT JOIN dbo.Mainentry AS m  ON m.agentid = a.agentsID
+        LEFT JOIN dbo.Mainentry AS m  ON m.agent = a.agentsID
                                        AND CAST(m.subdate AS DATE) <= @AsOfDate
         LEFT JOIN dbo.PaxStatus AS ps ON ps.refno = m.refno
     GROUP BY a.agentsID, a.Description
@@ -91,14 +97,14 @@ BEGIN
 
     SELECT
         m.refno,
-        m.agentid,
-        a.Description   AS AgentName,           -- TODO: confirm column
+        m.agent,
+        a.Description   AS AgentName,
         ps.CountryID,
-        ps.coldate,                              -- TODO: confirm column name (collection date)
-        ps.visafee                               -- TODO: confirm fee column name
+        ps.coldate,
+        ps.visafee
     FROM dbo.Mainentry AS m
         INNER JOIN dbo.PaxStatus AS ps ON ps.refno = m.refno
-        LEFT JOIN  dbo.agents    AS a  ON a.agentsID = m.agentid
+        LEFT JOIN  dbo.agents    AS a  ON a.agentsID = m.agent
     WHERE ps.statusID = 501
       AND CAST(ps.coldate AS DATE) = @CollectionDate
     ORDER BY ps.coldate;

@@ -101,9 +101,13 @@ public class EntriesRbacTests : IClassFixture<VisaFusionWebApplicationFactory>
             new UpdateEntryRequest { Paxname = "A2", Passportno = "P2" }, token, ifMatch: created.Etag);
         Assert.Equal(HttpStatusCode.OK, put.StatusCode);
 
-        // POST /entries/{refno}/status → 200.
+        // POST /entries/{refno}/status → 200. NewStatusId must be a real
+        // legacy status code (deepanalysis.md §4.4: 101/201/251/301/401/408/
+        // 411/501/502/503/509/601) — the in-memory stub mirrors the real
+        // service's rejection of unknown status ids (400), so 2 (not in the
+        // legacy set) would fail here.
         var status = await PostAsync($"/api/v1/entries/{refno}/status",
-            new ChangeEntryStatusRequest { PaxId = 1, CountryId = 1, NewStatusId = 2 }, token);
+            new ChangeEntryStatusRequest { PaxId = 1, CountryId = 1, NewStatusId = 101 }, token);
         Assert.Equal(HttpStatusCode.OK, status.StatusCode);
 
         // POST /entries/{refno}/awb → 204.

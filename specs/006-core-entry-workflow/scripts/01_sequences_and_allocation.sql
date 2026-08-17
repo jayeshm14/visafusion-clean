@@ -11,26 +11,25 @@
 
 /* ---------- Sequences ------------------------------------------------ */
 
--- TODO: set START WITH to (SELECT MAX(refno) FROM dbo.Mainentry) + 1
--- at cutover time so numbering continues from the migrated data instead
--- of restarting at 1. Do not hardcode that value here — compute it at
--- deploy time against the actual cleansed data.
+-- GR-0001 RESOLVED 2026-08-16: START WITH seeded at cutover from the live
+-- migrated data. Verified against VisaFusion.dbo.Mainentry / dbo.invoice:
+--   MAX(refno)      = 283630  -> RefnoSeq        START WITH 283631
+--   MAX(invoiceno)  = 366251  -> InvoiceNumberSeq START WITH 366252
+-- (computed via sqlcmd against the target database, T033 sign-off)
 IF NOT EXISTS (SELECT 1 FROM sys.sequences WHERE name = 'RefnoSeq')
     CREATE SEQUENCE dbo.RefnoSeq
         AS BIGINT
-        START WITH 1          -- TODO: replace at cutover, see note above
+        START WITH 283631
         INCREMENT BY 1
         NO CACHE;              -- NO CACHE trades a little throughput for
                                 -- zero risk of losing/reusing numbers on
                                 -- an unexpected SQL Server restart
 GO
 
--- TODO: set START WITH to (SELECT MAX(invoiceno) FROM dbo.invoice) + 1
--- at cutover time, same reasoning as RefnoSeq above.
 IF NOT EXISTS (SELECT 1 FROM sys.sequences WHERE name = 'InvoiceNumberSeq')
     CREATE SEQUENCE dbo.InvoiceNumberSeq
         AS BIGINT
-        START WITH 1           -- TODO: replace at cutover
+        START WITH 366252
         INCREMENT BY 1
         NO CACHE;
 GO

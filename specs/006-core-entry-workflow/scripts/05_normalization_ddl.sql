@@ -21,21 +21,29 @@ BEGIN
     CREATE TABLE dbo.LegacyEmailListArchive
     (
         ArchiveId    INT IDENTITY(1,1) PRIMARY KEY,
-        CompanyName  NVARCHAR(200) NULL,   -- TODO: confirm column name/length against emailid/emaild1
-        EmailId      NVARCHAR(200) NULL,   -- TODO: confirm column name/length
+        CompanyName  NVARCHAR(50) NULL,   -- GR-0001 RESOLVED 2026-08-16: source emailid/emaild1.companyname is varchar(50)
+        EmailId      NVARCHAR(50) NULL,   -- GR-0001 RESOLVED 2026-08-16: source emailid/emaild1.emailid is varchar(50)
         SourceTable  VARCHAR(10) NOT NULL  -- 'emailid' or 'emaild1' — preserves provenance
     );
 END
 GO
 
+-- GR-0001 RESOLVED 2026-08-16 (T033): the dead tables emailid/emaild1/
+-- changes/changesbill are dispositioned ARCH (§3) and were NOT copied into
+-- the target VisaFusion database (verified: absent from sys.tables). The
+-- archive INSERTs therefore read from the legacy VisaEntry database
+-- (read-only, FR-010) via the explicit VisaEntry.dbo cross-database
+-- reference — same server, same credentials. Column names confirmed:
+-- emailid/emaild1 (companyname varchar(50), emailid varchar(50)),
+-- changes/changesbill (refno int, description varchar(50)).
 INSERT INTO dbo.LegacyEmailListArchive (CompanyName, EmailId, SourceTable)
-SELECT companyname, emailid, 'emailid' FROM dbo.emailid;   -- TODO: confirm column names
+SELECT companyname, emailid, 'emailid' FROM VisaEntry.dbo.emailid;
 INSERT INTO dbo.LegacyEmailListArchive (CompanyName, EmailId, SourceTable)
-SELECT companyname, emailid, 'emaild1' FROM dbo.emaild1;   -- TODO: confirm column names
+SELECT companyname, emailid, 'emaild1' FROM VisaEntry.dbo.emaild1;
 GO
 -- Note: emailid and emaild1 are NOT dropped (only dtproperties is
 -- dropped, per the plan's explicit instruction) — they remain in the
--- database, unused, alongside the new consolidated archive table.
+-- legacy database, unused, alongside the new consolidated archive table.
 
 IF OBJECT_ID('dbo.LegacyChangeLogArchive') IS NULL
 BEGIN
@@ -43,16 +51,16 @@ BEGIN
     (
         ArchiveId    INT IDENTITY(1,1) PRIMARY KEY,
         Refno        BIGINT NULL,
-        Description  NVARCHAR(MAX) NULL,   -- TODO: confirm column name/type
+        Description  NVARCHAR(50) NULL,   -- GR-0001 RESOLVED 2026-08-16: source changes/changesbill.description is varchar(50)
         LogType      VARCHAR(10) NOT NULL  -- 'Entry' (from `changes`) or 'Bill' (from `changesbill`)
     );
 END
 GO
 
 INSERT INTO dbo.LegacyChangeLogArchive (Refno, Description, LogType)
-SELECT refno, description, 'Entry' FROM dbo.changes;       -- TODO: confirm column names
+SELECT refno, description, 'Entry' FROM VisaEntry.dbo.changes;
 INSERT INTO dbo.LegacyChangeLogArchive (Refno, Description, LogType)
-SELECT refno, description, 'Bill' FROM dbo.changesbill;    -- TODO: confirm column names
+SELECT refno, description, 'Bill' FROM VisaEntry.dbo.changesbill;
 GO
 
 /* ---------- 2) Missing PRIMARY KEY template -------------------------
@@ -80,31 +88,49 @@ GO
    ambiguous statusID=508 rows for the referenced table.
    ------------------------------------------------------------------- */
 
--- Example — Mainentry.agentid -> agents.agentsID (only after
--- usp_Migrate_ReconcileOrphanAgents shows OrphanRowCount = 0):
+-- Example — Mainentry.agent -> agents.agentsID (only after
+-- usp_Migrate_ReconcileOrphanAgents shows OrphanRowCount = 0).
+-- GR-0001 RESOLVED 2026-08-16: Mainentry's owning-agent FK column is
+-- `agent` (int), NOT `agentid` (verified; FK_Mainentry_agents_agent is
+-- already enforced in the EF-migrated VisaFusion schema):
 -- ALTER TABLE dbo.Mainentry
 --     ADD CONSTRAINT FK_Mainentry_Agents
---     FOREIGN KEY (agentid) REFERENCES dbo.agents(agentsID);
+--     FOREIGN KEY (agent) REFERENCES dbo.agents(agentsID);
 
--- Example — PaxStatus.refno -> Mainentry.refno:
+-- Example — PaxStatus.refno -> Mainentry.refno (already enforced in the
+-- EF-migrated schema as FK_PaxStatus_Mainentry_refno; Mainentry.refno is
+-- UNIQUE via IX_Mainentry_refno):
 -- ALTER TABLE dbo.PaxStatus
 --     ADD CONSTRAINT FK_PaxStatus_Mainentry
 --     FOREIGN KEY (refno) REFERENCES dbo.Mainentry(refno);
 
--- Example — StatusHistory.refno -> Mainentry.refno:
--- ALTER TABLE dbo.StatusHistory
---     ADD CONSTRAINT FK_StatusHistory_Mainentry
---     FOREIGN KEY (refno) REFERENCES dbo.Mainentry(refno);
+-- GR-0001 RESOLVED 2026-08-16: the draft's "StatusHistory.refno ->
+-- Mainentry.refno" example was INVALID — StatusHistory has no refno
+-- column (verified: Id, PaxID, Date, CountryID, StatusID, Remarks,
+-- UpdatedBy). StatusHistory links to Mainentry through PaxStatus.PaxID;
+-- the EF-migrated schema already enforces FK_StatusHistory_status_StatusID
+-- and FK_PaxStatus_status_statusID.
 
 -- Example — PaxStatus.statusID -> status.statusID (only after
--- usp_Migrate_CleanseStatus508 resolves the duplicate):
+-- usp_Migrate_CleanseStatus508 resolves the duplicate; already enforced
+-- in the EF-migrated schema as FK_PaxStatus_status_statusID):
 -- ALTER TABLE dbo.PaxStatus
 --     ADD CONSTRAINT FK_PaxStatus_Status
 --     FOREIGN KEY (statusID) REFERENCES dbo.status(statusID);
 
--- TODO: extend this template for every relationship named in the plan's
--- §5.2 (CountryID, EmbassyID, PaxID) once column names are confirmed
--- against the live schema.
+-- GR-0001 RESOLVED 2026-08-16 (T033): the §5.2 relationship template is
+-- now complete — CountryID/EmbassyID/PaxID column names verified against
+-- the live schema (PaxStatus.CountryID, PaxStatus.PaxID, weeklyoff.
+-- embassyid, holidaylist.countryID, embassy.EmbassyID). The EF-migrated
+-- VisaFusion schema already enforces the PK/UNIQUE/FK set (PK_Mainentry,
+-- PK_PaxStatus, PK_StatusHistory, PK_bighistory, IX_Mainentry_refno,
+-- FK_Mainentry_agents_agent, FK_PaxStatus_Mainentry_refno,
+-- FK_PaxStatus_status_statusID, FK_StatusHistory_status_StatusID,
+-- FK_weeklyoff_embassy_embassyid, FK_entryDetails_Mainentry_refno,
+-- FK_invoicedetail_invoice_invoiceno, FK_PaxAttestation_*,
+-- FK_smsQueue_agents_agentID, FK_VisaInfo_Category_categoryID) — the
+-- templates above are retained for the legacy VisaEntry database, where
+-- the audit found 20 identity columns but only 2 enforced PKs.
 
 /* -- Explicitly not part of this file: dtproperties. It is the only
    table dropped per the plan, and is handled in a separate cutover

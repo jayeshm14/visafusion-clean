@@ -17,10 +17,21 @@
    date if that date is a Sunday, OR appears in holidaylist for that
    embassy, OR falls on the embassy's configured weekly-off day.
 
-   TODO: confirm exact column names against the live schema —
-   holidaylist and weeklyoff column names below are inferred from the
-   documented naming convention (EmbassyID, HolidayDate / DayOfWeek)
-   and must be verified before deployment.
+   GR-0001 RESOLVED 2026-08-16 (T033): column names verified against the
+   live VisaFusion schema (INFORMATION_SCHEMA.COLUMNS) and against the
+   authoritative C# rule (VisaFusion.Data/Application/HolidayService.cs):
+     - holidaylist.countryID holds the embassy id (NOT an EmbassyID column)
+       — HolidayService queries h.CountryId == embassyId (Holiday.CountryId
+       maps holidaylist.countryID);
+     - holidaylist.holiday is the date column (NOT HolidayDate) —
+       HolidayService compares h.HolidayDate == day (Holiday.HolidayDate
+       maps holidaylist.holiday);
+     - weeklyoff.embassyid is the embassy id column (NOT EmbassyID);
+     - weeklyoff.weekend stores the VBScript Weekday() number 1=SUNDAY ..
+       7=SATURDAY (NOT DayOfWeek) — verified against WeeklyOffList.asp and
+       HolidayService (w.Weekend == (int)date.DayOfWeek + 1). DATEPART
+       (WEEKDAY, ...) yields exactly this numbering when @@DATEFIRST = 7;
+       @@DATEFIRST = 7 confirmed on the target server (T033).
    ===================================================================== */
 
 CREATE OR ALTER FUNCTION dbo.fn_IsEmbassyClosed
@@ -33,27 +44,29 @@ AS
 BEGIN
     DECLARE @IsClosed BIT = 0;
 
-    -- Sunday check (DATEPART(WEEKDAY, ...) = 1 assumes default
-    -- SET DATEFIRST 7 / US-style week start; confirm server
-    -- @@DATEFIRST setting matches this assumption before relying on it)
+    -- Sunday check: DATEPART(WEEKDAY, ...) = 1 is Sunday only when
+    -- @@DATEFIRST = 7. Confirmed = 7 on the target server (T033) —
+    -- matches HolidayService's DayOfWeek.Sunday semantics.
     IF DATEPART(WEEKDAY, @CheckDate) = 1
         SET @IsClosed = 1;
 
-    -- Holiday check
+    -- Holiday check: holidaylist.countryID = embassy id AND
+    -- holidaylist.holiday = the date (verified column names, GR-0001).
     IF @IsClosed = 0 AND EXISTS (
         SELECT 1
         FROM dbo.holidaylist AS h
-        WHERE h.EmbassyID = @EmbassyId
-          AND h.HolidayDate = @CheckDate   -- TODO: confirm column name
+        WHERE h.countryID = @EmbassyId
+          AND h.holiday = @CheckDate
     )
         SET @IsClosed = 1;
 
-    -- Weekly-off check
+    -- Weekly-off check: weeklyoff.embassyid = embassy id AND
+    -- weeklyoff.weekend = VBScript Weekday() (1=Sun..7=Sat) of the date.
     IF @IsClosed = 0 AND EXISTS (
         SELECT 1
         FROM dbo.weeklyoff AS w
-        WHERE w.EmbassyID = @EmbassyId     -- TODO: confirm column name
-          AND w.DayOfWeek = DATEPART(WEEKDAY, @CheckDate)  -- TODO: confirm representation
+        WHERE w.embassyid = @EmbassyId
+          AND w.weekend = DATEPART(WEEKDAY, @CheckDate)
     )
         SET @IsClosed = 1;
 
@@ -66,12 +79,16 @@ GO
 
    SELECT refno, subdate
    FROM dbo.Mainentry
-   WHERE dbo.fn_IsEmbassyClosed(embassyID, subdate) = 1;   -- data-quality
-                                                            -- audit query,
-                                                            -- e.g. finding
-                                                            -- historical
-                                                            -- entries that
-                                                            -- were somehow
-                                                            -- submitted on
-                                                            -- a closed day
+   WHERE dbo.fn_IsEmbassyClosed(1, subdate) = 1;   -- audit query with a
+                                                    -- specific embassy id
+                                                    -- (1 here); the embassy
+                                                    -- id is the PaxStatus.
+                                                    -- CountryID value (the
+                                                    -- legacy schema keeps
+                                                    -- the embassy per
+                                                    -- passenger, not on
+                                                    -- Mainentry) — find
+                                                    -- historical entries
+                                                    -- that were submitted
+                                                    -- on a closed day
 */

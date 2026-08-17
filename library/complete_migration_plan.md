@@ -166,7 +166,7 @@ Every endpoint from `deepanalysis.md` §2.4 gets a named target route + minimum 
 | `holidayDeleteSubmit.asp` | anonymous DELETE holiday | `DELETE /api/v1/holidays/{id}` | `adm`,`su` |
 | `holiday_WebEntry.asp` | anonymous INSERT/DELETE | `POST/DELETE /api/v1/holidays` | `adm`,`su` |
 | `querieDetail.asp` | anonymous INSERT queries | `POST /api/v1/public/queries` | anonymous **allowed** — public contact-query submission is a by-design public feature (like `regsub*`), keep public but add validation + rate limiting |
-| `sendawbgo.asp` | anonymous INSERT sent-AWB | `POST /api/v1/entries/{refno}/awb` | `emp`,`adm`,`su`,`agt` (own entries) |
+| `sendawbgo.asp` | anonymous INSERT sent-AWB | `POST /api/v1/entries/{refno}/awb` | `emp`,`adm`,`su` (see SPEC-0006 deviation-log entry 4) |
 | `todayAgentStatusalltemp.asp` | anonymous INSERT | `POST /api/v1/reports/agent-status/today` | `emp`,`adm`,`su` |
 | `openForDay.asp` | anonymous INSERT `security` | `POST /api/v1/admin/security-day/open` | `adm`,`su` |
 | `closeForDay.asp` | anonymous UPDATE `security` | `POST /api/v1/admin/security-day/close` | `adm`,`su` |

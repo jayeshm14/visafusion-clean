@@ -125,7 +125,7 @@ public class SuperUserProvisioningTests
                  PhoneNumberConfirmed, TwoFactorEnabled, LockoutEnabled, AccessFailedCount)
             VALUES
                 (@id, @userName, UPPER(@userName), @userName + '@test.local', UPPER(@userName + '@test.local'),
-                 1, 'x', NEWID(), NEWID(), 0, 0, 1, 0)
+                 1, NULL, NEWID(), NEWID(), 0, 0, 1, 0)
             """;
         cmd.Parameters.AddWithValue("@id", id);
         cmd.Parameters.AddWithValue("@userName", userName);

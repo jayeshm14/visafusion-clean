@@ -32,15 +32,21 @@ BEGIN
     SET NOCOUNT ON;
 
     -- Reporting pass: always runs, regardless of @WhatIfOnly
+    -- GR-0001 RESOLVED 2026-08-16 (T033): StatusHistory has NO refno
+    -- column (verified: Id, PaxID, Date, CountryID, StatusID, Remarks,
+    -- UpdatedBy) — the join keys on PaxID + CountryID + StatusID instead
+    -- of the draft's refno assumption. sh.Date CONFIRMED.
     SELECT
         ps.refno,
         ps.CountryID,
         ps.statusID,
-        sh.Date              AS StatusHistoryDate   -- TODO: confirm column name
+        sh.Date              AS StatusHistoryDate
     INTO #Status508Rows
     FROM dbo.PaxStatus AS ps
         LEFT JOIN dbo.StatusHistory AS sh
-            ON sh.refno = ps.refno AND sh.statusID = ps.statusID
+            ON sh.PaxID = ps.PaxID
+           AND sh.CountryID = ps.CountryID
+           AND sh.StatusID = ps.statusID
     WHERE ps.statusID = 508;
 
     SELECT COUNT(*) AS AmbiguousRowCount FROM #Status508Rows;
@@ -95,9 +101,26 @@ BEGIN
     SELECT refno, 'traveldate', traveldate
     FROM dbo.Mainentry
     WHERE traveldate IS NOT NULL
-      AND (YEAR(traveldate) <= 1971 OR YEAR(traveldate) >= 2100);
-    -- TODO: extend to coldate/receivedate/sentDate if the same defect
-    -- is confirmed present in those columns during schema review.
+      AND (YEAR(traveldate) <= 1971 OR YEAR(traveldate) >= 2100)
+    UNION ALL
+    SELECT refno, 'coldate', coldate
+    FROM dbo.Mainentry
+    WHERE coldate IS NOT NULL
+      AND (YEAR(coldate) <= 1971 OR YEAR(coldate) >= 2100)
+    UNION ALL
+    SELECT refno, 'receivedate', receivedate
+    FROM dbo.Mainentry
+    WHERE receivedate IS NOT NULL
+      AND (YEAR(receivedate) <= 1971 OR YEAR(receivedate) >= 2100)
+    UNION ALL
+    SELECT refno, 'sentDate', sentDate
+    FROM dbo.Mainentry
+    WHERE sentDate IS NOT NULL
+      AND (YEAR(sentDate) <= 1971 OR YEAR(sentDate) >= 2100);
+    -- GR-0001 RESOLVED 2026-08-16 (T033): extended to coldate/receivedate/
+    -- sentDate — all three columns CONFIRMED present in Mainentry, and the
+    -- defect IS present in the migrated data (coldate 0, receivedate 2,
+    -- sentDate 8 rows outside 1971..2100, verified via sqlcmd).
 
     SELECT COUNT(*) AS JunkDateRowCount FROM #JunkDates;
     SELECT * FROM #JunkDates;
@@ -137,11 +160,11 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    SELECT m.refno, m.agentid AS OrphanAgentId
+    SELECT m.refno, m.agent AS OrphanAgentId
     INTO #OrphanRows
     FROM dbo.Mainentry AS m
     WHERE NOT EXISTS (
-        SELECT 1 FROM dbo.agents AS a WHERE a.agentsID = m.agentid
+        SELECT 1 FROM dbo.agents AS a WHERE a.agentsID = m.agent
     );
 
     SELECT COUNT(*) AS OrphanRowCount FROM #OrphanRows;
@@ -165,7 +188,7 @@ BEGIN
         END
 
         UPDATE m
-        SET m.agentid = @PlaceholderAgentId
+        SET m.agent = @PlaceholderAgentId
         FROM dbo.Mainentry AS m
             INNER JOIN #OrphanRows o ON o.refno = m.refno;
 

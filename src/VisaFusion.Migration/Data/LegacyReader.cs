@@ -30,6 +30,11 @@ public sealed class LegacyReader : IDisposable
     {
         await using var cmd = _connection.CreateCommand();
         cmd.CommandText = sql;
+        // The checksum query is a full-table SHA2_256 scan; over the verified
+        // data volumes (bighistory ≈ 1.4M rows) it exceeds the 30s default
+        // command timeout (observed 2026-08-16 during T032: SnapshotTests
+        // "Execution Timeout Expired"). 300s covers the largest legacy tables.
+        cmd.CommandTimeout = 300;
         return await cmd.ExecuteScalarAsync(ct);
     }
 

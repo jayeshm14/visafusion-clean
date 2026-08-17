@@ -116,6 +116,9 @@ public sealed class ValidationEngine
     {
         await using var cmd = target.CreateCommand();
         cmd.CommandText = $"SELECT COUNT_BIG(*) FROM [{table.Replace("]", "]]", StringComparison.Ordinal)}]";
+        // Full-table scans over large migrated tables can exceed the 30s
+        // default command timeout; 300s matches LegacyReader.ScalarAsync.
+        cmd.CommandTimeout = 300;
         var result = await cmd.ExecuteScalarAsync(ct);
         return Convert.ToInt64(result ?? 0L);
     }
@@ -125,6 +128,8 @@ public sealed class ValidationEngine
         var sql = await ChecksumSql.BuildAsync(target, table, ct);
         await using var cmd = target.CreateCommand();
         cmd.CommandText = sql;
+        // Full-table SHA2_256 scan (see ChecksumSql.ExecuteStringAsync).
+        cmd.CommandTimeout = 300;
         var result = await cmd.ExecuteScalarAsync(ct);
         return Convert.ToString(result, System.Globalization.CultureInfo.InvariantCulture) ?? "0";
     }
@@ -162,6 +167,9 @@ public sealed class ValidationEngine
                  WHERE c.[{childCol}] IS NOT NULL AND p.[{parentCol}] IS NULL";
             await using var cmd = target.CreateCommand();
             cmd.CommandText = sql;
+            // LEFT JOIN orphan scans run over large tables (entryDetails,
+            // Mainentry); 300s matches the other validation commands.
+            cmd.CommandTimeout = 300;
             var orphans = Convert.ToInt64(await cmd.ExecuteScalarAsync(ct) ?? 0L);
             if (orphans > 0)
             {

@@ -237,18 +237,18 @@ All endpoints return problem-details JSON on error (Phase-0 exception handling).
 
 | Requirement | Architecture | Domain | Database | API | UI | Test | Migration |
 |-------------|--------------|--------|----------|-----|----|------|-----------|
-| FR-001      |              |        |          |     |    |      |           |
-| FR-002      |              |        |          |     |    |      |           |
-| FR-003      |              |        |          |     |    |      |           |
-| FR-004      |              |        |          |     |    |      |           |
-| FR-005      |              |        |          |     |    |      |           |
-| FR-006      |              |        |          |     |    |      |           |
-| FR-007      |              |        |          |     |    |      |           |
-| FR-008      |              |        |          |     |    |      |           |
-| FR-009      |              |        |          |     |    |      |           |
-| FR-010      |              |        |          |     |    |      |           |
-| FR-011      |              |        |          |     |    |      |           |
-| AC-011      |              |        |          |     |    |      |           |
+| FR-001      | §2, deviation log §1 | CTX-Visa, EntryService | Mainentry, entryDetails | /api/v1/entries | — | EntryAggregateTests, EntryPassengerValidationTests | scripts 01-08 |
+| FR-002      | §2 | EntryService | Mainentry, entryDetails, PaxStatus | GET /entries/{refno} | — | EntriesRbacTests, EntriesErrorTests | — |
+| FR-003      | §2 | EntryService | Mainentry.refno | POST /entries | — | RefnoAllocationTests | script 01 |
+| FR-004      | §2 | EntryService.AllocateRefnoAsync | RefnoSeq, usp_AllocateNextRefno | POST /entries | — | RefnoAllocationTests (unit + integration) | script 01 |
+| FR-005      | §2 | EntryService.RecordStatusChangeAsync | PaxStatus, StatusHistory, bighistory, usp_RecordEntryStatusChange | POST /entries/{refno}/status | — | StatusChangeTests, StatusChangeIntegrationTests | script 08 (supersedes 06/07) |
+| FR-006      | §2 | HolidayService (C#, authoritative) + fn_IsEmbassyClosed (reporting mirror) | holidaylist, weeklyoff | — | — | HolidayServiceTests, EmbassyClosedTests | script 02 |
+| FR-007      | §2 | usp_ProvisionSuperUser | SuperUserProvisioningAudit | deferred (documented-only) | — | SuperUserProvisioningTests | script 06 |
+| FR-008      | §2 | EntryService | Mainentry, entryDetails, PaxStatus | POST/GET/PUT /entries, /status, /awb | — | EntriesRbacTests, EntriesConcurrencyTests, EntriesErrorTests | — |
+| FR-009      | §2 | SEC-RBAC-POLICIES | — | all 5 Entries endpoints | — | EntriesRbacTests (5-role matrix) | — |
+| FR-010      | §2 | — | VisaEntry (read-only) | — | — | T038 validation | — |
+| FR-011      | §2 | — | only dtproperties removed | — | — | T038 validation | — |
+| AC-011      | §2 | EntryService.UpdateAsync | Entry.RowVersion | PUT /entries (If-Match/ETag) | — | EntriesConcurrencyTests | T006 migration |
 
 ## Assumptions
 

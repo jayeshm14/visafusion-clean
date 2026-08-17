@@ -389,6 +389,97 @@
                       "id":  "TEST-AUTH",
                       "type":  "Test Case",
                       "label":  "auth/RBAC/backdoor/rewrite/static-asset functional suite (incl. web login/change-password pages, logout, rate limit, denial logging)"
+                  },
+                  {
+                      "id":  "SPEC-0006",
+                      "type":  "Requirement",
+                      "label":  "Core Entry Workflow (Entry aggregate, refno allocation, status change, bookable-date rule, super-user provisioning, Entries API)",
+                      "status":  "Accepted"
+                  },
+                  {
+                      "id":  "ENT-API",
+                      "type":  "API",
+                      "label":  "Entries module /api/v1/entries (POST/GET/PUT + /status + /awb, EntryOperations policy)"
+                  },
+                  {
+                      "id":  "ENT-SERVICE",
+                      "type":  "Domain Entity",
+                      "label":  "EntryService (VisaFusion.Data impl, IEntryService in Core; aggregate invariants BR-005)"
+                  },
+                  {
+                      "id":  "ENT-HOLIDAY",
+                      "type":  "Domain Entity",
+                      "label":  "HolidayService (authoritative holiday/weekly-off/Sunday rule, BR-003)"
+                  },
+                  {
+                      "id":  "ENT-REFNO",
+                      "type":  "Job",
+                      "label":  "usp_AllocateNextRefno + RefnoSeq (script 01, atomic max+1, AC-003)"
+                  },
+                  {
+                      "id":  "ENT-STATUS",
+                      "type":  "Job",
+                      "label":  "usp_RecordEntryStatusChange (script 08, supersedes 06/07, UpdatedBy={role}:{username}, AC-004)"
+                  },
+                  {
+                      "id":  "ENT-SUPERUSER",
+                      "type":  "Job",
+                      "label":  "usp_ProvisionSuperUser (script 06, su-only, pre-hashed password, AC-006)"
+                  },
+                  {
+                      "id":  "ENT-FNCLOSED",
+                      "type":  "Job",
+                      "label":  "fn_IsEmbassyClosed (script 02, read-only reporting mirror of the bookable-date rule)"
+                  },
+                  {
+                      "id":  "ENT-ROWVERSION",
+                      "type":  "Table",
+                      "label":  "Entry.RowVersion (rowversion, optimistic concurrency ETag, AC-011)"
+                  },
+                  {
+                      "id":  "ENT-SUPERAUDIT",
+                      "type":  "Table",
+                      "label":  "SuperUserProvisioningAudit (new table, GR-0003 item 1)"
+                  },
+                  {
+                      "id":  "TBL-holidaylist",
+                      "type":  "Table",
+                      "label":  "holidaylist (embassy holidays, read by HolidayService)"
+                  },
+                  {
+                      "id":  "TBL-weeklyoff",
+                      "type":  "Table",
+                      "label":  "weeklyoff (embassy weekly-off days, read by HolidayService)"
+                  },
+                  {
+                      "id":  "ENT-TEST",
+                      "type":  "Test Case",
+                      "label":  "entries unit/functional/integration suite (aggregate, refno, status, holiday, superuser, RBAC, concurrency)"
+                  },
+                  {
+                      "id":  "ENT-SCRIPTS",
+                      "type":  "Page",
+                      "label":  "specs/006-core-entry-workflow/scripts/01-08 (owner-supplied T-SQL, applied verbatim)"
+                  },
+                  {
+                      "id":  "ENT-PLAN",
+                      "type":  "Page",
+                      "label":  "specs/006-core-entry-workflow/plan.md"
+                  },
+                  {
+                      "id":  "ENT-CONTRACTS",
+                      "type":  "Page",
+                      "label":  "specs/006-core-entry-workflow/contracts/entries-api.md"
+                  },
+                  {
+                      "id":  "ENT-DATAMODEL",
+                      "type":  "Page",
+                      "label":  "specs/006-core-entry-workflow/data-model.md"
+                  },
+                  {
+                      "id":  "ENT-TASKS",
+                      "type":  "Page",
+                      "label":  "specs/006-core-entry-workflow/tasks.md (38 tasks)"
                   }
               ],
     "edges":  [
@@ -951,6 +1042,176 @@
                       "from":  "TEST-AUTH",
                       "to":  "UI-CHANGEPASSWORD",
                       "type":  "tests"
+                  },
+                  {
+                      "from":  "SPEC-0006",
+                      "to":  "ENT-API",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0006",
+                      "to":  "ENT-SERVICE",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0006",
+                      "to":  "ENT-HOLIDAY",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0006",
+                      "to":  "ENT-REFNO",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0006",
+                      "to":  "ENT-STATUS",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0006",
+                      "to":  "ENT-SUPERUSER",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0006",
+                      "to":  "ENT-FNCLOSED",
+                      "type":  "implements"
+                  },
+                  {
+                      "from":  "SPEC-0006",
+                      "to":  "ENT-TEST",
+                      "type":  "tested_by"
+                  },
+                  {
+                      "from":  "SPEC-0006",
+                      "to":  "ENT-SCRIPTS",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "SPEC-0006",
+                      "to":  "ENT-PLAN",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "SPEC-0006",
+                      "to":  "ENT-CONTRACTS",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "SPEC-0006",
+                      "to":  "ENT-DATAMODEL",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "SPEC-0006",
+                      "to":  "ENT-TASKS",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "SPEC-0006",
+                      "to":  "SPEC-0004",
+                      "type":  "references"
+                  },
+                  {
+                      "from":  "ENT-API",
+                      "to":  "ENT-SERVICE",
+                      "type":  "calls"
+                  },
+                  {
+                      "from":  "ENT-API",
+                      "to":  "SEC-RBAC-POLICIES",
+                      "type":  "secures"
+                  },
+                  {
+                      "from":  "ENT-SERVICE",
+                      "to":  "ENT-REFNO",
+                      "type":  "calls"
+                  },
+                  {
+                      "from":  "ENT-SERVICE",
+                      "to":  "ENT-STATUS",
+                      "type":  "calls"
+                  },
+                  {
+                      "from":  "ENT-SERVICE",
+                      "to":  "TBL-Mainentry",
+                      "type":  "writes"
+                  },
+                  {
+                      "from":  "ENT-SERVICE",
+                      "to":  "TBL-PaxStatus",
+                      "type":  "writes"
+                  },
+                  {
+                      "from":  "ENT-SERVICE",
+                      "to":  "TBL-StatusHistory",
+                      "type":  "writes"
+                  },
+                  {
+                      "from":  "ENT-SERVICE",
+                      "to":  "TBL-bighistory",
+                      "type":  "writes"
+                  },
+                  {
+                      "from":  "ENT-HOLIDAY",
+                      "to":  "TBL-holidaylist",
+                      "type":  "reads"
+                  },
+                  {
+                      "from":  "ENT-HOLIDAY",
+                      "to":  "TBL-weeklyoff",
+                      "type":  "reads"
+                  },
+                  {
+                      "from":  "ENT-REFNO",
+                      "to":  "TBL-Mainentry",
+                      "type":  "reads"
+                  },
+                  {
+                      "from":  "ENT-SUPERUSER",
+                      "to":  "ENT-SUPERAUDIT",
+                      "type":  "writes"
+                  },
+                  {
+                      "from":  "ENT-SUPERUSER",
+                      "to":  "SEC-RBAC-POLICIES",
+                      "type":  "secures"
+                  },
+                  {
+                      "from":  "ENT-TEST",
+                      "to":  "ENT-API",
+                      "type":  "tests"
+                  },
+                  {
+                      "from":  "ENT-TEST",
+                      "to":  "ENT-REFNO",
+                      "type":  "tests"
+                  },
+                  {
+                      "from":  "ENT-TEST",
+                      "to":  "ENT-STATUS",
+                      "type":  "tests"
+                  },
+                  {
+                      "from":  "ENT-TEST",
+                      "to":  "ENT-SUPERUSER",
+                      "type":  "tests"
+                  },
+                  {
+                      "from":  "ENT-TEST",
+                      "to":  "ENT-FNCLOSED",
+                      "type":  "tests"
+                  },
+                  {
+                      "from":  "ENT-TEST",
+                      "to":  "ENT-HOLIDAY",
+                      "type":  "tests"
+                  },
+                  {
+                      "from":  "MOD-001",
+                      "to":  "ENT-API",
+                      "type":  "calls"
                   }
               ]
 }
