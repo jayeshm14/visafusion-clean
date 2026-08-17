@@ -507,7 +507,7 @@ public class VisaFusionWebApplicationFactory : WebApplicationFactory<Program>
             return summary;
         }
 
-        public Task<UserSummary> DeactivateAsync(
+        public async Task<UserSummary> DeactivateAsync(
             string userId, string actorUserId, string actorUserName,
             IReadOnlyList<string> actorRoles, CancellationToken ct = default)
         {
@@ -524,9 +524,23 @@ public class VisaFusionWebApplicationFactory : WebApplicationFactory<Program>
                     "Only a super-user can deactivate a super-user account.");
             }
 
+            // Mirror the real service (FR-023): lock the Identity login so the
+            // user-management list page (which reads the Identity store) shows
+            // the Deactivated badge.
+            using var scope = _services.CreateScope();
+            var userManager = scope.ServiceProvider
+                .GetRequiredService<UserManager<IdentityIntegration.VisaFusionUser>>();
+            var user = await userManager.FindByIdAsync(userId);
+            if (user is not null)
+            {
+                user.LockoutEnabled = true;
+                user.LockoutEnd = DateTimeOffset.MaxValue;
+                await userManager.UpdateAsync(user);
+            }
+
             var updated = current with { Active = false };
             _users[userId] = updated;
-            return Task.FromResult(updated);
+            return updated;
         }
 
         public Task<UserSummary> ProvisionSuperUserAsync(

@@ -1,0 +1,77 @@
+@page
+@model VisaFusion.Web.Areas.Admin.Pages.Users.ListModel
+@{
+    ViewData["Title"] = "Users";
+    ViewData["UseSidebar"] = true;
+}
+
+@section SidebarNav {
+    <a asp-area="Admin" asp-page="/Users/List" aria-current="page">Users</a>
+}
+
+<div class="vf-content">
+    <h1>Users</h1>
+
+    @if (!string.IsNullOrWhiteSpace(Model.OutcomeMessage))
+    {
+        <div class="vf-alert vf-alert-success" role="status">@Model.OutcomeMessage</div>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.OutcomeError))
+    {
+        <div class="vf-alert vf-alert-danger" role="alert">@Model.OutcomeError</div>
+    }
+
+    <p>
+        <a class="vf-btn vf-btn-primary" href="/Admin/Users/Create">New user</a>
+    </p>
+
+    <div class="vf-card">
+        @if (Model.Users.Count == 0)
+        {
+            <p>No users found.</p>
+        }
+        else
+        {
+            <table class="vf-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Login</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Roles</th>
+                        <th scope="col">Status</th>
+                        <th scope="col"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model.Users)
+                    {
+                        <tr>
+                            <td>@user.UserName</td>
+                            <td>@(string.IsNullOrWhiteSpace(user.Email) ? "—" : user.Email)</td>
+                            <td>@string.Join(", ", user.Roles)</td>
+                            <td>
+                                @if (user.Active)
+                                {
+                                    <span class="vf-badge vf-badge-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="vf-badge vf-badge-danger">Deactivated</span>
+                                }
+                            </td>
+                            <td>
+                                @if (user.Active)
+                                {
+                                    <form method="post" asp-page-handler="Deactivate">
+                                        <input type="hidden" name="id" value="@user.Id" />
+                                        <button type="submit" class="vf-btn vf-btn-secondary">Deactivate</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

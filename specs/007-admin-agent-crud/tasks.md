@@ -90,7 +90,7 @@
 
 - [x] T019 [P] [US2] Create user contracts in `src/VisaFusion.Api/Contracts/` (`CreateUserRequest`, `ProvisionSuperUserRequest`) per `contracts/admin-api.md` §4/§5 — DONE 2026-08-17 (`AdminContracts.cs`; plus `UserResponse` for §6)
 - [x] T020 [US2] Implement `AdminEndpoint` in `src/VisaFusion.Api/Endpoints/AdminEndpoint.cs`: `POST /api/v1/admin/users` (UserManagement — DP-001), `POST /api/v1/admin/superusers` (SuperUserOnly), `POST /api/v1/admin/users/{id}/deactivate` (UserManagement; SuperUserOnly when target is `su`) — depends on T007, T019 — DONE 2026-08-17 (actor + roles resolved from validated JWT claims, GR-0004; routes wired in `src/VisaFusion.Web/Program.cs`)
-- [ ] T021 [US2] Implement user management pages in `src/VisaFusion.Web/Areas/Admin/Pages/Users/` (list, create, deactivate) on the new shell (T009)
+- [x] T021 [US2] Implement user management pages in `src/VisaFusion.Web/Areas/Admin/Pages/Users/` (list, create, deactivate) on the new shell (T009) — DONE 2026-08-17 (`List.cshtml(.cs)` reads the Identity store, deactivate routes through `IUserManagementService` with the FR-007 su-target re-check; `Create.cshtml(.cs)` mirrors contract §4 field validation incl. role whitelist BR-004 and agt claim-link CHK026; `UserManagement` policy adm/emp — DP-001; `UserPagesTests` 10 cases)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
