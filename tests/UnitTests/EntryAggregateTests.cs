@@ -30,7 +30,7 @@ public class EntryAggregateTests
         var ex = await Assert.ThrowsAsync<EntryValidationException>(() =>
             service.CreateAsync(1, new CreateEntryCommand(
                 Paxname: "", Passportno: "P123", DateOfBirth: null, Category: null,
-                TotalPassengers: 1, TravelDate: null, Remarks: null, AgentInstruction: null)));
+                TotalPassengers: 1, TravelDate: null, Remarks: null, AgentInstruction: null), TestActor));
 
         Assert.Contains("passenger", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -43,7 +43,7 @@ public class EntryAggregateTests
         var ex = await Assert.ThrowsAsync<EntryValidationException>(() =>
             service.CreateAsync(1, new CreateEntryCommand(
                 Paxname: "John", Passportno: "", DateOfBirth: null, Category: null,
-                TotalPassengers: 1, TravelDate: null, Remarks: null, AgentInstruction: null)));
+                TotalPassengers: 1, TravelDate: null, Remarks: null, AgentInstruction: null), TestActor));
 
         Assert.Contains("passenger", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -54,7 +54,7 @@ public class EntryAggregateTests
         var (service, _) = NewService();
 
         var ex = await Assert.ThrowsAsync<EntryValidationException>(() =>
-            service.CreateAsync(0, ValidCommand()));
+            service.CreateAsync(0, ValidCommand(), TestActor));
 
         Assert.Contains("refno", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -63,10 +63,10 @@ public class EntryAggregateTests
     public async Task Create_With_Duplicate_Refno_Rejects_With_Conflict()
     {
         var (service, _) = NewService();
-        await service.CreateAsync(42, ValidCommand());
+        await service.CreateAsync(42, ValidCommand(), TestActor);
 
         var ex = await Assert.ThrowsAsync<EntryConflictException>(() =>
-            service.CreateAsync(42, ValidCommand()));
+            service.CreateAsync(42, ValidCommand(), TestActor));
 
         Assert.Contains("42", ex.Message);
     }
@@ -76,7 +76,7 @@ public class EntryAggregateTests
     {
         var (service, _) = NewService();
 
-        var result = await service.CreateAsync(7, ValidCommand());
+        var result = await service.CreateAsync(7, ValidCommand(), TestActor);
 
         Assert.Equal(7, result.Refno);
         Assert.Equal(7, result.Entry.Refno);
@@ -93,7 +93,7 @@ public class EntryAggregateTests
     public async Task Get_By_Refno_Returns_Aggregate_With_Passengers_And_PaxStatuses()
     {
         var (service, _) = NewService();
-        await service.CreateAsync(9, ValidCommand());
+        await service.CreateAsync(9, ValidCommand(), TestActor);
 
         var aggregate = await service.GetByRefnoAsync(9);
 
@@ -119,7 +119,7 @@ public class EntryAggregateTests
         // writable at any time, no transition validation. A stored status value
         // (here the sentinel 999) must round-trip unchanged.
         var (service, databaseName) = NewService();
-        await service.CreateAsync(11, ValidCommand());
+        await service.CreateAsync(11, ValidCommand(), TestActor);
 
         // A second context over the same InMemory database mutates the row
         // directly (the service exposes no write surface for status).
@@ -141,6 +141,12 @@ public class EntryAggregateTests
         Paxname: "John", Passportno: "P123", DateOfBirth: new DateTime(1990, 1, 1),
         Category: 1, TotalPassengers: 1, TravelDate: new DateTime(2026, 9, 1),
         Remarks: null, AgentInstruction: null);
+
+    /// <summary>
+    /// The acting user for the create/update audit rows (SPEC-0006 §19, T040):
+    /// an employee, so the composed <c>UpdatedBy</c> is <c>emp:tester</c>.
+    /// </summary>
+    private static readonly EntryActor TestActor = new("tester", new[] { "emp" });
 
     private static (EntryService Service, string DatabaseName) NewService()
     {

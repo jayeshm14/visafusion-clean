@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -28,11 +29,16 @@ public static class EntriesEndpoint
         var request = await TryReadJsonAsync<CreateEntryRequest>(context);
         if (request is null) return;
 
+        // Resolve the authenticated actor from the validated JWT claims — never
+        // from the request body (anti-spoofing, GR-0004; spec §19 audit).
+        var actor = await ResolveActorAsync(context);
+        if (actor is null) return;
+
         try
         {
             // Allocate the refno atomically (US2), then create the aggregate (US1).
             var refno = await entries.AllocateRefnoAsync(context.RequestAborted);
-            var result = await entries.CreateAsync(refno, ToCommand(request), context.RequestAborted);
+            var result = await entries.CreateAsync(refno, ToCommand(request), actor, context.RequestAborted);
 
             context.Response.StatusCode = StatusCodes.Status201Created;
             context.Response.ContentType = "application/json";
@@ -86,9 +92,14 @@ public static class EntriesEndpoint
             return;
         }
 
+        // Resolve the authenticated actor from the validated JWT claims — never
+        // from the request body (anti-spoofing, GR-0004; spec §19 audit).
+        var actor = await ResolveActorAsync(context);
+        if (actor is null) return;
+
         try
         {
-            var result = await entries.UpdateAsync(refno, ToCommand(request), expected, context.RequestAborted);
+            var result = await entries.UpdateAsync(refno, ToCommand(request), expected, actor, context.RequestAborted);
 
             context.Response.StatusCode = StatusCodes.Status200OK;
             context.Response.ContentType = "application/json";
@@ -183,6 +194,36 @@ public static class EntriesEndpoint
         {
             await WriteProblemAsync(context, StatusCodes.Status404NotFound, "Not Found", ex.Message);
         }
+    }
+
+    /// <summary>
+    /// Resolves the authenticated actor (username + effective role claims) from
+    /// the validated JWT principal — never from the request body (anti-spoofing,
+    /// GR-0004; spec §19 audit). Mirrors <see cref="ChangeStatusAsync"/>'s user
+    /// resolution: a principal with no resolvable username is answered with a
+    /// defensive 401 (unreachable for <c>EntryOperations</c>-secured routes,
+    /// where a policy pass implies an authenticated principal). The role
+    /// precedence (su &gt; adm &gt; emp &gt; agt) is applied by the service
+    /// (<c>ComposeUpdatedBy</c>), not here, so the composition is deterministic
+    /// and unit-tested in one place.
+    /// </summary>
+    private static async Task<EntryActor?> ResolveActorAsync(HttpContext context)
+    {
+        var userName = context.User.Identity?.Name;
+        if (string.IsNullOrEmpty(userName))
+        {
+            await WriteProblemAsync(
+                context, StatusCodes.Status401Unauthorized, "Unauthorized",
+                "The authenticated principal does not resolve to a user.");
+            return null;
+        }
+
+        var roles = context.User.FindAll(ClaimTypes.Role)
+            .Select(c => c.Value)
+            .Where(r => !string.IsNullOrEmpty(r))
+            .ToList();
+
+        return new EntryActor(userName, roles);
     }
 
     private static CreateEntryCommand ToCommand(CreateEntryRequest r) => new(

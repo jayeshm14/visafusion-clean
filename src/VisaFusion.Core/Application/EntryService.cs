@@ -144,6 +144,23 @@ public sealed record RecordAwbCommand(
     string? Remark);
 
 /// <summary>
+/// The authenticated actor performing an entry create/update (SPEC-0006 §19
+/// audit, T040; FR-002/FR-008). Resolved server-side by the API layer from the
+/// validated JWT claims — never from the request body (anti-spoofing, GR-0004).
+/// <see cref="UserName"/> is the claim-bound username (<c>sub</c>/<c>name</c>,
+/// IdentityClaims.cs:66) and <see cref="EffectiveRoles"/> the claim-bound
+/// effective role set (<c>role</c> claims; <c>su</c> already expands to
+/// <c>su</c>+<c>adm</c>, IdentityClaims.cs:36). The service composes the
+/// <c>bighistory</c> <c>UpdatedBy</c> = <c>{role}:{username}</c> with the same
+/// su &gt; adm &gt; emp &gt; agt precedence as <c>usp_RecordEntryStatusChange</c>
+/// (script 08:70-89) so the create/update audit rows are indistinguishable in
+/// format from the proc-written rows.
+/// </summary>
+public sealed record EntryActor(
+    string UserName,
+    IReadOnlyList<string> EffectiveRoles);
+
+/// <summary>
 /// Shared entry-aggregate service (SPEC-0006 US1/US2/US3, FR-001..FR-005,
 /// BR-001/BR-002/BR-005, AC-002/AC-003/AC-004).
 ///
@@ -160,8 +177,12 @@ public interface IEntryService
     /// ≥ 1-passenger invariant (BR-005) and a valid reference number; status is
     /// free-form per legacy (no transition validation, clarification Q3).
     /// The caller allocates the reference number first (US2) and passes it in.
+    /// Writes the create-audit <c>bighistory</c> row in the same commit
+    /// (spec §19; legacy insertEntry.asp:233), <c>UpdatedBy</c> composed
+    /// <c>{role}:{username}</c> from <paramref name="actor"/> (GR-0004).
     /// </summary>
-    Task<CreateEntryResult> CreateAsync(int refno, CreateEntryCommand command, CancellationToken ct = default);
+    Task<CreateEntryResult> CreateAsync(
+        int refno, CreateEntryCommand command, EntryActor actor, CancellationToken ct = default);
 
     /// <summary>
     /// Loads an entry aggregate by reference number with its passengers and
@@ -174,11 +195,15 @@ public interface IEntryService
     /// Updates an entry aggregate (SPEC-0006 US6, FR-008, AC-011). The caller
     /// supplies the <c>expectedRowVersion</c> from the <c>If-Match</c> ETag; a
     /// stale write (the current rowversion differs) throws
-    /// <see cref="EntryConflictException"/> (409). Returns the updated aggregate
-    /// with a fresh concurrency token.
+    /// <see cref="EntryConflictException"/> (409) and writes no audit row.
+    /// Writes the update-audit <c>bighistory</c> row in the same commit as the
+    /// change (spec §19 subject/endpoint/outcome; legacy editEntrySubmit.asp:189),
+    /// <c>UpdatedBy</c> composed <c>{role}:{username}</c> (GR-0004). Returns the
+    /// updated aggregate with a fresh concurrency token.
     /// </summary>
     Task<CreateEntryResult> UpdateAsync(
-        int refno, CreateEntryCommand command, byte[] expectedRowVersion, CancellationToken ct = default);
+        int refno, CreateEntryCommand command, byte[] expectedRowVersion,
+        EntryActor actor, CancellationToken ct = default);
 
     /// <summary>
     /// Allocates the next reference number atomically via

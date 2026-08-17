@@ -27,7 +27,7 @@ public sealed class EntryService : IEntryService
     public EntryService(VisaEntryDbContext db) => _db = db;
 
     public async Task<CreateEntryResult> CreateAsync(
-        int refno, CreateEntryCommand command, CancellationToken ct = default)
+        int refno, CreateEntryCommand command, EntryActor actor, CancellationToken ct = default)
     {
         // ≥ 1-passenger invariant (BR-005): the principal passenger is carried
         // at the entry level (legacy insertEntry.asp writes paxname/passportno
@@ -78,6 +78,24 @@ public sealed class EntryService : IEntryService
             Category = command.Category,
             Totalpax = command.TotalPassengers,
         };
+
+        // Create-audit bighistory row (SPEC-0006 §19, T040; legacy
+        // insertEntry.asp:233): refno, agent, timestamp, updatedby, remark.
+        // The ratified create contract (contracts/entries-api.md §1) carries no
+        // agent field, so the entry — and therefore its audit row — has no
+        // owning agent on create (legacy read the agent from the form). The
+        // remark is the external remark, exactly as legacy mapped
+        // request("retrieveremark") → externalremark (insertEntry.asp:141/231).
+        // Written in the SAME commit as the entry so a failed create never
+        // leaves an entry without its audit row.
+        _db.EntryAuditLogs.Add(new EntryAuditLog
+        {
+            Refno = refno,
+            Agent = null,
+            Date = DateTime.Now,
+            UpdatedBy = ComposeUpdatedBy(actor),
+            Remarks = command.Remarks,
+        });
 
         _db.Entries.Add(entry);
         _db.EntryPassengers.Add(passenger);
@@ -133,7 +151,8 @@ public sealed class EntryService : IEntryService
     }
 
     public async Task<CreateEntryResult> UpdateAsync(
-        int refno, CreateEntryCommand command, byte[] expectedRowVersion, CancellationToken ct = default)
+        int refno, CreateEntryCommand command, byte[] expectedRowVersion,
+        EntryActor actor, CancellationToken ct = default)
     {
         // Same ≥ 1-passenger invariant as create (BR-005).
         if (string.IsNullOrWhiteSpace(command.Paxname)
@@ -150,10 +169,20 @@ public sealed class EntryService : IEntryService
         }
 
         // Optimistic concurrency (AC-011): the caller's If-Match ETag is the
-        // expected rowversion. EF Core includes the original rowversion in the
-        // UPDATE's WHERE clause; a mismatch throws DbUpdateConcurrencyException,
-        // translated to 409 (contracts/entries-api.md §3).
-        entry.RowVersion = expectedRowVersion;
+        // expected rowversion. The check is performed EXPLICITLY against the
+        // freshly-loaded value — assigning expectedRowVersion to the tracked
+        // entity would not work: EF Core's UPDATE WHERE clause uses the token's
+        // ORIGINAL (as-loaded) value, so overwriting it makes the check compare
+        // the current rowversion against itself and always succeed (surfaced by
+        // EntryAuditIntegrationTests, T040; see deviation log). A stale write
+        // is rejected here, BEFORE any mutation — no audit row is written.
+        if (expectedRowVersion is null
+            || entry.RowVersion is null
+            || !expectedRowVersion.SequenceEqual(entry.RowVersion))
+        {
+            throw new EntryConflictException(
+                $"Entry {refno} was modified by another request; the If-Match ETag is stale.");
+        }
 
         entry.Paxname = command.Paxname;
         entry.Passportno = command.Passportno;
@@ -163,6 +192,24 @@ public sealed class EntryService : IEntryService
         entry.Traveldate = command.TravelDate;
         entry.Externalremark = command.Remarks;
         entry.AgentInstruction = command.AgentInstruction;
+
+        // Update-audit bighistory row (SPEC-0006 §19 subject/endpoint/outcome,
+        // T040; legacy editEntrySubmit.asp:189): refno, agent (the entry's
+        // owning agent — never changed by this endpoint), timestamp, updatedby,
+        // remark. The PUT contract (contracts/entries-api.md §3) carries no
+        // internal-remark field, so the remark is the request's external remark
+        // — the closest available value to the legacy `internalrem` (see
+        // deviation log T040). Written in the SAME commit as the update: a
+        // stale write (409) rolls the audit row back too — no audit row is
+        // written for a rejected write.
+        _db.EntryAuditLogs.Add(new EntryAuditLog
+        {
+            Refno = refno,
+            Agent = entry.Agent,
+            Date = DateTime.Now,
+            UpdatedBy = ComposeUpdatedBy(actor),
+            Remarks = command.Remarks,
+        });
 
         try
         {
@@ -376,6 +423,39 @@ public sealed class EntryService : IEntryService
             Awb = command.Awb,
         });
         await _db.SaveChangesAsync(ct);
+    }
+
+    /// <summary>
+    /// Composes the bighistory <c>UpdatedBy</c> value <c>{role}:{username}</c>
+    /// for the service-written create/update audit rows (SPEC-0006 §19, T040).
+    /// The actor is resolved server-side from the JWT claims by the API layer —
+    /// never a caller-supplied formatted string (anti-spoofing, GR-0004). The
+    /// role is the HIGHEST-privilege effective role (su &gt; adm &gt; emp &gt;
+    /// agt), the same precedence as <c>usp_RecordEntryStatusChange</c>
+    /// (script 08:70-89), so the format is indistinguishable from proc-written
+    /// rows. Throws when the actor cannot be resolved — an unattributed audit
+    /// row is refused (mirrors the proc's RAISERROR for a user with no role).
+    /// </summary>
+    private static string ComposeUpdatedBy(EntryActor actor)
+    {
+        var role = actor.EffectiveRoles
+            .OrderBy(r => (r ?? string.Empty).ToLowerInvariant() switch
+            {
+                "su" => 1,
+                "adm" => 2,
+                "emp" => 3,
+                "agt" => 4,
+                _ => 5,
+            })
+            .FirstOrDefault();
+
+        if (string.IsNullOrWhiteSpace(actor.UserName) || role is null)
+        {
+            throw new EntryValidationException(
+                "The authenticated actor could not be resolved; the audit row cannot be attributed.");
+        }
+
+        return $"{role}:{actor.UserName}";
     }
 
     private static SqlParameter Param(string name, System.Data.DbType type, object value)

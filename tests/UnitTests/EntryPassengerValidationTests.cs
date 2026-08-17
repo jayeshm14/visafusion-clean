@@ -25,7 +25,7 @@ public class EntryPassengerValidationTests
         var ex = await Assert.ThrowsAsync<EntryValidationException>(() =>
             service.CreateAsync(1, new CreateEntryCommand(
                 Paxname: null, Passportno: "P123", DateOfBirth: null, Category: null,
-                TotalPassengers: 1, TravelDate: null, Remarks: null, AgentInstruction: null)));
+                TotalPassengers: 1, TravelDate: null, Remarks: null, AgentInstruction: null), TestActor));
 
         Assert.Contains("passenger", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -38,7 +38,7 @@ public class EntryPassengerValidationTests
         var ex = await Assert.ThrowsAsync<EntryValidationException>(() =>
             service.CreateAsync(1, new CreateEntryCommand(
                 Paxname: "John", Passportno: null, DateOfBirth: null, Category: null,
-                TotalPassengers: 1, TravelDate: null, Remarks: null, AgentInstruction: null)));
+                TotalPassengers: 1, TravelDate: null, Remarks: null, AgentInstruction: null), TestActor));
 
         Assert.Contains("passenger", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -51,7 +51,7 @@ public class EntryPassengerValidationTests
         var ex = await Assert.ThrowsAsync<EntryValidationException>(() =>
             service.CreateAsync(1, new CreateEntryCommand(
                 Paxname: "   ", Passportno: "   ", DateOfBirth: null, Category: null,
-                TotalPassengers: 1, TravelDate: null, Remarks: null, AgentInstruction: null)));
+                TotalPassengers: 1, TravelDate: null, Remarks: null, AgentInstruction: null), TestActor));
 
         Assert.Contains("passenger", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -64,7 +64,7 @@ public class EntryPassengerValidationTests
         var result = await service.CreateAsync(5, new CreateEntryCommand(
             Paxname: "Jane", Passportno: "P999", DateOfBirth: new DateTime(1985, 5, 5),
             Category: 2, TotalPassengers: 1, TravelDate: null, Remarks: "urgent",
-            AgentInstruction: "call first"));
+            AgentInstruction: "call first"), TestActor);
 
         Assert.Single(result.Entry.Passengers);
         var passenger = result.Entry.Passengers[0];
@@ -82,6 +82,12 @@ public class EntryPassengerValidationTests
         Assert.Equal("Jane", stored.Paxname);
         Assert.Equal("P999", stored.Passportno);
     }
+
+    /// <summary>
+    /// The acting user for the create/update audit rows (SPEC-0006 §19, T040):
+    /// an employee, so the composed <c>UpdatedBy</c> is <c>emp:tester</c>.
+    /// </summary>
+    private static readonly EntryActor TestActor = new("tester", new[] { "emp" });
 
     private static (EntryService Service, string DatabaseName) NewService()
     {

@@ -45,7 +45,7 @@ public class RefnoAllocationTests
 
         var result = await service.CreateAsync(int.MaxValue, new CreateEntryCommand(
             Paxname: "John", Passportno: "P123", DateOfBirth: null, Category: null,
-            TotalPassengers: 1, TravelDate: null, Remarks: null, AgentInstruction: null));
+            TotalPassengers: 1, TravelDate: null, Remarks: null, AgentInstruction: null), TestActor);
 
         Assert.Equal(int.MaxValue, result.Refno);
     }
@@ -58,7 +58,7 @@ public class RefnoAllocationTests
         var ex = await Assert.ThrowsAsync<EntryValidationException>(() =>
             service.CreateAsync(-1, new CreateEntryCommand(
                 Paxname: "John", Passportno: "P123", DateOfBirth: null, Category: null,
-                TotalPassengers: 1, TravelDate: null, Remarks: null, AgentInstruction: null)));
+                TotalPassengers: 1, TravelDate: null, Remarks: null, AgentInstruction: null), TestActor));
 
         Assert.Contains("refno", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -73,18 +73,24 @@ public class RefnoAllocationTests
 
         await service.CreateAsync(100, new CreateEntryCommand(
             Paxname: "A", Passportno: "P1", DateOfBirth: null, Category: null,
-            TotalPassengers: 1, TravelDate: null, Remarks: null, AgentInstruction: null));
+            TotalPassengers: 1, TravelDate: null, Remarks: null, AgentInstruction: null), TestActor);
         await service.CreateAsync(101, new CreateEntryCommand(
             Paxname: "B", Passportno: "P2", DateOfBirth: null, Category: null,
-            TotalPassengers: 1, TravelDate: null, Remarks: null, AgentInstruction: null));
+            TotalPassengers: 1, TravelDate: null, Remarks: null, AgentInstruction: null), TestActor);
 
         var ex = await Assert.ThrowsAsync<EntryConflictException>(() =>
             service.CreateAsync(101, new CreateEntryCommand(
                 Paxname: "C", Passportno: "P3", DateOfBirth: null, Category: null,
-                TotalPassengers: 1, TravelDate: null, Remarks: null, AgentInstruction: null)));
+                TotalPassengers: 1, TravelDate: null, Remarks: null, AgentInstruction: null), TestActor));
 
         Assert.Contains("101", ex.Message);
     }
+
+    /// <summary>
+    /// The acting user for the create/update audit rows (SPEC-0006 §19, T040):
+    /// an employee, so the composed <c>UpdatedBy</c> is <c>emp:tester</c>.
+    /// </summary>
+    private static readonly EntryActor TestActor = new("tester", new[] { "emp" });
 
     private static (EntryService Service, string DatabaseName) NewService()
     {

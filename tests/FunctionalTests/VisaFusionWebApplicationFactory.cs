@@ -145,7 +145,7 @@ public class VisaFusionWebApplicationFactory : WebApplicationFactory<Program>
     /// The status-change validity check mirrors the real service's
     /// SqlException translation for the proc's "StatusID not found" RAISERROR
     /// (script 08:54-56): the stub rejects a NewStatusId outside the legacy
-    /// status-code set (deepanalysis.md §4.5 line 165 / lines 182-191 —
+    /// status-code set (deepanalysis.md §4.4 lines 175-191 —
     /// 101/201/251/301/401/408/411/501/502/503/509/601) with the same
     /// EntryValidationException the API maps to 400, so the endpoint's
     /// problem-details path is exercised hermetically (T026).
@@ -155,15 +155,15 @@ public class VisaFusionWebApplicationFactory : WebApplicationFactory<Program>
         private readonly Dictionary<int, EntryAggregate> _entries = new();
         private int _nextRefno = 1;
 
-        // Legacy status codes, verbatim from findings/deepanalysis.md §4.5
-        // (lines 165, 182-191): the `status` table's natural-key set.
+        // Legacy status codes, verbatim from findings/deepanalysis.md §4.4
+        // (lines 175-191): the `status` table's natural-key set.
         private static readonly HashSet<int> LegacyStatusCodes = new()
         {
             101, 201, 251, 301, 401, 408, 411, 501, 502, 503, 509, 601,
         };
 
         public Task<CreateEntryResult> CreateAsync(
-            int refno, CreateEntryCommand command, CancellationToken ct = default)
+            int refno, CreateEntryCommand command, EntryActor actor, CancellationToken ct = default)
         {
             // ≥ 1-passenger invariant (BR-005) — mirror of the real service.
             if (string.IsNullOrWhiteSpace(command.Paxname)
@@ -205,7 +205,7 @@ public class VisaFusionWebApplicationFactory : WebApplicationFactory<Program>
             => Task.FromResult(_nextRefno++);
 
         public Task<CreateEntryResult> UpdateAsync(
-            int refno, CreateEntryCommand command, byte[] expectedRowVersion, CancellationToken ct = default)
+            int refno, CreateEntryCommand command, byte[] expectedRowVersion, EntryActor actor, CancellationToken ct = default)
         {
             if (!_entries.TryGetValue(refno, out var current))
             {
