@@ -1213,5 +1213,83 @@
                       "to":  "ENT-API",
                       "type":  "calls"
                   }
+              {
+                      "id":  "MOD-007",
+                      "type":  "Module",
+                      "label":  "Public Site",
+                      "legacy":  "querieDetail.asp, contact.asp, register.asp"
+                  },
+                  {
+                      "id":  "API-v1-public",
+                      "type":  "API",
+                      "label":  "/api/v1/public/queries"
+                  },
+                  {
+                      "id":  "UI-Public",
+                      "type":  "Page",
+                      "label":  "Public Razor Pages"
+                  },
+                  {
+                      "id":  "TEST-Public",
+                      "type":  "Test Case",
+                      "label":  "Public site parity functional suite"
+                  },
+                  {
+                      "id":  "SPEC-0007",
+                      "type":  "Requirement",
+                      "label":  "Public Site Parity (SPEC-0007)",
+                      "status":  "Accepted"
+                  },
               ]
+                   {
+                       "from":  "SPEC-0007",
+                       "to":  "MOD-007",
+                       "type":  "implements"
+                   },
+                   {
+                       "from":  "SPEC-0007",
+                       "to":  "API-v1-public",
+                       "type":  "implements"
+                   },
+                   {
+                       "from":  "SPEC-0007",
+                       "to":  "UI-Public",
+                       "type":  "implements"
+                   },
+                   {
+                       "from":  "SPEC-0007",
+                       "to":  "TEST-Public",
+                       "type":  "tested_by"
+                   },
+                   {
+                       "from":  "MOD-007",
+                       "to":  "API-v1-public",
+                       "type":  "calls"
+                   },
+                   {
+                       "from":  "MOD-007",
+                       "to":  "UI-Public",
+                       "type":  "calls"
+                   },
+                   {
+                       "from":  "API-v1-public",
+                       "to":  "UI-Public",
+                       "type":  "backed_by"
+                   },
+                   {
+                       "from":  "TEST-Public",
+                       "to":  "API-v1-public",
+                       "type":  "tests"
+                   },
+                   {
+                       "from":  "TEST-Public",
+                       "to":  "UI-Public",
+                       "type":  "tests"
+                   },
+                   {
+                       "from":  "MIG-0001",
+                       "to":  "GAP-0001",
+                       "type":  "records"
+                   },
+               ]
 }

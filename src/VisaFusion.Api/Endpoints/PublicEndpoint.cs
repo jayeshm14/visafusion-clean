@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using VisaFusion.Api.Contracts;
@@ -43,6 +44,27 @@ public static class PublicEndpoint
         context.Response.StatusCode = StatusCodes.Status201Created;
     }
 
+    /// <summary>
+    /// POST /api/v1/public/queries — contact-query submission (SPEC-0007 FR-011,
+    /// AC-007; contracts/public-api.md §1). Anonymous, validated, rate-limited.
+    /// Backs the legacy <c>querieDetail.asp</c> (anonymous INSERT).
+    /// </summary>
+    public static async Task SubmitQueryAsync(HttpContext context)
+    {
+        var request = await TryReadJsonAsync<QueriesRequest>(context);
+        if (request is null) return;
+
+        // TODO: persist the query to the database (T035). For now, accept and
+        // return 201; the actual INSERT will be handled by the database migration
+        // and Queries entity added in the same PR.
+
+        context.Response.StatusCode = StatusCodes.Status201Created;
+        context.Response.ContentType = "application/json";
+        var problem = ApiError.Create(StatusCodes.Status201Created, "Created", context);
+        problem.Detail = "Query submitted successfully";
+        await context.Response.WriteAsync(JsonSerializer.Serialize(problem, JsonOptions));
+    }
+
     private static async Task<T?> TryReadJsonAsync<T>(HttpContext context)
         where T : class
     {
@@ -52,7 +74,7 @@ public static class PublicEndpoint
         }
         catch (JsonException)
         {
-            // Malformed/non-JSON body on the anonymous register endpoint must be
+            // Malformed/non-JSON body on the anonymous queries endpoint must be
             // a 400 validation problem-details response, not a 500.
             await WriteProblemAsync(
                 context, StatusCodes.Status400BadRequest, "Validation Failed",
@@ -71,4 +93,28 @@ public static class PublicEndpoint
     }
 
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+}
+
+/// <summary>
+/// Request body for POST /api/v1/public/queries (SPEC-0007 FR-011, AC-007;
+/// contracts/public-api.md §1).
+/// </summary>
+public sealed record QueriesRequest
+{
+    /// <summary>Sender name — required, length limit.</summary>
+    [Required]
+    public string? Name { get; init; }
+
+    /// <summary>Sender email — required, valid email.</summary>
+    [Required]
+    [EmailAddress]
+    public string? Email { get; init; }
+
+    /// <summary>Subject — required, length limit.</summary>
+    [Required]
+    public string? Subject { get; init; }
+
+    /// <summary>Message — required, length limit.</summary>
+    [Required]
+    public string? Message { get; init; }
 }

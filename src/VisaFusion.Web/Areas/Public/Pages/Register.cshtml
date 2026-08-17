@@ -1,0 +1,23 @@
+@page
+@{
+    ViewData["Title"] = "Register";
+}
+<h1>Register an Account</h1>
+<p>Create a new account to access visa services.</p>
+<p>Registration creates a guest-role account with limited privileges.</p>
+<form method="post" action="/Auth/Register" novalidate>
+    <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required class="form-control" minlength="8" />
+    </div>
+    <button type="submit" class="btn btn-primary">Register</button>
+</form>
+<p>By registering, you agree to the terms and conditions. Your account will have the <strong>guest</strong> role, providing access to public services only.</p>

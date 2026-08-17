@@ -14,6 +14,7 @@ Generated: 2026-08-06 | Source: SPEC-0001, ADR-0001, knowledge-graph/kg.json
 | FR-006 Reporting | ADR-0001 | CTX-Report | Views | /api/v1/reports | Report pages | Regression tests | MIG-0001 |
 | FR-007 Security hardening | ADR-0001 | CTX-Identity | — | all | all | Security tests | — |
 | FR-008 KG & traceability | ADR-0001 | KG | — | — | — | Traceability checks | — |
+| SPEC-0007 | §5 | Public | — | /api/v1/public/queries | Public Razor Pages | PublicSiteParityTests.cs | — |
 
 ## Module → Legacy Mapping
 
@@ -25,6 +26,7 @@ Generated: 2026-08-06 | Source: SPEC-0001, ADR-0001, knowledge-graph/kg.json
 | Notifications | SendSMS.asp | MOD-004 |
 | Reporting | report pages | MOD-005 |
 | Identity & Security | connection.asp | MOD-006 |
+| Public Site | querieDetail.asp, contact.asp, register.asp | MOD-007 |
 
 ## Outstanding decisions (owner decisions, from findings/modernization_plan.md)
 

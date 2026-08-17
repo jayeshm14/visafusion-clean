@@ -29,7 +29,7 @@
     "visafusion": {
       "mode": "primary",
       "description": "Drives the VisaFusion legacy-modernization program (Classic ASP VisaEntry to ASP.NET Core). Executes the deterministic pipeline from library/.",
-      "model": "opencode/deepseek-v4-flash-free",
+      "model": "opencode/Nemotron 3 Ultra Free",
       "temperature": 0
     }
   }
