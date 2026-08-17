@@ -125,17 +125,17 @@
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T027 [P] [US4] Unit tests for own-agent scoping in `tests/UnitTests/AgentScopingTests.cs`
-- [ ] T028 [P] [US4] Integration tests for portal endpoints in `tests/IntegrationTests/AgentPortalIntegrationTests.cs`
+- [x] T027 [P] [US4] Unit tests for own-agent scoping in `tests/UnitTests/AgentScopingTests.cs` — DONE 2026-08-17 (11 cases: agt own/other/no-claim, emp/adm/su any, null principal; CHK026 covered)
+- [x] T028 [P] [US4] Integration tests for portal endpoints in `tests/IntegrationTests/AgentPortalIntegrationTests.cs` — DONE 2026-08-17 (real `AgentService` over real SQL Server: entries/statuses/statement scoped to agent, `?q=` filter, other agent → empty, marker-based cleanup, skip-on-unreachable)
 
 ### Implementation for User Story 4
 
-- [ ] T029 [P] [US4] Create portal contracts in `src/VisaFusion.Api/Contracts/` (`AgentEntriesResponse`, `AgentStatementResponse`) per `contracts/agents-api.md` §3/§4
-- [ ] T030 [US4] Implement portal endpoints in `src/VisaFusion.Api/Endpoints/AgentsEndpoint.cs`: `GET /api/v1/agents/{id}/entries` (AgentSelf), `GET /api/v1/agents/{id}/statement` (AgentLedger), `PUT /api/v1/agents/{id}/self` (AgentSelf, own-only via claim-bound `AgentId`, BR-007) — depends on T014, T029
-- [ ] T031 [US4] Implement portal pages in `src/VisaFusion.Web/Areas/Agent/Pages/` (home, entries, statuses, statement, account) on the new shell (T009)
-- [ ] T046 [P] [US4] Implement `GET /api/v1/agents/{id}/statuses` (AgentSelf, own-only via claim-bound `AgentId`) in `src/VisaFusion.Api/Endpoints/AgentsEndpoint.cs` per `contracts/agents-api.md` §3a — adds FR-018 coverage (post-analyze F1 remediation)
-- [ ] T047 [P] [US4] Implement `?q=` keyword filter on `GET /api/v1/agents/{id}/entries` and `/statuses` (`Search` policy, scoped to the claim-bound `{id}`, FR-021) in `src/VisaFusion.Api/Endpoints/AgentsEndpoint.cs` — post-analyze F2 remediation
-- [ ] T048 [P] [US4] Integration tests for statuses + scoped search in `tests/IntegrationTests/AgentPortalIntegrationTests.cs` (own agent `?q=` → 200 filtered; other agent's `{id}` → 403/404; **CHK026**: `agt` without a linked `AgentId` claim → 403 on portal routes)
+- [x] T029 [P] [US4] Create portal contracts in `src/VisaFusion.Api/Contracts/` (`AgentEntriesResponse`, `AgentStatementResponse`) per `contracts/agents-api.md` §3/§4 — DONE 2026-08-17 (`AgentPortalContracts.cs`: `AgentEntryResponse`, `AgentEntriesResponse`, `AgentStatusResponse`, `AgentStatusesResponse`, `AgentStatementLineResponse`, `AgentStatementResponse`)
+- [x] T030 [US4] Implement portal endpoints in `src/VisaFusion.Api/Endpoints/AgentsEndpoint.cs`: `GET /api/v1/agents/{id}/entries` (AgentSelf), `GET /api/v1/agents/{id}/statement` (AgentLedger), `PUT /api/v1/agents/{id}/self` (AgentSelf, own-only via claim-bound `AgentId`, BR-007) — depends on T014, T029 — DONE 2026-08-17 (scoping via `AgentPortalScoping.CanRead/CanUpdateSelf`; 403 on mismatch/no-claim; routes wired in `Program.cs` replacing the 501 placeholder)
+- [x] T031 [US4] Implement portal pages in `src/VisaFusion.Web/Areas/Agent/Pages/` (home, entries, statuses, statement, account) on the new shell (T009) — DONE 2026-08-17 (`Index.cshtml(.cs)`, `Entries.cshtml(.cs)`, `Statuses.cshtml(.cs)`, `Statement.cshtml(.cs)`, `Account.cshtml(.cs)`; shared `AgentPortalPageModel` resolves claim-bound `AgentId` from user row; `AgentSelf`/`AgentLedger` policies; CHK026 empty state)
+- [x] T046 [P] [US4] Implement `GET /api/v1/agents/{id}/statuses` (AgentSelf, own-only via claim-bound `AgentId`) in `src/VisaFusion.Api/Endpoints/AgentsEndpoint.cs` per `contracts/agents-api.md` §3a — adds FR-018 coverage (post-analyze F1 remediation) — DONE 2026-08-17
+- [x] T047 [P] [US4] Implement `?q=` keyword filter on `GET /api/v1/agents/{id}/entries` and `/statuses` (`Search` policy, scoped to the claim-bound `{id}`, FR-021) in `src/VisaFusion.Api/Endpoints/AgentsEndpoint.cs` — post-analyze F2 remediation — DONE 2026-08-17
+- [x] T048 [P] [US4] Integration tests for statuses + scoped search in `tests/IntegrationTests/AgentPortalIntegrationTests.cs` (own agent `?q=` → 200 filtered; other agent's `{id}` → 403/404; **CHK026**: `agt` without a linked `AgentId` claim → 403 on portal routes) — DONE 2026-08-17 (covered by T028 + `AgentPortalRbacTests` 23 cases in FunctionalTests)
 
 **Checkpoint**: At this point, User Stories 1-4 should all work independently
 

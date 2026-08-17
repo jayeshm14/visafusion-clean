@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using VisaFusion.Api.Authorization;
 using VisaFusion.Api.Contracts;
 using VisaFusion.Api.Errors;
 using VisaFusion.Core.Application;
@@ -136,6 +137,148 @@ public static class AgentsEndpoint
             context.Response.StatusCode = StatusCodes.Status200OK;
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsJsonAsync(ToResponse(agent));
+        }
+        catch (AgentNotFoundException ex)
+        {
+            await WriteProblemAsync(context, StatusCodes.Status404NotFound, "Not Found", ex.Message);
+        }
+    }
+
+    /// <summary>GET /api/v1/agents/{id}/entries — agent's entries list (contract §3, FR-017).</summary>
+    public static async Task GetEntriesAsync(HttpContext context, IAgentService agents, int id)
+    {
+        // Own-agent scoping (BR-007, AC-012): agt callers may only read their
+        // own record; emp/adm/su may read any (contract §3).
+        if (!AgentPortalScoping.CanRead(context.User, id))
+        {
+            await WriteProblemAsync(
+                context, StatusCodes.Status403Forbidden, "Forbidden",
+                "Agents may only access their own record.");
+            return;
+        }
+
+        var page = TryParse(context.Request.Query["page"], 1);
+        var pageSize = TryParse(context.Request.Query["pageSize"], 50);
+        var q = context.Request.Query["q"].ToString();
+
+        var result = await agents.GetPortalEntriesAsync(id, page, pageSize, q, context.RequestAborted);
+
+        context.Response.StatusCode = StatusCodes.Status200OK;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(new AgentEntriesResponse
+        {
+            Items = result.Items.Select(e => new AgentEntryResponse
+            {
+                Refno = e.Refno,
+                Paxname = e.Paxname,
+                Traveldate = e.Traveldate,
+                Status = e.Status,
+                StatusDescription = e.StatusDescription,
+            }).ToList(),
+            Total = result.Total,
+        });
+    }
+
+    /// <summary>GET /api/v1/agents/{id}/statuses — agent's passenger statuses (contract §3a, FR-018).</summary>
+    public static async Task GetStatusesAsync(HttpContext context, IAgentService agents, int id)
+    {
+        // Own-agent scoping (BR-007, AC-012): agt callers may only read their
+        // own record; emp/adm/su may read any (contract §3a).
+        if (!AgentPortalScoping.CanRead(context.User, id))
+        {
+            await WriteProblemAsync(
+                context, StatusCodes.Status403Forbidden, "Forbidden",
+                "Agents may only access their own record.");
+            return;
+        }
+
+        var q = context.Request.Query["q"].ToString();
+
+        var result = await agents.GetPortalStatusesAsync(id, q, context.RequestAborted);
+
+        context.Response.StatusCode = StatusCodes.Status200OK;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(new AgentStatusesResponse
+        {
+            Items = result.Items.Select(s => new AgentStatusResponse
+            {
+                Paxname = s.Paxname,
+                Refno = s.Refno,
+                CountryId = s.CountryId,
+                StatusId = s.StatusId,
+                StatusDescription = s.StatusDescription,
+                Updated = s.Updated,
+            }).ToList(),
+        });
+    }
+
+    /// <summary>GET /api/v1/agents/{id}/statement — agent's financial statement (contract §4, FR-019).</summary>
+    public static async Task GetStatementAsync(HttpContext context, IAgentService agents, int id)
+    {
+        // Own-agent scoping (BR-008, AC-012): agt callers may only read their
+        // own record; emp/adm/su may read any (contract §4).
+        if (!AgentPortalScoping.CanRead(context.User, id))
+        {
+            await WriteProblemAsync(
+                context, StatusCodes.Status403Forbidden, "Forbidden",
+                "Agents may only access their own record.");
+            return;
+        }
+
+        var result = await agents.GetPortalStatementAsync(id, context.RequestAborted);
+
+        context.Response.StatusCode = StatusCodes.Status200OK;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(new AgentStatementResponse
+        {
+            Items = result.Items.Select(l => new AgentStatementLineResponse
+            {
+                Id = l.Id,
+                Date = l.Date,
+                Bank = l.Bank,
+                TransactionType = l.TransactionType,
+                Refno = l.Refno,
+                Paxname = l.Paxname,
+                Reftype = l.Reftype,
+                Invno = l.Invno,
+                Debit = l.Debit,
+                Credit = l.Credit,
+                Balance = l.Balance,
+            }).ToList(),
+            TotalDebits = result.TotalDebits,
+            TotalCredits = result.TotalCredits,
+            Balance = result.Balance,
+        });
+    }
+
+    /// <summary>PUT /api/v1/agents/{id}/self — agent updates own record (contract §2, FR-020).</summary>
+    public static async Task UpdateSelfAsync(HttpContext context, IAgentService agents, int id)
+    {
+        // Own-record rule (FR-020, AC-014, BR-007): the route id must equal the
+        // claim-bound AgentId; a mismatch is a denial, never another agent's
+        // record (contract §2).
+        if (!AgentPortalScoping.CanUpdateSelf(context.User, id))
+        {
+            await WriteProblemAsync(
+                context, StatusCodes.Status403Forbidden, "Forbidden",
+                "Agents may only update their own record.");
+            return;
+        }
+
+        var request = await TryReadJsonAsync<UpdateAgentRequest>(context);
+        if (request is null) return;
+
+        try
+        {
+            var agent = await agents.UpdateAsync(id, ToInput(request), context.RequestAborted);
+
+            context.Response.StatusCode = StatusCodes.Status200OK;
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsJsonAsync(ToResponse(agent));
+        }
+        catch (AgentValidationException ex)
+        {
+            await WriteProblemAsync(context, StatusCodes.Status400BadRequest, "Validation Failed", ex.Message);
         }
         catch (AgentNotFoundException ex)
         {

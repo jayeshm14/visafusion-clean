@@ -1,7 +1,61 @@
 ﻿@page
+@model VisaFusion.Web.Areas.Agent.Pages.IndexModel
 @{
-    ViewData["Title"] = "Agent Area";
+    ViewData["Title"] = "Agent portal";
+    ViewData["UseSidebar"] = true;
 }
 
-<h1>Agent Area</h1>
-<p>Placeholder page for the Agent area (SPEC-0003 T027, FR-005).</p>
+@section SidebarNav {
+    <a asp-area="Agent" asp-page="/Index" aria-current="page">Portal home</a>
+    <a asp-area="Agent" asp-page="/Entries">My entries</a>
+    <a asp-area="Agent" asp-page="/Statuses">Passenger statuses</a>
+    <a asp-area="Agent" asp-page="/Statement">Statement</a>
+    <a asp-area="Agent" asp-page="/Account">My account</a>
+}
+
+<div class="vf-content">
+    <h1>Agent portal</h1>
+
+    @if (Model.HasNoLinkedAgent)
+    {
+        <div class="vf-alert vf-alert-danger" role="alert">
+            This account has no linked agent (CHK026). Contact the office to have
+            an agent bound to this login before using the portal.
+        </div>
+    }
+    else if (Model.Agent is null)
+    {
+        <div class="vf-alert vf-alert-danger" role="alert">
+            The linked agent record could not be found.
+        </div>
+    }
+    else
+    {
+        <div class="vf-card">
+            <h2>@(string.IsNullOrWhiteSpace(Model.Agent.Companyname) ? "Agent" : Model.Agent.Companyname)</h2>
+            <p>
+                @if (!string.IsNullOrWhiteSpace(Model.Agent.Street1)) { @Model.Agent.Street1<br /> }
+                @if (!string.IsNullOrWhiteSpace(Model.Agent.Area)) { @Model.Agent.Area<br /> }
+                @if (!string.IsNullOrWhiteSpace(Model.Agent.City)) { @Model.Agent.City }
+                @if (!string.IsNullOrWhiteSpace(Model.Agent.Pincode)) { @(" — " + Model.Agent.Pincode) }
+            </p>
+            <p>
+                @if (!string.IsNullOrWhiteSpace(Model.Agent.Phoneno))
+                {
+                    <span>Phone: @Model.Agent.Phoneno</span><br />
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.Agent.Emailid))
+                {
+                    <span>Email: @Model.Agent.Emailid</span>
+                }
+            </p>
+        </div>
+
+        <ul class="vf-list">
+            <li><a asp-area="Agent" asp-page="/Entries">My entries</a> — the entries submitted under this agent.</li>
+            <li><a asp-area="Agent" asp-page="/Statuses">Passenger statuses</a> — the current status of each passenger.</li>
+            <li><a asp-area="Agent" asp-page="/Statement">Statement</a> — the ledger of debits, credits and balance.</li>
+            <li><a asp-area="Agent" asp-page="/Account">My account</a> — review and update the agent's contact details.</li>
+        </ul>
+    }
+</div>

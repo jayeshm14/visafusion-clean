@@ -326,11 +326,26 @@ public class VisaFusionWebApplicationFactory : WebApplicationFactory<Program>
     /// the unit and integration tests (AgentLifecycleTests,
     /// AgentCrudIntegrationTests).
     /// </summary>
-    private sealed class InMemoryAgentServiceStub : IAgentService
+    internal sealed class InMemoryAgentServiceStub : IAgentService
     {
         private readonly Dictionary<int, AgentDetail> _agents = new();
         private readonly HashSet<string> _usernames = new(StringComparer.OrdinalIgnoreCase);
         private int _nextId = 1;
+
+        public void SeedPortalAgents()
+        {
+            // Seed agents 42 and 43 for the portal RBAC tests (T048).
+            _agents[42] = new AgentDetail(
+                42, "Portal Agent 42", "Sample agent for portal tests", "1 Portal St", null,
+                "Portal Area", "Portal City", "400001", "022-5555", null, "agent42@test.com",
+                null, "Portal Director", "9000000000", null, null, null, null, null, null, null, null, null,
+                Active: "Y", Creationdate: new DateTime(2026, 1, 1), Enteredby: "test");
+            _agents[43] = new AgentDetail(
+                43, "Portal Agent 43", "Sample agent for portal tests", "2 Portal St", null,
+                "Portal Area", "Portal City", "400001", "022-5555", null, "agent43@test.com",
+                null, "Portal Director", "9000000000", null, null, null, null, null, null, null, null, null,
+                Active: "Y", Creationdate: new DateTime(2026, 1, 1), Enteredby: "test");
+        }
 
         public Task<AgentDetail> CreateAsync(
             AgentInput input, string username, string password,
@@ -442,6 +457,78 @@ public class VisaFusionWebApplicationFactory : WebApplicationFactory<Program>
             var items = query.OrderBy(a => a.Companyname).ToList();
             return Task.FromResult(new AgentListResult(items, items.Count));
         }
+
+        // ---- Agent portal reads (SPEC-0007 US4, FR-017..019; contracts/agents-api.md
+        // §3/§3a/§4) ----
+        // The stub returns deterministic sample data for the requested agent so
+        // the endpoint wiring (scoping 403s, ?q= passthrough, response shapes)
+        // is proven hermetically. The real query behavior is covered by the
+        // unit and integration tests (AgentScopingTests, AgentPortalIntegrationTests).
+
+        public Task<AgentPortalEntriesResult> GetPortalEntriesAsync(
+            int agentId, int page, int pageSize, string? q, CancellationToken ct = default)
+        {
+            var rows = SampleEntries(agentId);
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                var needle = q.Trim();
+                rows = rows.Where(e =>
+                    (e.Paxname is not null && e.Paxname.Contains(needle))
+                    || (int.TryParse(needle, out var refno) && e.Refno == refno)).ToList();
+            }
+
+            var total = rows.Count;
+            var items = rows
+                .OrderByDescending(e => e.Refno)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+            return Task.FromResult(new AgentPortalEntriesResult(items, total));
+        }
+
+        public Task<AgentPortalStatusesResult> GetPortalStatusesAsync(
+            int agentId, string? q, CancellationToken ct = default)
+        {
+            var rows = SampleStatuses(agentId);
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                var needle = q.Trim();
+                rows = rows.Where(s =>
+                    (s.Paxname is not null && s.Paxname.Contains(needle))
+                    || (int.TryParse(needle, out var refno) && s.Refno == refno)).ToList();
+            }
+
+            return Task.FromResult(new AgentPortalStatusesResult(rows));
+        }
+
+        public Task<AgentStatementResult> GetPortalStatementAsync(
+            int agentId, CancellationToken ct = default)
+        {
+            var rows = SampleStatement(agentId);
+            return Task.FromResult(new AgentStatementResult(
+                rows,
+                rows.Sum(l => l.Debit),
+                rows.Sum(l => l.Credit),
+                rows.LastOrDefault()?.Balance));
+        }
+
+        private static List<AgentPortalEntry> SampleEntries(int agentId) => new()
+        {
+            new AgentPortalEntry(1001, "Portal Pax One", new DateTime(2026, 8, 1), 1, "Submitted"),
+            new AgentPortalEntry(1002, "Portal Pax Two", new DateTime(2026, 8, 2), 2, "In Process"),
+        };
+
+        private static List<AgentPortalStatus> SampleStatuses(int agentId) => new()
+        {
+            new AgentPortalStatus("Portal Pax One", 1001, 1, 1, "Submitted", new DateTime(2026, 8, 1)),
+            new AgentPortalStatus("Portal Pax Two", 1002, 2, 2, "In Process", new DateTime(2026, 8, 2)),
+        };
+
+        private static List<AgentStatementLine> SampleStatement(int agentId) => new()
+        {
+            new AgentStatementLine(1, new DateTime(2026, 8, 1), 1, "SALES", 1001, "Portal Pax One", "B", 101, 1000m, null, 1000m),
+            new AgentStatementLine(2, new DateTime(2026, 8, 2), 1, "RECEIPT", 1001, "Portal Pax One", "P", 201, null, 500m, 500m),
+        };
     }
 
     /// <summary>

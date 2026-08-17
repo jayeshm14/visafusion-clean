@@ -334,6 +334,143 @@ public sealed class AgentService : IAgentService
         return new AgentListResult(items.Select(ToDetail).ToList(), total);
     }
 
+    public async Task<AgentPortalEntriesResult> GetPortalEntriesAsync(
+        int agentId, int page, int pageSize, string? q, CancellationToken ct = default)
+    {
+        // Pagination bounds (contracts/agents-api.md General): default 50, max 200.
+        if (page < 1) page = 1;
+        if (pageSize < 1) pageSize = 50;
+        if (pageSize > 200) pageSize = 200;
+
+        // Own-agent scope only: Mainentry rows owned by the agent
+        // (contracts/agents-api.md §3; legacy listforagents.asp joins
+        // Mainentry x EntryDetails x Paxstatus on Mainentry.Agent = agentID).
+        var query = _db.Entries.AsNoTracking().Where(e => e.Agent == agentId);
+        if (!string.IsNullOrWhiteSpace(q))
+        {
+            var needle = q.Trim();
+            // Keyword filter (FR-021, contracts/agents-api.md §3): paxname
+            // substring (the legacy `Paxname LIKE '%q%'` filter) or an exact
+            // refno when the keyword parses as an integer.
+            if (int.TryParse(needle, out var refno))
+            {
+                query = query.Where(e => e.Refno == refno
+                    || (e.Paxname != null && e.Paxname.Contains(needle)));
+            }
+            else
+            {
+                query = query.Where(e => e.Paxname != null && e.Paxname.Contains(needle));
+            }
+        }
+
+        var total = await query.CountAsync(ct);
+        var rows = await query
+            .OrderByDescending(e => e.Refno) // legacy order by entryDetails.refno desc
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(ct);
+
+        var descriptions = await StatusDescriptionsAsync(ct);
+        return new AgentPortalEntriesResult(
+            rows.Select(e => new AgentPortalEntry(
+                e.Refno ?? 0,
+                e.Paxname,
+                e.Traveldate,
+                e.Status,
+                e.Status.HasValue && descriptions.TryGetValue(e.Status.Value, out var d) ? d : null))
+            .ToList(),
+            total);
+    }
+
+    public async Task<AgentPortalStatusesResult> GetPortalStatusesAsync(
+        int agentId, string? q, CancellationToken ct = default)
+    {
+        // Legacy agentpaxStatus.asp: Paxstatus x EntryDetails x Mainentry on
+        // paxid + refno, scoped to the agent's entries (Mainentry.Agent =
+        // agentID). One row per pax-per-country status chain entry.
+        var query =
+            from ps in _db.PaxCountryStatuses.AsNoTracking()
+            join p in _db.EntryPassengers.AsNoTracking() on ps.PaxId equals p.Id
+            join e in _db.Entries.AsNoTracking() on p.Refno equals e.Refno
+            where e.Agent == agentId
+            select new
+            {
+                ps,
+                e.Refno,
+                Paxname = p.Paxname,
+            };
+
+        if (!string.IsNullOrWhiteSpace(q))
+        {
+            var needle = q.Trim();
+            // Keyword filter (FR-021, contracts/agents-api.md §3a): paxname
+            // substring or an exact refno when the keyword parses as an integer.
+            if (int.TryParse(needle, out var refno))
+            {
+                query = query.Where(x => x.Refno == refno
+                    || (x.Paxname != null && x.Paxname.Contains(needle)));
+            }
+            else
+            {
+                query = query.Where(x => x.Paxname != null && x.Paxname.Contains(needle));
+            }
+        }
+
+        var rows = await query.ToListAsync(ct);
+        var descriptions = await StatusDescriptionsAsync(ct);
+
+        return new AgentPortalStatusesResult(rows.Select(x => new AgentPortalStatus(
+            x.Paxname,
+            x.Refno ?? 0,
+            x.ps.CountryId,
+            x.ps.StatusId,
+            x.ps.StatusId.HasValue && descriptions.TryGetValue(x.ps.StatusId.Value, out var d) ? d : null,
+            // Updated = the current status row's submission date (the date the
+            // legacy page's row displays alongside the status).
+            x.ps.Subdate))
+        .ToList());
+    }
+
+    public async Task<AgentStatementResult> GetPortalStatementAsync(
+        int agentId, CancellationToken ct = default)
+    {
+        // The agent's ledger (contracts/agents-api.md §4; legacy
+        // agentStatement.asp reads `select * from ledger where agentid = ...`).
+        // Ordered by entry date — the running `balance` column is meaningful
+        // only in chronological order (the legacy page renders rows in the
+        // same sequence the ledger stores them).
+        var rows = await _db.LedgerHistory.AsNoTracking()
+            .Where(l => l.AgentId == agentId)
+            .OrderBy(l => l.EntrydateTime).ThenBy(l => l.Id)
+            .ToListAsync(ct);
+
+        return new AgentStatementResult(
+            rows.Select(l => new AgentStatementLine(
+                l.Id,
+                l.EntrydateTime,
+                l.Bank,
+                l.TransactionType,
+                l.Refno,
+                l.Paxname,
+                l.Reftype,
+                l.Invno,
+                l.Debit,
+                l.Credit,
+                l.Balance))
+            .ToList(),
+            rows.Sum(l => l.Debit),
+            rows.Sum(l => l.Credit),
+            // Running balance: the last line's balance (the closing figure the
+            // legacy page's final row shows).
+            rows.LastOrDefault()?.Balance);
+    }
+
+    /// <summary>statusID → description lookup for the status column rendering.</summary>
+    private async Task<Dictionary<int, string>> StatusDescriptionsAsync(CancellationToken ct)
+        => await _db.Statuses.AsNoTracking()
+            .Where(s => s.Description != null)
+            .ToDictionaryAsync(s => s.StatusId, s => s.Description!, ct);
+
     private async Task<IdentityIntegration.VisaFusionUser?> FindLinkedUserAsync(
         int agentId, CancellationToken ct)
     {

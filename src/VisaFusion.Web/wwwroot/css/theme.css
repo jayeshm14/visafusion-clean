@@ -384,6 +384,23 @@ textarea:focus-visible,
     border: 1px solid var(--vf-color-danger);
 }
 
+/* ---- Utility classes ---- */
+
+.vf-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.vf-list li {
+    margin-bottom: var(--vf-space-2);
+}
+
+.vf-numeric {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
 /* ---- Responsive: narrow the shell to a top nav under the breakpoint ---- */
 
 @media (max-width: calc(var(--vf-breakpoint-lg) - 1px)) {

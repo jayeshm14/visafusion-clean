@@ -477,13 +477,43 @@ public partial class Program
                 AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             });
 
-        // FR-016 own-record rule: the handler validates the route id against
-        // the caller's claim-bound AgentId (mismatch → 403). The business
-        // payload lands with the Agent portal feature (SPEC-0007 US4, T030).
-        app.MapPut("/api/v1/agents/{id:int}/self", (HttpContext ctx, int id) => SecuredPlaceholderEndpoint.HandleOwnAgent(ctx, id))
+        // Agent portal routes (SPEC-0007 US4, FR-017..021, AC-012..015;
+        // contracts/agents-api.md §2/§3/§3a/§4). The AgentSelf/AgentLedger
+        // policies admit agt/emp/adm/su; the handlers enforce the own-agent
+        // scoping rule (BR-007/BR-008) against the claim-bound AgentId — agt
+        // callers may only read/update their own record, emp/adm/su may read
+        // any (CHK026: an agt without a linked AgentId claim is denied 403).
+        app.MapGet("/api/v1/agents/{id:int}/entries", (HttpContext ctx, IAgentService agents, int id) =>
+            AgentsEndpoint.GetEntriesAsync(ctx, agents, id))
             .RequireAuthorization(new AuthorizeAttribute
             {
-                Roles = "agt",
+                Policy = AuthorizationPolicies.AgentSelf,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapGet("/api/v1/agents/{id:int}/statuses", (HttpContext ctx, IAgentService agents, int id) =>
+            AgentsEndpoint.GetStatusesAsync(ctx, agents, id))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.AgentSelf,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapGet("/api/v1/agents/{id:int}/statement", (HttpContext ctx, IAgentService agents, int id) =>
+            AgentsEndpoint.GetStatementAsync(ctx, agents, id))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.AgentLedger,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        // FR-020 own-record update (contract §2): the handler validates the
+        // route id against the caller's claim-bound AgentId (mismatch → 403).
+        app.MapPut("/api/v1/agents/{id:int}/self", (HttpContext ctx, IAgentService agents, int id) =>
+            AgentsEndpoint.UpdateSelfAsync(ctx, agents, id))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.AgentSelf,
                 AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             });
 

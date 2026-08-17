@@ -122,9 +122,10 @@ public class SecuredWriteRoutesTests : IClassFixture<VisaFusionWebApplicationFac
         // The three /api/v1/entries* rows were removed on SPEC-0006 T027/T028
         // (implemented; covered by EntriesRbacTests T024), the
         // PUT /api/v1/agents/{id} row on SPEC-0007 T014 (implemented; covered
-        // by AgentRbacTests), and the security-day open/close rows on SPEC-0007
-        // T025 (implemented; covered by the SecurityDay functional tests).
-        yield return new object[] { HttpMethod.Put, "/api/v1/agents/5771/self", new[] { "agt" }, true };
+        // by AgentRbacTests), the security-day open/close rows on SPEC-0007
+        // T025 (implemented; covered by the SecurityDay functional tests), and
+        // the PUT /api/v1/agents/{id}/self row on SPEC-0007 T030 (implemented;
+        // covered by the Agent portal functional tests).
         yield return new object[] { HttpMethod.Post, "/api/v1/billing/entries", new[] { "emp", "adm", "su" }, false };
         yield return new object[] { HttpMethod.Post, "/api/v1/holidays", new[] { "adm", "su" }, false };
         yield return new object[] { HttpMethod.Delete, "/api/v1/holidays/5", new[] { "adm", "su" }, false };

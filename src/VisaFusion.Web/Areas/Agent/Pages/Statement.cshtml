@@ -1,0 +1,75 @@
+@page
+@model VisaFusion.Web.Areas.Agent.Pages.StatementModel
+@{
+    ViewData["Title"] = "Statement";
+    ViewData["UseSidebar"] = true;
+}
+
+@section SidebarNav {
+    <a asp-area="Agent" asp-page="/Index">Portal home</a>
+    <a asp-area="Agent" asp-page="/Entries">My entries</a>
+    <a asp-area="Agent" asp-page="/Statuses">Passenger statuses</a>
+    <a asp-area="Agent" asp-page="/Statement" aria-current="page">Statement</a>
+    <a asp-area="Agent" asp-page="/Account">My account</a>
+}
+
+<div class="vf-content">
+    <h1>Statement</h1>
+
+    @if (Model.HasNoLinkedAgent)
+    {
+        <div class="vf-alert vf-alert-danger" role="alert">
+            This account has no linked agent (CHK026). Contact the office to have
+            an agent bound to this login before using the portal.
+        </div>
+    }
+    else
+    {
+        <div class="vf-card">
+            @if (Model.Result!.Items.Count == 0)
+            {
+                <p>No ledger entries for this agent.</p>
+            }
+            else
+            {
+                <table class="vf-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Ref no.</th>
+                            <th scope="col">Passenger</th>
+                            <th scope="col">Voucher</th>
+                            <th scope="col" class="vf-numeric">Debit</th>
+                            <th scope="col" class="vf-numeric">Credit</th>
+                            <th scope="col" class="vf-numeric">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var line in Model.Result.Items)
+                        {
+                            <tr>
+                                <td>@(line.Date?.ToString("yyyy-MM-dd") ?? "—")</td>
+                                <td>@(string.IsNullOrWhiteSpace(line.TransactionType) ? "—" : line.TransactionType)</td>
+                                <td>@(line.Refno?.ToString() ?? "—")</td>
+                                <td>@(string.IsNullOrWhiteSpace(line.Paxname) ? "—" : line.Paxname)</td>
+                                <td>@(string.IsNullOrWhiteSpace(line.Reftype) ? "—" : line.Reftype + (line.Invno.HasValue ? "/" + line.Invno : ""))</td>
+                                <td class="vf-numeric">@(line.Debit?.ToString("N2") ?? "—")</td>
+                                <td class="vf-numeric">@(line.Credit?.ToString("N2") ?? "—")</td>
+                                <td class="vf-numeric">@(line.Balance?.ToString("N2") ?? "—")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th scope="row" colspan="5">Totals</th>
+                            <td class="vf-numeric">@(Model.Result.TotalDebits?.ToString("N2") ?? "—")</td>
+                            <td class="vf-numeric">@(Model.Result.TotalCredits?.ToString("N2") ?? "—")</td>
+                            <td class="vf-numeric">@(Model.Result.Balance?.ToString("N2") ?? "—")</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            }
+        </div>
+    }
+</div>

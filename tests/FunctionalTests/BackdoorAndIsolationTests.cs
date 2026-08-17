@@ -5,6 +5,8 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -23,7 +25,8 @@ namespace VisaFusion.FunctionalTests;
 ///   route: responses are byte-identical to requests without them.
 /// - Agent isolation (FR-016/§17): an `agt` principal requesting another
 ///   agent's id on the own-record route yields 403, never the other agent's
-///   data; the own id yields the 501 placeholder.
+///   data; the own id with a valid body updates the agent's own record
+///   (SPEC-0007 US4, FR-020).
 /// </summary>
 public class BackdoorAndIsolationTests : IClassFixture<VisaFusionWebApplicationFactory>
 {
@@ -91,17 +94,83 @@ public class BackdoorAndIsolationTests : IClassFixture<VisaFusionWebApplicationF
     }
 
     [Fact]
-    public async Task Agent_Requesting_Own_Id_Returns_501()
+    public async Task Agent_Requesting_Own_Id_With_Valid_Body_Returns_200()
     {
-        // Own record: the claim-bound AgentId (5771) equals the route id → the
-        // placeholder 501 (the business payload lands with the Agent
-        // self-service module feature).
-        var request = new HttpRequestMessage(HttpMethod.Put, "/api/v1/agents/5771/self");
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", CreateTestToken(agentId: 5771));
+        // Own record: the claim-bound AgentId equals the route id → the
+        // implemented self-update handler (SPEC-0007 US4, FR-020) updates the
+        // agent's own record. The stub is seeded through the API surface (the
+        // same convention as AgentRbacTests) so the update resolves.
+        var adminToken = MintToken(IdentityIntegration.Roles.Admin);
+        var create = new HttpRequestMessage(HttpMethod.Post, "/api/v1/agents");
+        create.Headers.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
+        create.Content = JsonContent.Create(new
+        {
+            companyname = "Self Update Co",
+            username = $"self-{Guid.NewGuid():N}",
+            password = "Str0ngPass!",
+        });
+        var createResponse = await _client.SendAsync(create);
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
+        var created = await createResponse.Content.ReadFromJsonAsync<JsonElement>();
+        var agentId = created.GetProperty("id").GetInt32();
+
+        var request = new HttpRequestMessage(HttpMethod.Put, $"/api/v1/agents/{agentId}/self");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", CreateTestToken(agentId: agentId));
+        request.Content = JsonContent.Create(new { city = "Pune" });
 
         var response = await _client.SendAsync(request);
 
-        Assert.Equal(HttpStatusCode.NotImplemented, response.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    private string MintToken(string role)
+    {
+        var userName = $"backdoor-{role}-{Guid.NewGuid():N}";
+        SeedUser(userName, role);
+        return CreateTestToken(userName, role);
+    }
+
+    private string CreateTestToken(string userName, string role)
+    {
+        var jwtKey = _factory.Services.GetService(typeof(IConfiguration)) is IConfiguration config
+            ? config["Jwt:Key"]
+            : null;
+        jwtKey ??= "CHANGE_ME_development_only_do_not_use_in_production_0123456789";
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.Name, userName),
+            new Claim(ClaimTypes.Role, role),
+        };
+        var token = new JwtSecurityToken(
+            issuer: "VisaFusion",
+            audience: "VisaFusion.Api",
+            claims: claims,
+            expires: DateTime.UtcNow.AddHours(1),
+            signingCredentials: credentials);
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    private void SeedUser(string userName, string role)
+    {
+        using var scope = _factory.Services.CreateScope();
+        var userManager = scope.ServiceProvider
+            .GetRequiredService<UserManager<IdentityIntegration.VisaFusionUser>>();
+
+        var user = new IdentityIntegration.VisaFusionUser
+        {
+            UserName = userName,
+            Email = $"{userName}@test.local",
+        };
+        var createResult = userManager.CreateAsync(user, "TestPass123!").GetAwaiter().GetResult();
+        Assert.True(createResult.Succeeded,
+            string.Join("; ", createResult.Errors.Select(e => e.Description)));
+        var roleResult = userManager.AddToRoleAsync(user, role).GetAwaiter().GetResult();
+        Assert.True(roleResult.Succeeded,
+            string.Join("; ", roleResult.Errors.Select(e => e.Description)));
     }
 
     private string CreateTestToken(int agentId)

@@ -1,0 +1,90 @@
+@page
+@model VisaFusion.Web.Areas.Agent.Pages.EntriesModel
+@{
+    ViewData["Title"] = "My entries";
+    ViewData["UseSidebar"] = true;
+}
+
+@section SidebarNav {
+    <a asp-area="Agent" asp-page="/Index">Portal home</a>
+    <a asp-area="Agent" asp-page="/Entries" aria-current="page">My entries</a>
+    <a asp-area="Agent" asp-page="/Statuses">Passenger statuses</a>
+    <a asp-area="Agent" asp-page="/Statement">Statement</a>
+    <a asp-area="Agent" asp-page="/Account">My account</a>
+}
+
+<div class="vf-content">
+    <h1>My entries</h1>
+
+    @if (Model.HasNoLinkedAgent)
+    {
+        <div class="vf-alert vf-alert-danger" role="alert">
+            This account has no linked agent (CHK026). Contact the office to have
+            an agent bound to this login before using the portal.
+        </div>
+    }
+    else
+    {
+        <div class="vf-card">
+            <form method="get">
+                <div class="vf-form-group" style="max-width: 28rem;">
+                    <label class="vf-form-label" asp-for="Q">Search by passenger name or ref no.</label>
+                    <input class="vf-form-control" asp-for="Q" placeholder="e.g. passenger name or 12345" />
+                </div>
+                <button type="submit" class="vf-btn vf-btn-primary">Search</button>
+                <a class="vf-btn vf-btn-secondary" href="/Agent/Entries">Clear</a>
+            </form>
+        </div>
+
+        <div class="vf-card">
+            @if (Model.Result!.Items.Count == 0)
+            {
+                <p>No entries found.@(string.IsNullOrWhiteSpace(Model.Q) ? "" : " Try a different search term.")</p>
+            }
+            else
+            {
+                <table class="vf-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Ref no.</th>
+                            <th scope="col">Passenger</th>
+                            <th scope="col">Travel date</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var entry in Model.Result.Items)
+                        {
+                            <tr>
+                                <td>@entry.Refno</td>
+                                <td>@(string.IsNullOrWhiteSpace(entry.Paxname) ? "—" : entry.Paxname)</td>
+                                <td>@(entry.Traveldate?.ToString("yyyy-MM-dd") ?? "—")</td>
+                                <td>@(string.IsNullOrWhiteSpace(entry.StatusDescription) ? "—" : entry.StatusDescription)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+
+        @if (Model.Result.Total > 0)
+        {
+            var totalPages = (int)Math.Ceiling(Model.Result.Total / 50.0);
+            <nav aria-label="Entries pages">
+                <p>
+                    Page @Model.PageNumber of @totalPages (@Model.Result.Total entries)
+                </p>
+                <p>
+                    @if (Model.PageNumber > 1)
+                    {
+                        <a class="vf-btn vf-btn-secondary" href="/Agent/Entries?page=@(Model.PageNumber - 1)&q=@Uri.EscapeDataString(Model.Q ?? string.Empty)">Previous</a>
+                    }
+                    @if (Model.PageNumber < totalPages)
+                    {
+                        <a class="vf-btn vf-btn-secondary" href="/Agent/Entries?page=@(Model.PageNumber + 1)&q=@Uri.EscapeDataString(Model.Q ?? string.Empty)">Next</a>
+                    }
+                </p>
+            </nav>
+        }
+    }
+</div>
