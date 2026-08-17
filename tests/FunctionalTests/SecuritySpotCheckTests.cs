@@ -61,12 +61,13 @@ public class SecuritySpotCheckTests : IClassFixture<VisaFusionWebApplicationFact
     }
 
     [Theory]
-    [InlineData("/api/v1/admin/users")]
     [InlineData("/api/v1/agents/1/password")]
+    [InlineData("/api/v1/admin/unknown-path")]
     public async Task Deferred_Admin_And_Agent_Password_Routes_Do_Not_Exist(string path)
     {
-        // secured-write-routes.md §3: admin user-management and agent
-        // password-set are deferred — the routes must 404, not half-exist.
+        // secured-write-routes.md §3: the agent password-set route is still
+        // deferred and unknown admin paths are never half-built — they must
+        // 404, not half-exist.
         var response = await _client.GetAsync(path);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);

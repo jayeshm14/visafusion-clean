@@ -1,0 +1,93 @@
+@page
+@model VisaFusion.Web.Areas.Admin.Pages.Agents.ListModel
+@{
+    ViewData["Title"] = "Agents";
+    ViewData["UseSidebar"] = true;
+}
+
+@section SidebarNav {
+    <a asp-area="Admin" asp-page="/Agents/List" aria-current="page">Agents</a>
+}
+
+<div class="vf-content">
+    <h1>Agents</h1>
+
+    <div class="vf-card">
+        <form method="get">
+            <div class="vf-form-group" style="max-width: 28rem;">
+                <label class="vf-form-label" asp-for="Q">Search by company name</label>
+                <input class="vf-form-control" asp-for="Q" placeholder="e.g. Acme Travels" />
+            </div>
+            <button type="submit" class="vf-btn vf-btn-primary">Search</button>
+            <a class="vf-btn vf-btn-secondary" href="/Admin/Agents/List">Clear</a>
+        </form>
+    </div>
+
+    <div class="vf-card">
+        @if (Model.Result.Items.Count == 0)
+        {
+            <p>No agents found.@(string.IsNullOrWhiteSpace(Model.Q) ? "" : " Try a different search term.")</p>
+        }
+        else
+        {
+            <table class="vf-table">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Company</th>
+                        <th scope="col">City</th>
+                        <th scope="col">Phone</th>
+                        <th scope="col">Status</th>
+                        <th scope="col"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var agent in Model.Result.Items)
+                    {
+                        <tr>
+                            <td>@agent.Id</td>
+                            <td>@(string.IsNullOrWhiteSpace(agent.Companyname) ? "—" : agent.Companyname)</td>
+                            <td>@(string.IsNullOrWhiteSpace(agent.City) ? "—" : agent.City)</td>
+                            <td>@(string.IsNullOrWhiteSpace(agent.Phoneno) ? "—" : agent.Phoneno)</td>
+                            <td>
+                                @if (agent.Active == "Y")
+                                {
+                                    <span class="vf-badge vf-badge-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="vf-badge vf-badge-danger">Deactivated</span>
+                                }
+                            </td>
+                            <td>
+                                <a href="/Admin/Agents/Detail?id=@agent.Id">View</a>
+                                &nbsp;|&nbsp;
+                                <a href="/Admin/Agents/Edit?id=@agent.Id">Edit</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    @if (Model.Result.Total > 0)
+    {
+        var totalPages = (int)Math.Ceiling(Model.Result.Total / 50.0);
+        <nav aria-label="Agent list pages">
+            <p>
+                Page @Model.PageNumber of @totalPages (@Model.Result.Total agents)
+            </p>
+            <p>
+                @if (Model.PageNumber > 1)
+                {
+                    <a class="vf-btn vf-btn-secondary" href="/Admin/Agents/List?page=@(Model.PageNumber - 1)&q=@Uri.EscapeDataString(Model.Q ?? string.Empty)">Previous</a>
+                }
+                @if (Model.PageNumber < totalPages)
+                {
+                    <a class="vf-btn vf-btn-secondary" href="/Admin/Agents/List?page=@(Model.PageNumber + 1)&q=@Uri.EscapeDataString(Model.Q ?? string.Empty)">Next</a>
+                }
+            </p>
+        </nav>
+    }
+</div>

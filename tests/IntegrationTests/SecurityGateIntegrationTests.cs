@@ -87,8 +87,11 @@ public class SecurityGateIntegrationTests
                 SecurityGateDecision.RejectedNotOpened,
                 await EvaluateAsync(connection, date, EmployeeRoles));
 
-            // Case 3: open row (closingtime IS NULL) → allowed.
-            await InsertSecurityRowAsync(connection, date, closingTime: null);
+            // Case 3: open row (closingtime IS NULL) → allowed. The unique
+            // date1 index (SPEC-0007 BR-003/CHK022) allows exactly one row per
+            // date, so "open" is modelled by reopening the Case 2 row
+            // (closingtime → NULL) — never a second row for the same date.
+            await ReopenSecurityRowAsync(connection, date);
             Assert.Equal(
                 SecurityGateDecision.Allowed,
                 await EvaluateAsync(connection, date, EmployeeRoles));
@@ -126,6 +129,20 @@ public class SecurityGateIntegrationTests
         cmd.Parameters.AddWithValue("@openby", TestOpenBy);
         cmd.Parameters.AddWithValue("@closingtime", (object?)closingTime ?? DBNull.Value);
         cmd.Parameters.AddWithValue("@closedby", closingTime.HasValue ? TestOpenBy : (object)DBNull.Value);
+        await cmd.ExecuteNonQueryAsync();
+    }
+
+    private static async Task ReopenSecurityRowAsync(SqlConnection connection, DateTime date)
+    {
+        // Reopens the test row (closingtime/closedby → NULL) so the same date
+        // models the open state without a second row (unique date1, BR-003).
+        await using var cmd = connection.CreateCommand();
+        cmd.CommandText = """
+            UPDATE [security] SET [closingtime] = NULL, [closedby] = NULL
+            WHERE [date1] = @date1 AND [openby] = @openby
+            """;
+        cmd.Parameters.AddWithValue("@date1", date);
+        cmd.Parameters.AddWithValue("@openby", TestOpenBy);
         await cmd.ExecuteNonQueryAsync();
     }
 

@@ -1,22 +1,92 @@
+@using System.Security.Claims
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - VisaFusion</title>
+    <link rel="stylesheet" href="~/css/tokens.css" />
+    <link rel="stylesheet" href="~/css/theme.css" />
 </head>
 <body>
-    <header>
-        <nav>
-            <a href="/">Home</a>
-        </nav>
-    </header>
-    <main>
-        @RenderBody()
-    </main>
-    <footer>
-        <p>&copy; VisaFusion</p>
-    </footer>
+    @{
+        // Shell selection (SPEC-0007 T009, R-003; contracts/ui-contract.md §1):
+        // admin/agent surfaces use the sidebar + topbar shell, public/auth
+        // surfaces use the top-nav layout. Pages opt in with
+        // ViewData["UseSidebar"] = true; authenticated pages default to the
+        // sidebar shell (the admin/agent experience), anonymous pages (login,
+        // register, public site) default to the top-nav.
+        var isAuthenticated = User.Identity?.IsAuthenticated == true;
+        var useSidebar = (bool?)ViewData["UseSidebar"] ?? isAuthenticated;
+        var userName = User.Identity?.Name;
+        var role = User.FindFirstValue(ClaimTypes.Role);
+    }
+
+    <a class="vf-skip-link" href="#vf-content">Skip to main content</a>
+
+    @if (useSidebar)
+    {
+        <div class="vf-shell">
+            <aside class="vf-sidebar" aria-label="Primary">
+                <a class="vf-sidebar-brand" asp-page="/Index">VisaFusion</a>
+                <nav class="vf-sidebar-nav" aria-label="Main navigation">
+                    <a asp-page="/Index">Home</a>
+                    @if (isAuthenticated)
+                    {
+                        <a asp-page="/Auth/ChangePassword">Change password</a>
+                    }
+                    @await RenderSectionAsync("SidebarNav", required: false)
+                </nav>
+            </aside>
+            <div class="vf-main">
+                <header class="vf-topbar">
+                    <div aria-hidden="true"></div>
+                    @if (isAuthenticated)
+                    {
+                        <div class="vf-topbar-user">
+                            <span>@userName</span>
+                            @if (!string.IsNullOrEmpty(role))
+                            {
+                                <span class="vf-role">@role</span>
+                            }
+                        </div>
+                    }
+                </header>
+                <main id="vf-content" class="vf-content" tabindex="-1">
+                    @RenderBody()
+                </main>
+                <footer class="vf-footer">
+                    &copy; @DateTime.Now.Year VisaFusion
+                </footer>
+            </div>
+        </div>
+    }
+    else
+    {
+        <header class="vf-topnav">
+            <a class="vf-topnav-brand" asp-page="/Index">VisaFusion</a>
+            <nav class="vf-topnav-links" aria-label="Main navigation">
+                @if (isAuthenticated)
+                {
+                    <a asp-page="/Auth/ChangePassword">Change password</a>
+                }
+                else
+                {
+                    <a asp-page="/Auth/Login">Log in</a>
+                    <a asp-page="/Auth/Register">Register</a>
+                }
+            </nav>
+        </header>
+        <main id="vf-content" tabindex="-1">
+            <div class="vf-content">
+                @RenderBody()
+            </div>
+        </main>
+        <footer class="vf-footer">
+            &copy; @DateTime.Now.Year VisaFusion
+        </footer>
+    }
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

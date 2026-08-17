@@ -1,0 +1,145 @@
+@page
+@model VisaFusion.Web.Areas.Admin.Pages.Agents.EditModel
+@{
+    ViewData["Title"] = "Edit agent";
+    ViewData["UseSidebar"] = true;
+}
+
+@section SidebarNav {
+    <a asp-area="Admin" asp-page="/Agents/List" aria-current="page">Agents</a>
+}
+
+<div class="vf-content">
+    <h1>Edit agent @Model.Id</h1>
+
+    @if (Model.IsNotFound)
+    {
+        <div class="vf-alert vf-alert-danger" role="alert">
+            Agent @Model.Id was not found.
+        </div>
+        <a class="vf-btn vf-btn-secondary" href="/Admin/Agents/List">Back to agents</a>
+    }
+    else
+    {
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="vf-validation-summary-errors"></div>
+
+            <div class="vf-card">
+                <h2>Company</h2>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="Companyname">Company name</label>
+                    <input class="vf-form-control" asp-for="Companyname" />
+                </div>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="Description">Description</label>
+                    <input class="vf-form-control" asp-for="Description" />
+                </div>
+            </div>
+
+            <div class="vf-card">
+                <h2>Address</h2>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="Street1">Street 1</label>
+                    <input class="vf-form-control" asp-for="Street1" />
+                </div>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="Street2">Street 2</label>
+                    <input class="vf-form-control" asp-for="Street2" />
+                </div>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="Area">Area</label>
+                    <input class="vf-form-control" asp-for="Area" />
+                </div>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="City">City</label>
+                    <input class="vf-form-control" asp-for="City" />
+                </div>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="Pincode">PIN code</label>
+                    <input class="vf-form-control" asp-for="Pincode" />
+                </div>
+            </div>
+
+            <div class="vf-card">
+                <h2>Contact</h2>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="Phoneno">Phone</label>
+                    <input class="vf-form-control" asp-for="Phoneno" />
+                </div>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="Faxno">Fax</label>
+                    <input class="vf-form-control" asp-for="Faxno" />
+                </div>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="Emailid">Email</label>
+                    <input class="vf-form-control" asp-for="Emailid" type="email" />
+                </div>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="Smsno">SMS number</label>
+                    <input class="vf-form-control" asp-for="Smsno" />
+                </div>
+            </div>
+
+            <div class="vf-card">
+                <h2>People</h2>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="Directorname">Director</label>
+                    <input class="vf-form-control" asp-for="Directorname" />
+                </div>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="DirectorPH">Director phone</label>
+                    <input class="vf-form-control" asp-for="DirectorPH" />
+                </div>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="AcMgrPH">Accounts manager phone</label>
+                    <input class="vf-form-control" asp-for="AcMgrPH" />
+                </div>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="VisaInchargeName">Visa in-charge</label>
+                    <input class="vf-form-control" asp-for="VisaInchargeName" />
+                </div>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="VisaInchargePH">Visa in-charge phone</label>
+                    <input class="vf-form-control" asp-for="VisaInchargePH" />
+                </div>
+            </div>
+
+            <div class="vf-card">
+                <h2>Financial</h2>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="Acno">Account number</label>
+                    <input class="vf-form-control" asp-for="Acno" />
+                </div>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="Payment">Payment</label>
+                    <input class="vf-form-control" asp-for="Payment" />
+                </div>
+            </div>
+
+            <div class="vf-card">
+                <h2>Memberships</h2>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="TAAI">TAAI</label>
+                    <input class="vf-form-control" asp-for="TAAI" />
+                </div>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="TAFI">TAFI</label>
+                    <input class="vf-form-control" asp-for="TAFI" />
+                </div>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="Membership">Membership</label>
+                    <input class="vf-form-control" asp-for="Membership" />
+                </div>
+                <div class="vf-form-group">
+                    <label class="vf-form-label" asp-for="IATA">IATA</label>
+                    <input class="vf-form-control" asp-for="IATA" />
+                </div>
+            </div>
+
+            <p>
+                <button type="submit" class="vf-btn vf-btn-primary">Save changes</button>
+                <a class="vf-btn vf-btn-secondary" href="/Admin/Agents/Detail?id=@Model.Id">Cancel</a>
+            </p>
+        </form>
+    }
+</div>

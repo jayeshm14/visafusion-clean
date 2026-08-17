@@ -1,0 +1,129 @@
+@page
+@model VisaFusion.Web.Areas.Admin.Pages.Agents.DetailModel
+@{
+    ViewData["Title"] = "Agent detail";
+    ViewData["UseSidebar"] = true;
+}
+
+@section SidebarNav {
+    <a asp-area="Admin" asp-page="/Agents/List" aria-current="page">Agents</a>
+}
+
+<div class="vf-content">
+    <h1>Agent detail</h1>
+
+    @if (Model.IsNotFound)
+    {
+        <div class="vf-alert vf-alert-danger" role="alert">
+            Agent @Model.Id was not found.
+        </div>
+        <a class="vf-btn vf-btn-secondary" href="/Admin/Agents/List">Back to agents</a>
+    }
+    else
+    {
+        @if (Model.OutcomeMessage is not null)
+        {
+            <div class="vf-alert vf-alert-success" role="alert">@Model.OutcomeMessage</div>
+        }
+
+        <div class="vf-card">
+            <p>
+                @if (Model.Agent!.Active == "Y")
+                {
+                    <span class="vf-badge vf-badge-success">Active</span>
+                }
+                else
+                {
+                    <span class="vf-badge vf-badge-danger">Deactivated</span>
+                }
+            </p>
+
+            <dl>
+                <dt>ID</dt>
+                <dd>@Model.Agent.Id</dd>
+
+                <dt>Company name</dt>
+                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.Companyname) ? "—" : Model.Agent.Companyname)</dd>
+
+                <dt>Description</dt>
+                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.Description) ? "—" : Model.Agent.Description)</dd>
+
+                <dt>Address</dt>
+                <dd>
+                    @(string.IsNullOrWhiteSpace(Model.Agent.Street1) ? "—" : Model.Agent.Street1)
+                    @(string.IsNullOrWhiteSpace(Model.Agent.Street2) ? "" : ", " + Model.Agent.Street2)
+                    @(string.IsNullOrWhiteSpace(Model.Agent.Area) ? "" : ", " + Model.Agent.Area)
+                    @(string.IsNullOrWhiteSpace(Model.Agent.City) ? "" : ", " + Model.Agent.City)
+                    @(string.IsNullOrWhiteSpace(Model.Agent.Pincode) ? "" : " — " + Model.Agent.Pincode)
+                </dd>
+
+                <dt>Phone</dt>
+                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.Phoneno) ? "—" : Model.Agent.Phoneno)</dd>
+
+                <dt>Fax</dt>
+                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.Faxno) ? "—" : Model.Agent.Faxno)</dd>
+
+                <dt>Email</dt>
+                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.Emailid) ? "—" : Model.Agent.Emailid)</dd>
+
+                <dt>SMS number</dt>
+                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.Smsno) ? "—" : Model.Agent.Smsno)</dd>
+
+                <dt>Director</dt>
+                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.Directorname) ? "—" : Model.Agent.Directorname)</dd>
+
+                <dt>Director phone</dt>
+                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.DirectorPH) ? "—" : Model.Agent.DirectorPH)</dd>
+
+                <dt>Accounts manager phone</dt>
+                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.AcMgrPH) ? "—" : Model.Agent.AcMgrPH)</dd>
+
+                <dt>Visa in-charge</dt>
+                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.VisaInchargeName) ? "—" : Model.Agent.VisaInchargeName)</dd>
+
+                <dt>Visa in-charge phone</dt>
+                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.VisaInchargePH) ? "—" : Model.Agent.VisaInchargePH)</dd>
+
+                <dt>Account number</dt>
+                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.Acno) ? "—" : Model.Agent.Acno)</dd>
+
+                <dt>Payment</dt>
+                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.Payment) ? "—" : Model.Agent.Payment)</dd>
+
+                <dt>TAAI</dt>
+                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.TAAI) ? "—" : Model.Agent.TAAI)</dd>
+
+                <dt>TAFI</dt>
+                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.TAFI) ? "—" : Model.Agent.TAFI)</dd>
+
+                <dt>Membership</dt>
+                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.Membership) ? "—" : Model.Agent.Membership)</dd>
+
+                <dt>IATA</dt>
+                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.IATA) ? "—" : Model.Agent.IATA)</dd>
+
+                <dt>Created</dt>
+                <dd>@(Model.Agent.Creationdate?.ToString("yyyy-MM-dd") ?? "—") by @(string.IsNullOrWhiteSpace(Model.Agent.Enteredby) ? "—" : Model.Agent.Enteredby)</dd>
+            </dl>
+        </div>
+
+        <p>
+            <a class="vf-btn vf-btn-secondary" href="/Admin/Agents/List">Back to agents</a>
+            <a class="vf-btn vf-btn-primary" href="/Admin/Agents/Edit?id=@Model.Agent.Id">Edit</a>
+            @if (Model.Agent.Active == "Y")
+            {
+                <form method="post" asp-page-handler="Deactivate" style="display: inline;">
+                    <input type="hidden" asp-for="Id" />
+                    <button type="submit" class="vf-btn vf-btn-danger">Deactivate</button>
+                </form>
+            }
+            else
+            {
+                <form method="post" asp-page-handler="Reactivate" style="display: inline;">
+                    <input type="hidden" asp-for="Id" />
+                    <button type="submit" class="vf-btn vf-btn-primary">Reactivate</button>
+                </form>
+            }
+        </p>
+    }
+</div>

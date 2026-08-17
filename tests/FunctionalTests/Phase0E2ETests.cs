@@ -32,18 +32,36 @@ public class Phase0E2ETests : IClassFixture<VisaFusionWebApplicationFactory>
 
     [Theory]
     [InlineData("/forms/Argentina.pdf")]
-    [InlineData("/css/adminlte.css")]
-    [InlineData("/js/adminlte.js")]
+    [InlineData("/css/tokens.css")]
+    [InlineData("/css/theme.css")]
     [InlineData("/images/1.jpg")]
     [InlineData("/fonts/source-sans-3-latin-400-normal.woff2")]
     [InlineData("/updateimg/abullet3.gif")]
     public async Task Static_Assets_Are_Served_From_The_Self_Hosted_Wwwroot(string assetPath)
     {
         // TS-008 (AC-008/FR-004): no CDN — every legacy asset directory is
-        // served by the single VisaFusion.Web host.
+        // served by the single VisaFusion.Web host. The AdminLTE css/js
+        // entries were replaced by the SPEC-0007 design-token system
+        // (tokens.css/theme.css, T008) after the AdminLTE assets were removed
+        // (T009, AC-008).
         var response = await _client.GetAsync(assetPath);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Theory]
+    [InlineData("/css/adminlte.css")]
+    [InlineData("/css/adminlte.min.css")]
+    [InlineData("/js/adminlte.js")]
+    [InlineData("/js/adminlte.min.js")]
+    public async Task AdminLte_Assets_Are_Removed_And_Not_Served(string assetPath)
+    {
+        // AC-008 (SPEC-0007 T009): the AdminLTE assets were removed from
+        // wwwroot; no rendered page may reference them and the files must not
+        // be served.
+        var response = await _client.GetAsync(assetPath);
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Theory]

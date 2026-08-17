@@ -75,12 +75,14 @@ public class AuthorizationPoliciesTests
     public static IEnumerable<object[]> RoleBasedPolicies()
     {
         // Role sets verbatim from the §4.2 matrix (complete_migration_plan.md §4.2).
+        // UserManagement corrected by DP-001 (SPEC-0007 T004): `adm,emp` — `su`
+        // still passes via the inherited `adm` claim (IdentityClaims.EffectiveRoles).
         yield return new object[] { AuthorizationPolicies.EntryOperations, new[] { IdentityIntegration.Roles.Employee, IdentityIntegration.Roles.Admin, IdentityIntegration.Roles.SuperUser } };
         yield return new object[] { AuthorizationPolicies.AgentSelf, new[] { IdentityIntegration.Roles.Agent, IdentityIntegration.Roles.Employee, IdentityIntegration.Roles.Admin, IdentityIntegration.Roles.SuperUser } };
         yield return new object[] { AuthorizationPolicies.AgentLedger, new[] { IdentityIntegration.Roles.Agent, IdentityIntegration.Roles.Employee, IdentityIntegration.Roles.Admin, IdentityIntegration.Roles.SuperUser } };
         yield return new object[] { AuthorizationPolicies.BillingOperations, new[] { IdentityIntegration.Roles.Employee, IdentityIntegration.Roles.Admin, IdentityIntegration.Roles.SuperUser } };
         yield return new object[] { AuthorizationPolicies.Search, new[] { IdentityIntegration.Roles.Agent, IdentityIntegration.Roles.Employee, IdentityIntegration.Roles.Admin, IdentityIntegration.Roles.SuperUser } };
-        yield return new object[] { AuthorizationPolicies.UserManagement, new[] { IdentityIntegration.Roles.Admin, IdentityIntegration.Roles.SuperUser } };
+        yield return new object[] { AuthorizationPolicies.UserManagement, new[] { IdentityIntegration.Roles.Admin, IdentityIntegration.Roles.Employee } };
         yield return new object[] { AuthorizationPolicies.HolidayAdmin, new[] { IdentityIntegration.Roles.Admin, IdentityIntegration.Roles.SuperUser } };
         yield return new object[] { AuthorizationPolicies.SecurityGate, new[] { IdentityIntegration.Roles.Admin, IdentityIntegration.Roles.SuperUser } };
         yield return new object[] { AuthorizationPolicies.PasswordSelf, new[] { IdentityIntegration.Roles.Agent, IdentityIntegration.Roles.Employee, IdentityIntegration.Roles.Admin, IdentityIntegration.Roles.SuperUser } };

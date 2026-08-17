@@ -34,6 +34,7 @@ public sealed class VisaEntryDbContext : DbContext
     public DbSet<SmsQueue> SmsQueues => Set<SmsQueue>();
     public DbSet<Agent> Agents => Set<Agent>();
     public DbSet<SecurityDay> SecurityDays => Set<SecurityDay>();
+    public DbSet<AdminAuditLog> AdminAuditLogs => Set<AdminAuditLog>();
     public DbSet<MasterBalance> MasterBalances => Set<MasterBalance>();
     public DbSet<Bank> Banks => Set<Bank>();
     public DbSet<Holiday> Holidays => Set<Holiday>();
@@ -77,6 +78,7 @@ public sealed class VisaEntryDbContext : DbContext
         ConfigureSmsQueue(modelBuilder);
         ConfigureAgent(modelBuilder);
         ConfigureSecurityDay(modelBuilder);
+        ConfigureAdminAuditLog(modelBuilder);
         ConfigureMasterBalance(modelBuilder);
         ConfigureBank(modelBuilder);
         ConfigureHoliday(modelBuilder);
@@ -370,6 +372,29 @@ public sealed class VisaEntryDbContext : DbContext
         e.Property(x => x.Openby).HasColumnName("openby");
         e.Property(x => x.Closingtime).HasColumnName("closingtime");
         e.Property(x => x.Closedby).HasColumnName("closedby");
+        // Unique date1 (SPEC-0007 BR-003/CHK022): makes concurrent opens for
+        // the same date resolve to a single winner (the loser gets 409).
+        // Verified safe against live data — the migrated `security` table is
+        // currently empty (0 rows; the 1,461 legacy rows are not yet migrated).
+        e.HasIndex(x => x.Date1).IsUnique().HasDatabaseName("IX_security_date1");
+    }
+
+    private static void ConfigureAdminAuditLog(ModelBuilder mb)
+    {
+        var e = mb.Entity<AdminAuditLog>().ToTable("adminauditlog");
+        e.HasKey(x => x.Id);
+        e.Property(x => x.Id).HasColumnName("Id").ValueGeneratedOnAdd();
+        e.Property(x => x.EventType).HasColumnName("EventType").HasMaxLength(64);
+        e.Property(x => x.ActorUserId).HasColumnName("ActorUserId").HasMaxLength(450);
+        e.Property(x => x.ActorUserName).HasColumnName("ActorUserName").HasMaxLength(256);
+        e.Property(x => x.TargetUserId).HasColumnName("TargetUserId").HasMaxLength(450);
+        e.Property(x => x.TargetUserName).HasColumnName("TargetUserName").HasMaxLength(256);
+        e.Property(x => x.Role).HasColumnName("Role").HasMaxLength(16);
+        e.Property(x => x.Date).HasColumnName("Date");
+        e.Property(x => x.Detail).HasColumnName("Detail").HasMaxLength(512);
+        // Audit reads filter by event type and time range (spec §19).
+        e.HasIndex(x => x.EventType).HasDatabaseName("IX_adminauditlog_EventType");
+        e.HasIndex(x => x.Date).HasDatabaseName("IX_adminauditlog_Date");
     }
 
     private static void ConfigureMasterBalance(ModelBuilder mb)

@@ -10,6 +10,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
 using VisaFusion.Api;
+using VisaFusion.Api.Application;
 using VisaFusion.Api.Authorization;
 using VisaFusion.Api.Endpoints;
 using VisaFusion.Api.Errors;
@@ -81,7 +82,16 @@ public partial class Program
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
                 options.Password.RequireNonAlphanumeric = false;
-                options.User.RequireUniqueEmail = true;
+                // Email is OPTIONAL for the admin user-creation path
+                // (contracts/admin-api.md §4 — no email field) and the agent
+                // creation path (contracts/agents-api.md §6 — emailid optional).
+                // RequireUniqueEmail=true would make the UserValidator reject a
+                // null email ("Email '' is invalid"), so it is disabled here.
+                // The register flow is unaffected: RegistrationFlow performs its
+                // own format check (EmailAddressAttribute) and duplicate-email
+                // check (FindByEmailAsync → 409) before CreateAsync, and the
+                // UserValidator still validates the format of any NON-null email.
+                options.User.RequireUniqueEmail = false;
             })
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<VisaFusionIdentityDbContext>()
@@ -196,6 +206,20 @@ public partial class Program
         // CoreServiceCollectionExtensions (mirror of the ISecurityGateService
         // precedent).
         builder.Services.AddScoped<IEntryService, EntryService>();
+
+        // Agent lifecycle service (SPEC-0007 T006, US1, FR-001..004/FR-022;
+        // deviation log §8): the shared IAgentService interface lives in Core,
+        // but the implementation coordinates VisaEntryDbContext (Data) with the
+        // Identity store (UserManager) — VisaFusion.Data cannot reference
+        // VisaFusion.Identity (cycle), so the flow is hosted in the Api layer
+        // (RegistrationFlow precedent) and registered here at the composition
+        // root.
+        builder.Services.AddScoped<IAgentService, AgentService>();
+
+        // User-management service (SPEC-0007 T007, US2, FR-006/FR-023, BR-004;
+        // deviation log §8): same placement rationale as IAgentService — the
+        // implementation coordinates the Identity store with the audit log.
+        builder.Services.AddScoped<IUserManagementService, UserManagementService>();
 
         // Authoritative bookable-date rule (SPEC-0006 T020, US4, FR-006, BR-003;
         // deviation log §1): the shared IHolidayService interface lives in Core,
@@ -407,15 +431,55 @@ public partial class Program
         // → 501. AuthenticationSchemes must be explicitly JwtBearer so API
         // requests challenge with a 401 (problem-details) instead of a cookie
         // redirect (the default cookie scheme would redirect to /Auth/Login).
-        app.MapPut("/api/v1/agents/{id:int}", (HttpContext ctx, int id) => SecuredPlaceholderEndpoint.Handle(ctx))
+        // ---- Agents module (SPEC-0007 T014, US1, FR-001..004/FR-022; contracts/agents-api.md) ----
+        // Admin CRUD + lifecycle routes replace the §4.3 placeholders: the
+        // AdminPanel policy (adm/su) enforces the §4.2 matrix server-side, and
+        // the shared IAgentService (Core interface, Api implementation —
+        // deviation log §8) carries all business behavior. The audit actor is
+        // resolved from the validated JWT claims inside the handler (GR-0004).
+        app.MapPost("/api/v1/agents", (HttpContext ctx, IAgentService agents, UserManager<IdentityIntegration.VisaFusionUser> userManager) =>
+            AgentsEndpoint.CreateAsync(ctx, agents, userManager))
             .RequireAuthorization(new AuthorizeAttribute
             {
-                Roles = "adm,su",
+                Policy = AuthorizationPolicies.AdminPanel,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapGet("/api/v1/agents", (HttpContext ctx, IAgentService agents) =>
+            AgentsEndpoint.ListAsync(ctx, agents))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.AdminPanel,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapPut("/api/v1/agents/{id:int}", (HttpContext ctx, IAgentService agents, int id) =>
+            AgentsEndpoint.UpdateAsync(ctx, agents, id))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.AdminPanel,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapPost("/api/v1/agents/{id:int}/deactivate", (HttpContext ctx, IAgentService agents, UserManager<IdentityIntegration.VisaFusionUser> userManager, int id) =>
+            AgentsEndpoint.DeactivateAsync(ctx, agents, userManager, id))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.AdminPanel,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapPost("/api/v1/agents/{id:int}/reactivate", (HttpContext ctx, IAgentService agents, UserManager<IdentityIntegration.VisaFusionUser> userManager, int id) =>
+            AgentsEndpoint.ReactivateAsync(ctx, agents, userManager, id))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.AdminPanel,
                 AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             });
 
         // FR-016 own-record rule: the handler validates the route id against
-        // the caller's claim-bound AgentId (mismatch → 403).
+        // the caller's claim-bound AgentId (mismatch → 403). The business
+        // payload lands with the Agent portal feature (SPEC-0007 US4, T030).
         app.MapPut("/api/v1/agents/{id:int}/self", (HttpContext ctx, int id) => SecuredPlaceholderEndpoint.HandleOwnAgent(ctx, id))
             .RequireAuthorization(new AuthorizeAttribute
             {
@@ -502,6 +566,37 @@ public partial class Program
             .RequireAuthorization(new AuthorizeAttribute
             {
                 Roles = "adm,su",
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        // ---- User management (SPEC-0007 T020, US2, FR-005..007/FR-023, BR-004; contracts/admin-api.md §4/§5/§6) ----
+        // The UserManagement policy (adm/emp — DP-001 correction; su passes via
+        // the inherited adm claim) and the claim-based SuperUserOnly policy
+        // enforce the §4.2 matrix server-side; the shared IUserManagementService
+        // (Core interface, Api implementation — deviation log §8) carries all
+        // business behavior. The audit actor and the actor's roles are resolved
+        // from the validated JWT claims inside the handler (GR-0004).
+        app.MapPost("/api/v1/admin/users", (HttpContext ctx, IUserManagementService users, UserManager<IdentityIntegration.VisaFusionUser> userManager) =>
+            AdminEndpoint.CreateUserAsync(ctx, users, userManager))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.UserManagement,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapPost("/api/v1/admin/superusers", (HttpContext ctx, IUserManagementService users, UserManager<IdentityIntegration.VisaFusionUser> userManager) =>
+            AdminEndpoint.ProvisionSuperUserAsync(ctx, users, userManager))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.SuperUserOnly,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapPost("/api/v1/admin/users/{id:guid}/deactivate", (HttpContext ctx, IUserManagementService users, UserManager<IdentityIntegration.VisaFusionUser> userManager, string id) =>
+            AdminEndpoint.DeactivateUserAsync(ctx, users, userManager, id))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.UserManagement,
                 AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             });
 

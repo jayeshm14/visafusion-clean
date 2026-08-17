@@ -24,6 +24,14 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\VisaFusion.Data\VisaFusion.Data.csproj" />
     <ProjectReference Include="..\..\src\VisaFusion.Migration\VisaFusion.Migration.csproj" />
+    <!--
+      SPEC-0007 T012: the agent-CRUD integration tests exercise the REAL
+      AgentService (VisaFusion.Api.Application, deviation log §8) and the REAL
+      Identity store (VisaFusion.Identity) over SQL Server — the same surface
+      the production host resolves (Web Program.cs composition root).
+    -->
+    <ProjectReference Include="..\..\src\VisaFusion.Api\VisaFusion.Api.csproj" />
+    <ProjectReference Include="..\..\src\VisaFusion.Identity\VisaFusion.Identity.csproj" />
   </ItemGroup>
 
 </Project>

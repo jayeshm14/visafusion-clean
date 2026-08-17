@@ -44,7 +44,7 @@ public static class AuthorizationPolicies
             [AgentLedger] = new[] { IdentityIntegration.Roles.Agent, IdentityIntegration.Roles.Employee, IdentityIntegration.Roles.Admin, IdentityIntegration.Roles.SuperUser },
             [BillingOperations] = new[] { IdentityIntegration.Roles.Employee, IdentityIntegration.Roles.Admin, IdentityIntegration.Roles.SuperUser },
             [Search] = new[] { IdentityIntegration.Roles.Agent, IdentityIntegration.Roles.Employee, IdentityIntegration.Roles.Admin, IdentityIntegration.Roles.SuperUser },
-            [UserManagement] = new[] { IdentityIntegration.Roles.Admin, IdentityIntegration.Roles.SuperUser },
+            [UserManagement] = new[] { IdentityIntegration.Roles.Admin, IdentityIntegration.Roles.Employee },
             [HolidayAdmin] = new[] { IdentityIntegration.Roles.Admin, IdentityIntegration.Roles.SuperUser },
             [SecurityGate] = new[] { IdentityIntegration.Roles.Admin, IdentityIntegration.Roles.SuperUser },
             [PasswordSelf] = new[] { IdentityIntegration.Roles.Agent, IdentityIntegration.Roles.Employee, IdentityIntegration.Roles.Admin, IdentityIntegration.Roles.SuperUser },

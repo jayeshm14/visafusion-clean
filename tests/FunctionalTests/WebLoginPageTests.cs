@@ -213,6 +213,16 @@ public class WebLoginPageTests : IClassFixture<VisaFusionWebApplicationFactory>
             => Task.FromResult(roles.Contains(IdentityIntegration.Roles.Employee)
                 ? SecurityGateDecision.RejectedNotOpened
                 : SecurityGateDecision.Allowed);
+
+        // SPEC-0007 T005: open/close/today surface is a no-op in the hermetic
+        // stub (the write paths are covered by the unit and integration tests).
+        public Task<SecurityDayOpenResult> OpenDayAsync(DateTime date, string openedBy)
+            => Task.FromResult(SecurityDayOpenResult.Opened);
+
+        public Task<SecurityDayCloseResult> CloseDayAsync(DateTime date, string closedBy)
+            => Task.FromResult(SecurityDayCloseResult.Closed);
+
+        public Task<SecurityDayStatus?> GetTodayAsync(DateTime date) => Task.FromResult<SecurityDayStatus?>(null);
     }
 
     private async Task<string> GetAntiforgeryTokenAsync(HttpClient? client = null)

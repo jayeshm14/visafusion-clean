@@ -24,7 +24,9 @@ namespace VisaFusion.FunctionalTests;
 /// The three `/api/v1/entries*` rows from the original 11-route matrix were
 /// removed when SPEC-0006 T027/T028 implemented the Entries endpoints — those
 /// routes now return real payloads and their 5-role matrix is covered by
-/// EntriesRbacTests (T024). The remaining 8 routes (agents, billing, holidays,
+/// EntriesRbacTests (T024). The `PUT /api/v1/agents/{id}` row was removed on
+/// SPEC-0007 T014 (implemented; its adm/su matrix is covered by
+/// AgentRbacTests). The remaining 7 routes (agents/self, billing, holidays,
 /// reports, security-day) are still placeholders.
 ///
 /// Tokens are minted locally with the same development key the host uses
@@ -116,8 +118,9 @@ public class SecuredWriteRoutesTests : IClassFixture<VisaFusionWebApplicationFac
     {
         // Routes + minimum roles verbatim from contracts/secured-write-routes.md §1.
         // The three /api/v1/entries* rows were removed on SPEC-0006 T027/T028
-        // (implemented; covered by EntriesRbacTests T024).
-        yield return new object[] { HttpMethod.Put, "/api/v1/agents/5771", new[] { "adm", "su" }, false };
+        // (implemented; covered by EntriesRbacTests T024) and the
+        // PUT /api/v1/agents/{id} row on SPEC-0007 T014 (implemented; covered
+        // by AgentRbacTests).
         yield return new object[] { HttpMethod.Put, "/api/v1/agents/5771/self", new[] { "agt" }, true };
         yield return new object[] { HttpMethod.Post, "/api/v1/billing/entries", new[] { "emp", "adm", "su" }, false };
         yield return new object[] { HttpMethod.Post, "/api/v1/holidays", new[] { "adm", "su" }, false };

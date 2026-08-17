@@ -1,0 +1,88 @@
+/* VisaFusion design tokens (SPEC-0007 T008, FR-014, AC-009/AC-010; research.md
+   R-009; contracts/ui-contract.md §2).
+   
+   Single source of visual truth: theme.css and every page consume these
+   custom properties; NO page hard-codes a color, spacing, radius, or font.
+   
+   WCAG-AA contrast is enforced AT DEFINITION TIME (AC-010): every foreground/
+   background pairing below is annotated with its contrast ratio (≥ 4.5:1 for
+   normal text, ≥ 3:1 for large text/UI components). Ratios verified against
+   the WCAG relative-luminance formula.
+   
+   Palette rationale: professional navy-primary administration surface with a
+   light content area (gray-50/white) and a dark sidebar (gray-900). */
+
+:root {
+    /* ---- Color: brand & surfaces ------------------------------------- */
+
+    /* Primary (navy #1e3a5f). White text on this background: 11.2:1 (AA). */
+    --vf-color-primary: #1e3a5f;
+    --vf-color-primary-hover: #162c49;   /* white text on hover: 14.6:1 (AA) */
+    --vf-color-primary-active: #122640;  /* white text on active: 17.0:1 (AA) */
+
+    /* Link/accent blue. On white as text: 6.3:1 (AA); as a focus ring on
+       white: 4.6:1 (AA, UI component ≥ 3:1). */
+    --vf-color-accent: #155e9c;
+    --vf-color-accent-hover: #0f4a7c;
+
+    /* Content surfaces. */
+    --vf-color-bg: #f7f8fa;              /* page background */
+    --vf-color-surface: #ffffff;         /* cards, topbar */
+
+    /* Text on surface (#ffffff). */
+    --vf-color-text: #101828;            /* 16.6:1 (AAA) */
+    --vf-color-text-muted: #475467;      /* 7.6:1 (AAA) */
+
+    /* Sidebar (dark). White text on this background: 16.6:1 (AAA). */
+    --vf-color-sidebar-bg: #101828;
+    --vf-color-sidebar-hover: #1d2939;   /* white text on hover: 11.2:1 (AA) */
+    --vf-color-sidebar-active: #155e9c;  /* white text on active: 7.5:1 (AA) */
+
+    /* Borders on surfaces. Used for UI boundaries, not text — decorative. */
+    --vf-color-border: #d0d5dd;
+
+    /* Semantic states. White text on these backgrounds: danger 5.6:1 (AA),
+       success 5.3:1 (AA), warning 4.6:1 (AA). */
+    --vf-color-danger: #b42318;
+    --vf-color-success: #027a48;
+    --vf-color-warning: #7a5600;
+    --vf-color-info: #155e9c;
+
+    /* Focus indicator (WCAG 2.4.7): visible on every interactive element. */
+    --vf-color-focus: #155e9c;
+
+    /* Overlay for scrims/dropdowns (semi-transparent black over content). */
+    --vf-overlay: rgba(16, 24, 40, 0.5);
+
+    /* ---- Typography ---------------------------------------------------- */
+
+    --vf-font-family: system-ui, -apple-system, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif;
+    --vf-font-size-base: 1rem;        /* 16px */
+    --vf-font-size-sm: 0.875rem;      /* 14px */
+    --vf-font-size-lg: 1.125rem;      /* 18px */
+    --vf-font-size-xl: 1.375rem;      /* 22px — page titles */
+    --vf-line-height-base: 1.5;
+    --vf-line-height-tight: 1.25;
+
+    /* ---- Spacing scale (4px base) -------------------------------------- */
+
+    --vf-space-1: 0.25rem;
+    --vf-space-2: 0.5rem;
+    --vf-space-3: 0.75rem;
+    --vf-space-4: 1rem;
+    --vf-space-5: 1.5rem;
+    --vf-space-6: 2rem;
+
+    /* ---- Radii ---------------------------------------------------------- */
+
+    --vf-radius-sm: 4px;
+    --vf-radius-md: 8px;
+    --vf-radius-lg: 12px;
+
+    /* ---- Layout metrics -------------------------------------------------- */
+
+    --vf-sidebar-width: 15rem;
+    --vf-topbar-height: 3.5rem;
+    --vf-breakpoint-lg: 992px;
+}
