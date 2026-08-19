@@ -1,1 +1,2 @@
-*.bak filter=lfs diff=lfs merge=lfs -text
+# Database backups are never stored in git (SQL files are not suited to git;
+# see about-large-files-on-github). Both *.bak and dbBackup/ are also in .gitignore.
