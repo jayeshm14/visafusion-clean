@@ -105,7 +105,7 @@ Runs on **every page** that includes `connection.asp`:
 - Nothing in the app depends on it. Identical block exists in `connectionold.asp`, `Demo\connection.asp`, `udaanuma-dev\connection.asp`, `r&d\connection.asp`.
 
 ### 2.8 MEDIUM — Hardcoded credentials
-`sa`/`sa123` (live, `connection.asp:5`) plus historical prod creds `udaanindia`/`uda3000`, `babita321uma007`, `umHGn3549K`, `rajan1604` (SMS gateway) in plaintext across `connectionweb.asp`, `r&d/*`, `SendSMS*.asp` — with live server IPs.
+`sa`/`[REDACTED]` (live, `connection.asp:5`) plus historical prod creds `udaanindia`/`[REDACTED]`, `[REDACTED]`, `[REDACTED]`, `[REDACTED]` (SMS gateway) in plaintext across `connectionweb.asp`, `r&d/*`, `SendSMS*.asp` — with live server IPs.
 
 ### 2.9 MEDIUM — User-management gaps
 - `newUser.asp` UI dropdown offers adm/emp/agt only, but the POST handler (`addNewUser.asp`) has **no whitelist**.

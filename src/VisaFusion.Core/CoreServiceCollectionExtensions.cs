@@ -20,8 +20,10 @@ public static class CoreServiceCollectionExtensions
         // Placeholder domain services (T036/T037, FR-003). Scoped lifetimes.
         services.AddScoped<IStatusService, StatusService>();
         services.AddScoped<IBillingService, BillingService>();
-        services.AddScoped<ISmsService, SmsService>();
-        services.AddScoped<IEmailService, EmailService>();
+        // ISmsService/IEmailService are NOT registered here (SPEC-0008 T014): their
+        // implementations query VisaEntryDbContext and therefore live in
+        // VisaFusion.Data (HolidayService precedent, research D-7). They are
+        // registered at both composition roots (VisaFusion.Web and VisaFusion.Jobs).
         // IEntryService, ISecurityGateService and IHolidayService are NOT
         // registered here: their implementations query VisaEntryDbContext and
         // therefore live in VisaFusion.Data (approved deviations, deviation

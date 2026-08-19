@@ -1,0 +1,35 @@
+@page
+@model VisaFusion.Web.Areas.Public.Pages.DailyUpdateModel
+@{
+    ViewData["Title"] = "Daily Updates";
+}
+<div class="vf-content">
+    <h1>Daily Updates</h1>
+
+    @if (Model.Entries.Count == 0)
+    {
+        <p>No updates found for this month.</p>
+    }
+    else
+    {
+        <div class="vf-card">
+            <table class="vf-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Update</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var entry in Model.Entries)
+                    {
+                        <tr>
+                            <td>@entry.Entrydate.ToString("dd-MMM-yyyy")</td>
+                            <td>@entry.Description</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

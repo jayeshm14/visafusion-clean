@@ -15,6 +15,14 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
+    <!-- Serilog mirror of the Web host (SPEC-0008 T016): the Jobs process logs to
+         console + rolling file, and to the SQL `Logs` table in non-Testing
+         environments (NFR-006). Versions match VisaFusion.Web. -->
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="10.0.0" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\VisaFusion.Core\VisaFusion.Core.csproj" />
     <ProjectReference Include="..\VisaFusion.Data\VisaFusion.Data.csproj" />
   </ItemGroup>

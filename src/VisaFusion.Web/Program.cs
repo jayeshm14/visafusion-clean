@@ -132,10 +132,14 @@ public partial class Program
         // Fail fast in Production with placeholder/dev-only configuration
         // (T075, MD-3, NFR-004): never run a production host with the committed
         // development JWT key or a localhost/Trusted_Connection connection string.
-        ProductionSecretsGuard.Validate(
-            builder.Environment.EnvironmentName,
-            jwtKey,
-            builder.Configuration.GetConnectionString("DefaultConnection") ?? string.Empty);
+        // Skip validation in Testing environment (functional tests use test keys).
+        if (!string.Equals(builder.Environment.EnvironmentName, "Testing", StringComparison.OrdinalIgnoreCase))
+        {
+            ProductionSecretsGuard.Validate(
+                builder.Environment.EnvironmentName,
+                jwtKey,
+                builder.Configuration.GetConnectionString("DefaultConnection") ?? string.Empty);
+        }
         builder.Services
             .AddAuthentication()
             .AddJwtBearer(options =>
@@ -228,6 +232,15 @@ public partial class Program
         // CoreServiceCollectionExtensions (mirror of the ISecurityGateService
         // precedent).
         builder.Services.AddScoped<IHolidayService, HolidayService>();
+
+        // SPEC-0008 (T015): ISmsService/IEmailService implementations query
+        // VisaEntryDbContext (Data) — registered here at the Web composition root
+        // (HolidayService precedent, research D-7). Dispatch providers default to
+        // log-only mode (owner Q1:C, research D-2).
+        builder.Services.AddScoped<ISmsService, SmsService>();
+        builder.Services.AddScoped<IEmailService, EmailService>();
+        builder.Services.AddScoped<ISmsDispatchProvider, LogOnlySmsDispatchProvider>();
+        builder.Services.AddScoped<IEmailDispatchProvider, LogOnlyEmailDispatchProvider>();
 
         // ---- EF Core over the legacy VisaEntry database (T035, FR-006) ----
         builder.Services.AddDbContext<VisaEntryDbContext>(options =>
@@ -557,6 +570,42 @@ public partial class Program
                 AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             });
 
+        // Notification routes (SPEC-0008 T027, FR-001/FR-004, FR-009;
+        // contracts/notifications-api.md §1/§3): the EntryOperations policy
+        // enforces the emp/adm/su role set; the scheme is explicitly JwtBearer
+        // so API requests challenge with a 401 instead of the cookie redirect
+        // (same convention as the other /api/v1 routes).
+        app.MapPost("/api/v1/notifications/sms", (HttpContext ctx, ISmsService sms) => NotificationsEndpoint.EnqueueSmsAsync(ctx, sms))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.EntryOperations,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapGet("/api/v1/notifications/sms-history", (HttpContext ctx, ISmsService sms) => NotificationsEndpoint.GetSmsHistoryAsync(ctx, sms))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.EntryOperations,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        // Email notification routes (SPEC-0008 T032, FR-002/FR-005, FR-009;
+        // contracts/notifications-api.md §2/§4): same EntryOperations policy
+        // and JwtBearer challenge as the SMS routes above.
+        app.MapPost("/api/v1/notifications/email", (HttpContext ctx, IEmailService email) => NotificationsEndpoint.EnqueueEmailAsync(ctx, email))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.EntryOperations,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapGet("/api/v1/notifications/email-history", (HttpContext ctx, IEmailService email) => NotificationsEndpoint.GetEmailHistoryAsync(ctx, email))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.EntryOperations,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
         app.MapPost("/api/v1/billing/entries", (HttpContext ctx) => SecuredPlaceholderEndpoint.Handle(ctx))
             .RequireAuthorization(new AuthorizeAttribute
             {
@@ -564,24 +613,95 @@ public partial class Program
                 AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             });
 
-        app.MapPost("/api/v1/holidays", (HttpContext ctx) => SecuredPlaceholderEndpoint.Handle(ctx))
+        // ---- Holiday/weekly-off management (SPEC-0008 T043, US5, FR-011, BR-006, AC-007; contracts/content-api.md §3-§6) ----
+        // The HolidayAdmin policy (adm/su — DP-001) gates the CRUD; the rows are
+        // immediately honored by IHolidayService.IsEmbassyClosedAsync (AC-007).
+        // Replaces the SecuredPlaceholderEndpoint mappings for POST /api/v1/holidays
+        // and DELETE /api/v1/holidays/{id} (SPEC-0005 T030 pre-registration).
+        app.MapPost("/api/v1/holidays/weekly-off", (HttpContext ctx, VisaEntryDbContext db, UserManager<IdentityIntegration.VisaFusionUser> userManager) =>
+            HolidaysEndpoint.CreateWeeklyOffAsync(ctx, db, userManager))
             .RequireAuthorization(new AuthorizeAttribute
             {
-                Roles = "adm,su",
+                Policy = AuthorizationPolicies.HolidayAdmin,
                 AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             });
 
-        app.MapDelete("/api/v1/holidays/{id:int}", (HttpContext ctx, int id) => SecuredPlaceholderEndpoint.Handle(ctx))
+        app.MapDelete("/api/v1/holidays/weekly-off/{id:long}", (HttpContext ctx, VisaEntryDbContext db, UserManager<IdentityIntegration.VisaFusionUser> userManager, long id) =>
+            HolidaysEndpoint.DeleteWeeklyOffAsync(ctx, db, userManager, id))
             .RequireAuthorization(new AuthorizeAttribute
             {
-                Roles = "adm,su",
+                Policy = AuthorizationPolicies.HolidayAdmin,
                 AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             });
 
-        app.MapPost("/api/v1/reports/agent-status/today", (HttpContext ctx) => SecuredPlaceholderEndpoint.Handle(ctx))
+        app.MapPost("/api/v1/holidays", (HttpContext ctx, VisaEntryDbContext db, UserManager<IdentityIntegration.VisaFusionUser> userManager) =>
+            HolidaysEndpoint.CreateHolidayAsync(ctx, db, userManager))
             .RequireAuthorization(new AuthorizeAttribute
             {
-                Roles = "emp,adm,su",
+                Policy = AuthorizationPolicies.HolidayAdmin,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapDelete("/api/v1/holidays/{id:long}", (HttpContext ctx, VisaEntryDbContext db, UserManager<IdentityIntegration.VisaFusionUser> userManager, long id) =>
+            HolidaysEndpoint.DeleteHolidayAsync(ctx, db, userManager, id))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.HolidayAdmin,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        // ---- Operational reports (SPEC-0008 T048, US6, FR-012, AC-008; contracts/reports-api.md) ----
+        // The EntryOperations policy (emp/adm/su — DP-001) gates all seven
+        // report GETs; agt/guest receive 403 (AC-008). All data access is
+        // parameterized EF Core LINQ (NFR-002). Replaces the
+        // SecuredPlaceholderEndpoint mapping for POST /api/v1/reports/agent-status/today
+        // (SPEC-0005 T030 pre-registration) with the GET surface.
+        app.MapGet("/api/v1/reports/agent-status/today", (HttpContext ctx, VisaEntryDbContext db) => ReportsEndpoint.AgentStatusTodayAsync(ctx, db))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.EntryOperations,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapGet("/api/v1/reports/pending", (HttpContext ctx, VisaEntryDbContext db) => ReportsEndpoint.PendingAsync(ctx, db))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.EntryOperations,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapGet("/api/v1/reports/today-submission", (HttpContext ctx, VisaEntryDbContext db) => ReportsEndpoint.TodaySubmissionAsync(ctx, db))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.EntryOperations,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapGet("/api/v1/reports/today-collection", (HttpContext ctx, VisaEntryDbContext db) => ReportsEndpoint.TodayCollectionAsync(ctx, db))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.EntryOperations,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapGet("/api/v1/reports/today-transaction", (HttpContext ctx, VisaEntryDbContext db) => ReportsEndpoint.TodayTransactionAsync(ctx, db))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.EntryOperations,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapGet("/api/v1/reports/daily-visa-fee", (HttpContext ctx, VisaEntryDbContext db) => ReportsEndpoint.DailyVisaFeeAsync(ctx, db))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.EntryOperations,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapGet("/api/v1/reports/daily-bill", (HttpContext ctx, VisaEntryDbContext db) => ReportsEndpoint.DailyBillAsync(ctx, db))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.EntryOperations,
                 AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             });
 
@@ -646,11 +766,34 @@ public partial class Program
                 AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             });
 
-        // Public-by-design write (T030, §4.3): anonymous, validated and
-        // rate-limited per §17/R7 — the limiter is wired above when the owner
-        // supplies the queries thresholds (no invented values). The payload
-        // lands with the Public/Contact module feature (501 placeholder).
-        var queriesRoute = app.MapPost("/api/v1/public/queries", (HttpContext ctx) => SecuredPlaceholderEndpoint.Handle(ctx));
+        // ---- Content CMS (SPEC-0008 T038, US4, FR-010, BR-003, AC-006; contracts/content-api.md §1/§2) ----
+        // dailyUpdate create/edit/delete is gated by the AdminPanel policy
+        // (adm/su — DP-001), closing the legacy anonymous dailyupdate.asp write
+        // endpoint (BR-003; the §2.8 finding). The public read page remains
+        // anonymous (Areas/Public/Pages/DailyUpdate.cshtml).
+        app.MapPost("/api/v1/admin/content/daily-update", (HttpContext ctx, VisaEntryDbContext db, UserManager<IdentityIntegration.VisaFusionUser> userManager) =>
+            ContentEndpoint.SaveDailyUpdateAsync(ctx, db, userManager))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.AdminPanel,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        app.MapDelete("/api/v1/admin/content/daily-update/{id:long}", (HttpContext ctx, VisaEntryDbContext db, UserManager<IdentityIntegration.VisaFusionUser> userManager, long id) =>
+            ContentEndpoint.DeleteDailyUpdateAsync(ctx, db, userManager, id))
+            .RequireAuthorization(new AuthorizeAttribute
+            {
+                Policy = AuthorizationPolicies.AdminPanel,
+                AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            });
+
+        // Public-by-design write (SPEC-0005 T030, §4.3; SPEC-0008 FR-007/FR-008):
+        // anonymous, validated and rate-limited per §17/R7 — the limiter is
+        // wired above when the owner supplies the queries thresholds. The
+        // payload is delivered by PublicEndpoint.SubmitQueryAsync (SPEC-0008
+        // T019): persist to the `queries` table + enqueue the office
+        // notification email (legacy contactus.asp → contactsendpre.asp).
+        var queriesRoute = app.MapPost("/api/v1/public/queries", PublicEndpoint.SubmitQueryAsync);
         if (queriesLimiterConfigured)
         {
             queriesRoute.RequireRateLimiting("queries");

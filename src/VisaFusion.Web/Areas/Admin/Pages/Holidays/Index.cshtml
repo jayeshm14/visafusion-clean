@@ -1,0 +1,153 @@
+@page
+@model VisaFusion.Web.Areas.Admin.Pages.Holidays.IndexModel
+@{
+    ViewData["Title"] = "Holidays & Weekly Off";
+    ViewData["UseSidebar"] = true;
+}
+
+@section SidebarNav {
+    <a asp-area="Admin" asp-page="/Holidays/Index" aria-current="page">Holidays</a>
+}
+
+<div class="vf-content">
+    <h1>Holidays &amp; Weekly Off</h1>
+
+    @if (!string.IsNullOrWhiteSpace(Model.OutcomeMessage))
+    {
+        <div class="vf-alert vf-alert-success" role="status">@Model.OutcomeMessage</div>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.OutcomeError))
+    {
+        <div class="vf-alert vf-alert-danger" role="alert">@Model.OutcomeError</div>
+    }
+
+    <div class="vf-card">
+        <h2>Record an embassy holiday</h2>
+        <form method="post" asp-page-handler="CreateHoliday">
+            <div class="form-group">
+                <label for="holiday-embassyId">Embassy</label>
+                <select id="holiday-embassyId" name="embassyId" required class="form-control">
+                    @foreach (var embassy in Model.Embassies)
+                    {
+                        <option value="@embassy.Id">@embassy.Description</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="holiday-date">Holiday date</label>
+                <input type="date" id="holiday-date" name="holidayDate" required class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="holiday-description">Reason (optional)</label>
+                <input type="text" id="holiday-description" name="description" class="form-control" />
+            </div>
+            <button type="submit" class="vf-btn vf-btn-primary">Record holiday</button>
+        </form>
+    </div>
+
+    <div class="vf-card">
+        <h2>Embassy holidays</h2>
+        @if (Model.Holidays.Count == 0)
+        {
+            <p>No holidays recorded.</p>
+        }
+        else
+        {
+            <table class="vf-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Embassy</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Reason</th>
+                        <th scope="col"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var holiday in Model.Holidays)
+                    {
+                        <tr>
+                            <td>@holiday.CountryId</td>
+                            <td>@(holiday.HolidayDate?.ToString("dd-MMM-yyyy") ?? "—")</td>
+                            <td>@(string.IsNullOrWhiteSpace(holiday.Description) ? "—" : holiday.Description)</td>
+                            <td>
+                                <form method="post" asp-page-handler="DeleteHoliday" class="vf-inline-form">
+                                    <input type="hidden" name="id" value="@holiday.Id" />
+                                    <button type="submit" class="vf-btn vf-btn-secondary">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <div class="vf-card">
+        <h2>Record a weekly-off day</h2>
+        <form method="post" asp-page-handler="CreateWeeklyOff">
+            <div class="form-group">
+                <label for="wo-embassyId">Embassy</label>
+                <select id="wo-embassyId" name="embassyId" required class="form-control">
+                    @foreach (var embassy in Model.Embassies)
+                    {
+                        <option value="@embassy.Id">@embassy.Description</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="wo-weekday">Weekday</label>
+                <select id="wo-weekday" name="weekday" required class="form-control">
+                    <option value="1">Sunday</option>
+                    <option value="2">Monday</option>
+                    <option value="3">Tuesday</option>
+                    <option value="4">Wednesday</option>
+                    <option value="5">Thursday</option>
+                    <option value="6">Friday</option>
+                    <option value="7">Saturday</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="wo-description">Reason (optional)</label>
+                <input type="text" id="wo-description" name="description" class="form-control" />
+            </div>
+            <button type="submit" class="vf-btn vf-btn-primary">Record weekly-off</button>
+        </form>
+    </div>
+
+    <div class="vf-card">
+        <h2>Weekly-off days</h2>
+        @if (Model.WeeklyOffs.Count == 0)
+        {
+            <p>No weekly-off days recorded.</p>
+        }
+        else
+        {
+            <table class="vf-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Embassy</th>
+                        <th scope="col">Weekday</th>
+                        <th scope="col">Reason</th>
+                        <th scope="col"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var weeklyOff in Model.WeeklyOffs)
+                    {
+                        <tr>
+                            <td>@weeklyOff.EmbassyId</td>
+                            <td>@weeklyOff.Weekend</td>
+                            <td>@(string.IsNullOrWhiteSpace(weeklyOff.Description) ? "—" : weeklyOff.Description)</td>
+                            <td>
+                                <form method="post" asp-page-handler="DeleteWeeklyOff" class="vf-inline-form">
+                                    <input type="hidden" name="id" value="@weeklyOff.Id" />
+                                    <button type="submit" class="vf-btn vf-btn-secondary">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

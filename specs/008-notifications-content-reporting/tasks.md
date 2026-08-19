@@ -24,9 +24,9 @@
 
 **Purpose**: Spec traceability amendment and configuration required before any code changes
 
-- [ ] T001 Amend spec: register the NEW `emailQueue` table in §16 + Assumptions (traceability from checklist CHK002/CHK014/CHK038; research D-1) and reconcile the `ReportWorker` scope contradiction (§5 completion list vs §6 out-of-scope; plan.md:20/109) in `specs/008-notifications-content-reporting/spec.md`
-- [ ] T002 Add `RateLimiting:Queries` = `{ "PermitLimit": 5, "WindowSeconds": 3600 }` to `src/VisaFusion.Web/appsettings.json` (owner Q3:A — 5/hour per source enforced in v1)
-- [ ] T003 [P] Add `RateLimiting:Queries` = `{ "PermitLimit": 5, "WindowSeconds": 3600 }` to `src/VisaFusion.Web/appsettings.Development.json` (owner Q3:A; local testability of AC-001)
+- [X] T001 Amend spec: register the NEW `emailQueue` table in §16 + Assumptions (traceability from checklist CHK002/CHK014/CHK038; research D-1) and reconcile the `ReportWorker` scope contradiction (§5 completion list vs §6 out-of-scope; plan.md:20/109) in `specs/008-notifications-content-reporting/spec.md`
+- [X] T002 Add `RateLimiting:Queries` = `{ "PermitLimit": 5, "WindowSeconds": 3600 }` to `src/VisaFusion.Web/appsettings.json` (owner Q3:A — 5/hour per source enforced in v1)
+- [X] T003 [P] Add `RateLimiting:Queries` = `{ "PermitLimit": 5, "WindowSeconds": 3600 }` to `src/VisaFusion.Web/appsettings.Development.json` (owner Q3:A; local testability of AC-001)
 
 ---
 
@@ -36,19 +36,19 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Define `ISmsService` interface (`EnqueueAsync`, `DrainNextBatchAsync`, `GetHistoryAsync`) in `src/VisaFusion.Core/Application/SmsService.cs` (replaces the empty placeholder)
-- [ ] T005 [P] Define `IEmailService` interface (`EnqueueAsync`, `DrainNextBatchAsync`, `GetHistoryAsync`) in `src/VisaFusion.Core/Application/EmailService.cs` (replaces the empty placeholder)
-- [ ] T006 [P] Create shared notification contracts (`SmsMessage`, `EmailMessage`, `QueueDrainResult`, `SmsHistoryItem`, `EmailHistoryItem`) in `src/VisaFusion.Core/Application/NotificationMessages.cs` (named to avoid collision with the Api DTOs file)
-- [ ] T007 [P] Create `ContactQuery` entity (NEW `queries` table: Id, Name, Email, Subject, Message, Subdate, Status default `new`, IpAddress) in `src/VisaFusion.Data/Persistence/Entities/ContactQuery.cs`
-- [ ] T008 [P] Create `EmailQueue` entity (NEW `emailQueue` table: Id, Toemail, Subject, Body, Agentsid, Refno, Awb, Sentby, Sentdate) in `src/VisaFusion.Data/Persistence/Entities/EmailQueue.cs`
-- [ ] T009 Register `DbSet<ContactQuery>` and `DbSet<EmailQueue>` + entity configurations in `src/VisaFusion.Data/Persistence/VisaEntryDbContext.cs`
-- [ ] T010 Create additive EF migration (queries + emailQueue only; no existing table altered) + reversibility test in `src/VisaFusion.Data/Migrations/` and `tests/IntegrationTests/MigrationReversibilityTests.cs`
-- [ ] T011 Implement `SmsService` (enqueue → `smsQueue`; transactional drain → `smshistory` with all 8 audit fields; history read) in `src/VisaFusion.Data/Application/SmsService.cs` (research D-3)
-- [ ] T012 [P] Implement `EmailService` (enqueue → `emailQueue`; transactional drain → `sentmails`; history read) in `src/VisaFusion.Data/Application/EmailService.cs` (research D-3)
-- [ ] T013 [P] Create log-only dispatch providers (`ISmsDispatchProvider`/`IEmailDispatchProvider` + LogOnly default; vendor provider config-gated) in `src/VisaFusion.Data/Application/NotificationDispatchProviders.cs` (research D-2, owner Q1:C)
-- [ ] T014 Remove placeholder `ISmsService`/`IEmailService` registrations from `src/VisaFusion.Core/CoreServiceCollectionExtensions.cs` (implementations move to Data — HolidayService precedent, research D-7)
-- [ ] T015 Register Data-backed services + `VisaEntryDbContext` at the Web composition root in `src/VisaFusion.Web/Program.cs`
-- [ ] T016 [P] Register Data-backed services + `VisaEntryDbContext` + Serilog at the Jobs composition root in `src/VisaFusion.Jobs/Program.cs`
+- [X] T004 Define `ISmsService` interface (`EnqueueAsync`, `DrainNextBatchAsync`, `GetHistoryAsync`) in `src/VisaFusion.Core/Application/SmsService.cs` (replaces the empty placeholder)
+- [X] T005 [P] Define `IEmailService` interface (`EnqueueAsync`, `DrainNextBatchAsync`, `GetHistoryAsync`) in `src/VisaFusion.Core/Application/EmailService.cs` (replaces the empty placeholder)
+- [X] T006 [P] Create shared notification contracts (`SmsMessage`, `EmailMessage`, `QueueDrainResult`, `SmsHistoryItem`, `EmailHistoryItem`) in `src/VisaFusion.Core/Application/NotificationMessages.cs` (named to avoid collision with the Api DTOs file)
+- [X] T007 [P] Create `ContactQuery` entity (NEW `queries` table: Id, Name, Email, Subject, Message, Subdate, Status default `new`, IpAddress) in `src/VisaFusion.Data/Persistence/Entities/ContactQuery.cs`
+- [X] T008 [P] Create `EmailQueue` entity (NEW `emailQueue` table: Id, Toemail, Subject, Body, Agentsid, Refno, Awb, Sentby, Sentdate) in `src/VisaFusion.Data/Persistence/Entities/EmailQueue.cs`
+- [X] T009 Register `DbSet<ContactQuery>` and `DbSet<EmailQueue>` + entity configurations in `src/VisaFusion.Data/Persistence/VisaEntryDbContext.cs`
+- [X] T010 Create additive EF migration (queries + emailQueue only; no existing table altered) + reversibility test in `src/VisaFusion.Data/Migrations/` and `tests/IntegrationTests/MigrationReversibilityTests.cs`
+- [X] T011 Implement `SmsService` (enqueue → `smsQueue`; transactional drain → `smshistory` with all 8 audit fields; history read) in `src/VisaFusion.Data/Application/SmsService.cs` (research D-3)
+- [X] T012 [P] Implement `EmailService` (enqueue → `emailQueue`; transactional drain → `sentmails`; history read) in `src/VisaFusion.Data/Application/EmailService.cs` (research D-3)
+- [X] T013 [P] Create log-only dispatch providers (`ISmsDispatchProvider`/`IEmailDispatchProvider` + LogOnly default; vendor provider config-gated) in `src/VisaFusion.Data/Application/NotificationDispatchProviders.cs` (research D-2, owner Q1:C)
+- [X] T014 Remove placeholder `ISmsService`/`IEmailService` registrations from `src/VisaFusion.Core/CoreServiceCollectionExtensions.cs` (implementations move to Data — HolidayService precedent, research D-7)
+- [X] T015 Register Data-backed services + `VisaEntryDbContext` at the Web composition root in `src/VisaFusion.Web/Program.cs`
+- [X] T016 [P] Register Data-backed services + `VisaEntryDbContext` + Serilog at the Jobs composition root in `src/VisaFusion.Jobs/Program.cs`
 
 **Checkpoint**: Foundation ready — user story implementation can now begin in parallel
 
@@ -62,14 +62,14 @@
 
 ### Tests for User Story 1 (spec §23 — write FIRST, ensure they FAIL before implementation) ⚠️
 
-- [ ] T017 [P] [US1] Integration test: queries persistence + office-email enqueue→drain→`sentmails` in `tests/IntegrationTests/QueriesPersistenceTests.cs`
-- [ ] T018 [P] [US1] Functional test: queries endpoint 201/400/429 + rate-limit enforcement + `RateLimiting:Queries` config default (5/3600, Q3:A) in `tests/FunctionalTests/QueriesEndpointTests.cs`
+- [X] T017 [P] [US1] Integration test: queries persistence + office-email enqueue→drain→`sentmails` in `tests/IntegrationTests/QueriesPersistenceTests.cs`
+- [X] T018 [P] [US1] Functional test: queries endpoint 201/400/429 + rate-limit enforcement + `RateLimiting:Queries` config default (5/3600, Q3:A) in `tests/FunctionalTests/QueriesEndpointTests.cs`
 
 ### Implementation for User Story 1
 
-- [ ] T019 [US1] Complete `PublicEndpoint.SubmitQueryAsync` (persist `ContactQuery`, enqueue office email via `IEmailService`, fix the stale `querieDetail.asp` doc comment) + queries validation unit tests (name/email/subject/message limits) in `src/VisaFusion.Api/Endpoints/PublicEndpoint.cs` and `tests/UnitTests/QueriesValidationTests.cs`
-- [ ] T020 [US1] Wire the queries route to `PublicEndpoint.SubmitQueryAsync` (replacing `SecuredPlaceholderEndpoint.Handle`) in `src/VisaFusion.Web/Program.cs`
-- [ ] T021 [US1] Golden-file unit test: office-email payload vs the legacy `contactsendpre.asp` template (sender details + message text) in `tests/UnitTests/OfficeEmailTemplateTests.cs`
+- [X] T019 [US1] Complete `PublicEndpoint.SubmitQueryAsync` (persist `ContactQuery`, enqueue office email via `IEmailService`, fix the stale `querieDetail.asp` doc comment) + queries validation unit tests (name/email/subject/message limits) in `src/VisaFusion.Api/Endpoints/PublicEndpoint.cs` and `tests/UnitTests/QueriesValidationTests.cs`
+- [X] T020 [US1] Wire the queries route to `PublicEndpoint.SubmitQueryAsync` (replacing `SecuredPlaceholderEndpoint.Handle`) in `src/VisaFusion.Web/Program.cs`
+- [X] T021 [US1] Golden-file unit test: office-email payload vs the legacy `contactsendpre.asp` template (sender details + message text) in `tests/UnitTests/OfficeEmailTemplateTests.cs`
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -83,15 +83,15 @@
 
 ### Tests for User Story 2 (spec §23) ⚠️
 
-- [ ] T022 [P] [US2] Unit test: SMS validation rules + audit-field completeness in `tests/UnitTests/NotificationValidationTests.cs`
-- [ ] T023 [P] [US2] Integration test: SMS queue drain → `smshistory` (8 fields, send-once semantics) + failure-injection retry (AC-004: failed dispatch logged with failure status, retried, never silently swallowed) in `tests/IntegrationTests/SmsQueueDrainTests.cs`
-- [ ] T024 [P] [US2] Functional test: SMS enqueue/history endpoints + RBAC + enqueue latency < 1 s (AC-009) in `tests/FunctionalTests/NotificationsEndpointTests.cs`
+- [X] T022 [P] [US2] Unit test: SMS validation rules + audit-field completeness in `tests/UnitTests/NotificationValidationTests.cs`
+- [X] T023 [P] [US2] Integration test: SMS queue drain → `smshistory` (8 fields, send-once semantics) + failure-injection retry (AC-004: failed dispatch logged with failure status, retried, never silently swallowed) in `tests/IntegrationTests/SmsQueueDrainTests.cs`
+- [X] T024 [P] [US2] Functional test: SMS enqueue/history endpoints + RBAC + enqueue latency < 1 s (AC-009) in `tests/FunctionalTests/NotificationsEndpointTests.cs`
 
 ### Implementation for User Story 2
 
-- [ ] T025 [US2] Create `NotificationsEndpoint` (POST sms, GET sms-history) + API contracts in `src/VisaFusion.Api/Endpoints/NotificationsEndpoint.cs` and `src/VisaFusion.Api/Contracts/NotificationContracts.cs`
-- [ ] T026 [US2] Implement `SmsQueueWorker` real drain loop (bounded batch, retry, telemetry) in `src/VisaFusion.Jobs/Workers/SmsQueueWorker.cs`
-- [ ] T027 [US2] Wire SMS notification routes (policy `EntryOperations`) in `src/VisaFusion.Web/Program.cs`
+- [X] T025 [US2] Create `NotificationsEndpoint` (POST sms, GET sms-history) + API contracts in `src/VisaFusion.Api/Endpoints/NotificationsEndpoint.cs` and `src/VisaFusion.Api/Contracts/NotificationContracts.cs`
+- [X] T026 [US2] Implement `SmsQueueWorker` real drain loop (bounded batch, retry, telemetry) in `src/VisaFusion.Jobs/Workers/SmsQueueWorker.cs`
+- [X] T027 [US2] Wire SMS notification routes (policy `EntryOperations`) in `src/VisaFusion.Web/Program.cs`
 
 **Checkpoint**: At this point, User Story 2 should be fully functional and testable independently
 
@@ -105,14 +105,14 @@
 
 ### Tests for User Story 3 (spec §23) ⚠️
 
-- [ ] T028 [P] [US3] Unit test: email validation rules + `sentmails` audit-field completeness (FR-005) in `tests/UnitTests/NotificationValidationTests.cs` (append)
-- [ ] T029 [P] [US3] Integration test: email queue drain → `sentmails` in `tests/IntegrationTests/EmailQueueDrainTests.cs`
+- [X] T028 [P] [US3] Unit test: email validation rules + `sentmails` audit-field completeness (FR-005) in `tests/UnitTests/NotificationValidationTests.cs` (append)
+- [X] T029 [P] [US3] Integration test: email queue drain → `sentmails` in `tests/IntegrationTests/EmailQueueDrainTests.cs`
 
 ### Implementation for User Story 3
 
-- [ ] T030 [US3] Add email endpoints (POST email, GET email-history) to `src/VisaFusion.Api/Endpoints/NotificationsEndpoint.cs` (same file as T025 — sequential with US2)
-- [ ] T031 [US3] Implement `EmailQueueWorker` real drain loop (bounded batch, retry, telemetry) in `src/VisaFusion.Jobs/Workers/EmailQueueWorker.cs`
-- [ ] T032 [US3] Wire email notification routes (policy `EntryOperations`) in `src/VisaFusion.Web/Program.cs`
+- [X] T030 [US3] Add email endpoints (POST email, GET email-history) to `src/VisaFusion.Api/Endpoints/NotificationsEndpoint.cs` (same file as T025 — sequential with US2)
+- [X] T031 [US3] Implement `EmailQueueWorker` real drain loop (bounded batch, retry, telemetry) in `src/VisaFusion.Jobs/Workers/EmailQueueWorker.cs`
+- [X] T032 [US3] Wire email notification routes (policy `EntryOperations`) in `src/VisaFusion.Web/Program.cs`
 
 **Checkpoint**: At this point, User Stories 2 AND 3 should both work independently
 
@@ -126,15 +126,15 @@
 
 ### Tests for User Story 4 (spec §23) ⚠️
 
-- [ ] T033 [P] [US4] Functional test: CMS RBAC (403 for non-admin) + public read reflects changes in `tests/FunctionalTests/ContentCmsTests.cs`
-- [ ] T034 [P] [US4] Integration test: `ContentUpdate` create/edit/delete + validation (date + description ≤ 8,000 chars) in `tests/IntegrationTests/ContentUpdateCrudTests.cs`
+- [X] T033 [P] [US4] Functional test: CMS RBAC (403 for non-admin) + public read reflects changes in `tests/FunctionalTests/ContentCmsTests.cs`
+- [X] T034 [P] [US4] Integration test: `ContentUpdate` create/edit/delete + validation (date + description ≤ 8,000 chars) in `tests/IntegrationTests/ContentUpdateCrudTests.cs`
 
 ### Implementation for User Story 4
 
-- [ ] T035 [US4] Create `ContentEndpoint` (POST/DELETE daily-update) + contracts in `src/VisaFusion.Api/Endpoints/ContentEndpoint.cs` and `src/VisaFusion.Api/Contracts/ContentContracts.cs`
-- [ ] T036 [US4] Create Admin CMS pages (list/create/edit/delete) in `src/VisaFusion.Web/Areas/Admin/Pages/ContentUpdate/`
-- [ ] T037 [US4] Create anonymous public daily-update read page in `src/VisaFusion.Web/Areas/Public/Pages/DailyUpdate.cshtml`
-- [ ] T038 [US4] Wire content routes (policy `AdminPanel`) in `src/VisaFusion.Web/Program.cs`
+- [X] T035 [US4] Create `ContentEndpoint` (POST/DELETE daily-update) + contracts in `src/VisaFusion.Api/Endpoints/ContentEndpoint.cs` and `src/VisaFusion.Api/Contracts/ContentContracts.cs`
+- [X] T036 [US4] Create Admin CMS pages (list/create/edit/delete) in `src/VisaFusion.Web/Areas/Admin/Pages/ContentUpdate/`
+- [X] T037 [US4] Create anonymous public daily-update read page in `src/VisaFusion.Web/Areas/Public/Pages/DailyUpdate.cshtml`
+- [X] T038 [US4] Wire content routes (policy `AdminPanel`) in `src/VisaFusion.Web/Program.cs`
 
 **Checkpoint**: At this point, User Story 4 should be fully functional and testable independently
 
@@ -148,14 +148,14 @@
 
 ### Tests for User Story 5 (spec §23) ⚠️
 
-- [ ] T039 [P] [US5] Integration test: holiday/weekly-off CRUD parity vs `IHolidayService` in `tests/IntegrationTests/HolidayCrudParityTests.cs`
-- [ ] T040 [P] [US5] Functional test: holiday endpoints RBAC + 409 duplicates + weekday numbering boundaries (BR-006: 1–7 accepted, 0/8 rejected) in `tests/FunctionalTests/HolidayCrudEndpointTests.cs`
+- [X] T039 [P] [US5] Integration test: holiday/weekly-off CRUD parity vs `IHolidayService` in `tests/IntegrationTests/HolidayCrudParityTests.cs`
+- [X] T040 [P] [US5] Functional test: holiday endpoints RBAC + 409 duplicates + weekday numbering boundaries (BR-006: 1–7 accepted, 0/8 rejected) in `tests/FunctionalTests/HolidayCrudEndpointTests.cs`
 
 ### Implementation for User Story 5
 
-- [ ] T041 [US5] Create `HolidaysEndpoint` (POST/DELETE holidays + weekly-off) + contracts in `src/VisaFusion.Api/Endpoints/HolidaysEndpoint.cs` and `src/VisaFusion.Api/Contracts/HolidayContracts.cs`
-- [ ] T042 [US5] Create Admin holiday/weekly-off pages in `src/VisaFusion.Web/Areas/Admin/Pages/Holidays/`
-- [ ] T043 [US5] Wire holiday routes (policy `HolidayAdmin`; replace the `SecuredPlaceholderEndpoint` mappings for `POST /api/v1/holidays` and `DELETE /api/v1/holidays/{id}`) in `src/VisaFusion.Web/Program.cs`
+- [X] T041 [US5] Create `HolidaysEndpoint` (POST/DELETE holidays + weekly-off) + contracts in `src/VisaFusion.Api/Endpoints/HolidaysEndpoint.cs` and `src/VisaFusion.Api/Contracts/HolidayContracts.cs`
+- [X] T042 [US5] Create Admin holiday/weekly-off pages in `src/VisaFusion.Web/Areas/Admin/Pages/Holidays/`
+- [X] T043 [US5] Wire holiday routes (policy `HolidayAdmin`; replace the `SecuredPlaceholderEndpoint` mappings for `POST /api/v1/holidays` and `DELETE /api/v1/holidays/{id}`) in `src/VisaFusion.Web/Program.cs`
 
 **Checkpoint**: At this point, User Story 5 should be fully functional and testable independently
 
@@ -169,14 +169,14 @@
 
 ### Tests for User Story 6 (spec §23) ⚠️
 
-- [ ] T044 [P] [US6] Functional test: report RBAC (403 for `agt`/`guest`) in `tests/FunctionalTests/ReportEndpointTests.cs`
-- [ ] T045 [P] [US6] Integration test: report queries parameterized (no SQLi) + deterministic + date validation in `tests/IntegrationTests/ReportParameterizedSqlTests.cs`
+- [X] T044 [P] [US6] Functional test: report RBAC (403 for `agt`/`guest`) in `tests/FunctionalTests/ReportEndpointTests.cs`
+- [X] T045 [P] [US6] Integration test: report queries parameterized (no SQLi) + deterministic + date validation in `tests/IntegrationTests/ReportParameterizedSqlTests.cs`
 
 ### Implementation for User Story 6
 
-- [ ] T046 [US6] Create `ReportsEndpoint` (7 GETs: agent-status/today + pending, today-submission, today-collection, today-transaction, daily-visa-fee, daily-bill) + contracts in `src/VisaFusion.Api/Endpoints/ReportsEndpoint.cs` and `src/VisaFusion.Api/Contracts/ReportContracts.cs`
-- [ ] T047 [US6] Create Reporting pages (6 surfaces) in `src/VisaFusion.Web/Areas/Reporting/Pages/`
-- [ ] T048 [US6] Wire report routes (policy `EntryOperations`; replace the `SecuredPlaceholderEndpoint` mapping for `POST /api/v1/reports/agent-status/today`) in `src/VisaFusion.Web/Program.cs`
+- [X] T046 [US6] Create `ReportsEndpoint` (7 GETs: agent-status/today + pending, today-submission, today-collection, today-transaction, daily-visa-fee, daily-bill) + contracts in `src/VisaFusion.Api/Endpoints/ReportsEndpoint.cs` and `src/VisaFusion.Api/Contracts/ReportContracts.cs`
+- [X] T047 [US6] Create Reporting pages (6 surfaces) in `src/VisaFusion.Web/Areas/Reporting/Pages/`
+- [X] T048 [US6] Wire report routes (policy `EntryOperations`; replace the `SecuredPlaceholderEndpoint` mapping for `POST /api/v1/reports/agent-status/today`) in `src/VisaFusion.Web/Program.cs`
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -186,9 +186,9 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T049 [P] Append secrets-guard test (AC-010 — no SMS/SMTP credentials in source or logs) in `tests/UnitTests/ProductionSecretsGuardTests.cs`
-- [ ] T050 [P] Append audit-continuity integration test (BR-001 — `smshistory`/`sentmails` writes flow through the same tables) in `tests/IntegrationTests/AuditTableTests.cs`
-- [ ] T051 Create ADR-0005 for the `emailQueue` table + Data-backed notification services (research D-1/D-7) in `adr/ADR-0005.md` (next free number — ADR-0001..0004 exist)
+- [X] T049 [P] Append secrets-guard test (AC-010 — no SMS/SMTP credentials in source or logs) in `tests/UnitTests/ProductionSecretsGuardTests.cs`
+- [X] T050 [P] Append audit-continuity integration test (BR-001 — `smshistory`/`sentmails` writes flow through the same tables) in `tests/IntegrationTests/AuditTableTests.cs`
+- [X] T051 Create ADR-0005 for the `emailQueue` table + Data-backed notification services (research D-1/D-7) in `adr/ADR-0005.md` (next free number — ADR-0001..0004 exist)
 - [ ] T052 Run full test suites + quickstart validation scenarios S1..S7 per `specs/008-notifications-content-reporting/quickstart.md`
 - [ ] T053 Update the knowledge graph (`knowledge-graph/kg.json`, `knowledge-graph/traceability-matrix.md`) with SPEC-0008 components
 

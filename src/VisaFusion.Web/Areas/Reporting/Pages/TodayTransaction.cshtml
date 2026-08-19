@@ -1,0 +1,68 @@
+@page
+@model VisaFusion.Web.Areas.Reporting.Pages.TodayTransactionModel
+@{
+    ViewData["Title"] = "Today Transaction";
+    ViewData["UseSidebar"] = true;
+}
+
+@section SidebarNav {
+    <a asp-area="Reporting" asp-page="/Pending">Pending</a>
+    <a asp-area="Reporting" asp-page="/TodaySubmission">Today Submission</a>
+    <a asp-area="Reporting" asp-page="/TodayCollection">Today Collection</a>
+    <a asp-area="Reporting" asp-page="/TodayTransaction" aria-current="page">Today Transaction</a>
+    <a asp-area="Reporting" asp-page="/DailyVisaFee">Daily Visa Fee</a>
+    <a asp-area="Reporting" asp-page="/DailyBill">Daily Bill</a>
+}
+
+<div class="vf-content">
+    <h1>Today Transaction</h1>
+    <p>Transactions entered in the selected date range (defaults to today).</p>
+
+    <form method="get" class="vf-inline-form">
+        <div class="form-group">
+            <label for="dateFrom">From</label>
+            <input type="date" id="dateFrom" name="dateFrom" class="form-control"
+                   value="@(Model.Params?.From.ToString("yyyy-MM-dd"))" />
+        </div>
+        <div class="form-group">
+            <label for="dateTo">To</label>
+            <input type="date" id="dateTo" name="dateTo" class="form-control"
+                   value="@(Model.Params?.To is { } to ? to.AddDays(-1).ToString("yyyy-MM-dd") : string.Empty)" />
+        </div>
+        <button type="submit" class="vf-btn vf-btn-primary">Filter</button>
+    </form>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ParamError))
+    {
+        <div class="vf-alert vf-alert-danger" role="alert">@Model.ParamError</div>
+    }
+
+    @if (Model.Rows.Count == 0)
+    {
+        <p>No transactions in the selected range.</p>
+    }
+    else
+    {
+        <table class="vf-table">
+            <thead>
+                <tr>
+                    <th scope="col">Ref</th>
+                    <th scope="col">Visa fee</th>
+                    <th scope="col">Hotel</th>
+                    <th scope="col">Cab</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model.Rows)
+                {
+                    <tr>
+                        <td>@row.Refno</td>
+                        <td>@(row.VisafeeTotal?.ToString("0.00") ?? "—")</td>
+                        <td>@(row.HotelTotal?.ToString() ?? "—")</td>
+                        <td>@(row.CabTotal?.ToString() ?? "—")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

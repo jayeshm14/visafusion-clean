@@ -78,7 +78,7 @@ dotnet run --project src/VisaFusion.Jobs   # Jobs worker host (drain path)
 
 ### S7 — Secrets and audit continuity (AC-010, BR-001)
 
-1. Search the source tree and logs for the legacy plaintext credentials (`udaanindia`/`rajan1604`, relay hostnames) → no matches in source or logs (AC-010, NFR-004).
+1. Search the source tree and logs for the legacy plaintext credentials (`udaanindia`/`[REDACTED]`, relay hostnames) → no matches in source or logs (AC-010, NFR-004).
 2. Verify `smshistory`/`sentmails` writes flow through the same tables as legacy — audit continuity (BR-001).
 
 ## Expected outcome

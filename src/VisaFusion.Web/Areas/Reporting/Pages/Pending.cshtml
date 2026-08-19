@@ -1,0 +1,58 @@
+@page
+@model VisaFusion.Web.Areas.Reporting.Pages.PendingModel
+@{
+    ViewData["Title"] = "Pending List";
+    ViewData["UseSidebar"] = true;
+}
+
+@section SidebarNav {
+    <a asp-area="Reporting" asp-page="/Pending" aria-current="page">Pending</a>
+    <a asp-area="Reporting" asp-page="/TodaySubmission">Today Submission</a>
+    <a asp-area="Reporting" asp-page="/TodayCollection">Today Collection</a>
+    <a asp-area="Reporting" asp-page="/TodayTransaction">Today Transaction</a>
+    <a asp-area="Reporting" asp-page="/DailyVisaFee">Daily Visa Fee</a>
+    <a asp-area="Reporting" asp-page="/DailyBill">Daily Bill</a>
+}
+
+<div class="vf-content">
+    <h1>Pending List</h1>
+    <p>Entries in the pending status band (status 401–409).</p>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ParamError))
+    {
+        <div class="vf-alert vf-alert-danger" role="alert">@Model.ParamError</div>
+    }
+
+    @if (Model.Rows.Count == 0)
+    {
+        <p>No pending entries.</p>
+    }
+    else
+    {
+        <table class="vf-table">
+            <thead>
+                <tr>
+                    <th scope="col">Ref</th>
+                    <th scope="col">Passenger</th>
+                    <th scope="col">Agent</th>
+                    <th scope="col">Submitted</th>
+                    <th scope="col">Country</th>
+                    <th scope="col">External remark</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model.Rows)
+                {
+                    <tr>
+                        <td>@row.Refno</td>
+                        <td>@row.Paxname</td>
+                        <td>@row.Agentname</td>
+                        <td>@(row.Subdate?.ToString("dd-MMM-yyyy") ?? "—")</td>
+                        <td>@row.Countryname</td>
+                        <td>@(string.IsNullOrWhiteSpace(row.Externalremark) ? "—" : row.Externalremark)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

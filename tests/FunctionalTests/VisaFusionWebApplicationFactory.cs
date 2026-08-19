@@ -7,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using VisaFusion.Core.Application;
+using VisaFusion.Data.Application;
+using VisaFusion.Data.Persistence;
 using VisaFusion.Identity;
 using VisaFusion.Identity.Persistence;
 using VisaFusion.Web;
@@ -32,6 +34,14 @@ public class VisaFusionWebApplicationFactory : WebApplicationFactory<Program>
 {
     private readonly string _identityDatabaseName = $"VisaFusionIdentity-{Guid.NewGuid():N}";
 
+    // The VisaEntryDbContext InMemory store name is a stable field (NOT a
+    // Guid.NewGuid() inside the options lambda): EF Core may construct the
+    // DbContextOptions more than once, and each lambda evaluation would mint a
+    // NEW store name — silently splitting the store between the API request
+    // pipeline and the test's own scopes (observed in SPEC-0008 T033). The
+    // Identity store above uses the same stable-field pattern.
+    private readonly string _visaEntryDatabaseName = $"VisaFusion-{Guid.NewGuid():N}";
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
@@ -45,6 +55,9 @@ public class VisaFusionWebApplicationFactory : WebApplicationFactory<Program>
                 ["Serilog:WriteTo:0:Name"] = "Console",
                 ["ConnectionStrings:DefaultConnection"] =
                     "Server=localhost;Database=VisaFusion_Test;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true",
+                // SPEC-0008 FR-008/AC-002: office notification email recipient
+                // (BR-005 — no credentials/addresses hard-coded in source).
+                ["Notifications:OfficeEmail"] = "office@test.local",
             });
         });
 
@@ -54,6 +67,26 @@ public class VisaFusionWebApplicationFactory : WebApplicationFactory<Program>
             services.RemoveAll<VisaFusionIdentityDbContext>();
             services.AddDbContext<VisaFusionIdentityDbContext>(options =>
                 options.UseInMemoryDatabase(_identityDatabaseName));
+
+            // SPEC-0008 (T018): the real PublicEndpoint.SubmitQueryAsync persists
+            // the contact query and enqueues the office email through
+            // VisaEntryDbContext, which points at a non-routable placeholder
+            // connection here. Replace it with an EF Core InMemory store (the
+            // same pattern used for the Identity store above) so the queries
+            // functional tests (201/400/429, rate limit) are hermetic — the
+            // real SQL behavior is covered by the integration tests
+            // (QueriesPersistenceTests) and the migration tests.
+            services.RemoveAll<DbContextOptions<VisaEntryDbContext>>();
+            services.RemoveAll<VisaEntryDbContext>();
+            services.AddDbContext<VisaEntryDbContext>(options =>
+                options.UseInMemoryDatabase(_visaEntryDatabaseName)
+                    .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.InMemoryEventId.TransactionIgnoredWarning)));
+
+            // Ensure the in-memory database schema is created (includes emailQueue table for SPEC-0008)
+            services.AddScoped<IDatabaseInitializer, InMemoryDatabaseInitializer>();
+
+            // Ensure the in-memory database schema is created on startup
+            services.AddHostedService<DatabaseInitializationHostedService>();
 
             // US2 (T019/T020): the real day-gate implementation reads the
             // `security` table via VisaEntryDbContext, which points at a
@@ -95,6 +128,11 @@ public class VisaFusionWebApplicationFactory : WebApplicationFactory<Program>
             services.AddSingleton<IUserManagementService, InMemoryUserManagementServiceStub>();
 
             services.AddSingleton<IHostedService, IdentityRoleSeeder>();
+
+            // Register email service for the in-memory database (SPEC-0008 T018)
+            services.Configure<VisaFusion.Core.Options.QueueWorkerOptions>(options => { });
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IEmailDispatchProvider, LogOnlyEmailDispatchProvider>();
         });
     }
 
@@ -529,6 +567,54 @@ public class VisaFusionWebApplicationFactory : WebApplicationFactory<Program>
             new AgentStatementLine(1, new DateTime(2026, 8, 1), 1, "SALES", 1001, "Portal Pax One", "B", 101, 1000m, null, 1000m),
             new AgentStatementLine(2, new DateTime(2026, 8, 2), 1, "RECEIPT", 1001, "Portal Pax One", "P", 201, null, 500m, 500m),
         };
+    }
+
+    /// <summary>
+    /// Initializes the in-memory database schema for functional tests.
+    /// </summary>
+    private sealed class InMemoryDatabaseInitializer : IDatabaseInitializer
+    {
+        private readonly VisaEntryDbContext _dbContext;
+
+        public InMemoryDatabaseInitializer(VisaEntryDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
+        public async Task InitializeAsync()
+        {
+            await _dbContext.Database.EnsureCreatedAsync();
+        }
+    }
+
+    /// <summary>
+    /// Hosted service that initializes the in-memory database schema on startup.
+    /// </summary>
+    private sealed class DatabaseInitializationHostedService : IHostedService
+    {
+        private readonly IServiceProvider _serviceProvider;
+
+        public DatabaseInitializationHostedService(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
+        public async Task StartAsync(CancellationToken cancellationToken)
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var initializer = scope.ServiceProvider.GetRequiredService<IDatabaseInitializer>();
+            await initializer.InitializeAsync();
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Interface for database initialization.
+    /// </summary>
+    private interface IDatabaseInitializer
+    {
+        Task InitializeAsync();
     }
 
     /// <summary>

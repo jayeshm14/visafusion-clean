@@ -407,6 +407,61 @@ namespace VisaFusion.Data.Migrations
                     b.ToTable("certificate", (string)null);
                 });
 
+            modelBuilder.Entity("VisaFusion.Data.Persistence.Entities.ContactQuery", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)")
+                        .HasColumnName("email");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)")
+                        .HasColumnName("ip_address");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("message");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)")
+                        .HasDefaultValue("new")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("Subdate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("subdate");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)")
+                        .HasColumnName("subject");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("queries", (string)null);
+                });
+
             modelBuilder.Entity("VisaFusion.Data.Persistence.Entities.ContentUpdate", b =>
                 {
                     b.Property<long>("Id")
@@ -544,6 +599,62 @@ namespace VisaFusion.Data.Migrations
                         .HasDatabaseName("IX_sentmails_agentsid");
 
                     b.ToTable("sentmails", (string)null);
+                });
+
+            modelBuilder.Entity("VisaFusion.Data.Persistence.Entities.EmailQueue", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int?>("Agentsid")
+                        .HasColumnType("int")
+                        .HasColumnName("agentsid");
+
+                    b.Property<string>("Awb")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)")
+                        .HasColumnName("awb");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("body");
+
+                    b.Property<int?>("Refno")
+                        .HasColumnType("int")
+                        .HasColumnName("refno");
+
+                    b.Property<string>("Sentby")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)")
+                        .HasColumnName("sentby");
+
+                    b.Property<DateTime?>("Sentdate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("sentdate");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)")
+                        .HasColumnName("subject");
+
+                    b.Property<string>("Toemail")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)")
+                        .HasColumnName("toemail");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Agentsid")
+                        .HasDatabaseName("IX_emailQueue_agentsid");
+
+                    b.ToTable("emailQueue", (string)null);
                 });
 
             modelBuilder.Entity("VisaFusion.Data.Persistence.Entities.Embassy", b =>
@@ -1866,6 +1977,14 @@ namespace VisaFusion.Data.Migrations
                     b.HasIndex("Embassyid");
 
                     b.ToTable("weeklyoff", (string)null);
+                });
+
+            modelBuilder.Entity("VisaFusion.Data.Persistence.Entities.EmailQueue", b =>
+                {
+                    b.HasOne("VisaFusion.Data.Persistence.Entities.Agent", null)
+                        .WithMany()
+                        .HasForeignKey("Agentsid")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("VisaFusion.Data.Persistence.Entities.Entry", b =>

@@ -257,8 +257,8 @@ Filename-pattern census (585 files, includes ~700 dated update snapshots counted
 1. **Backdoor in `connection.asp` lines 177–184:** query params `udaanappraj123guruadm` echo internals; `udaan12345functiondisplaymarquee=76` leaks the `con` connection object into the page; `=77` sets `con` to `Nothing` → per-request DoS. Present in every copy of connection.asp.
 2. **SQL injection everywhere:** user input concatenated into SQL in hundreds of places (search pages, `listforagents.asp` keyword search, login, all `request("...")` writes).
 3. **Agent identity = query string:** `jn=`, `agent=`, `agentsID=` params select the acting agent. `listforagents.asp` shows *another agent's* statuses if `jn` is changed. Session identity is never used.
-4. **Plaintext passwords** in `Udaan_users` and `registration`; passwords emailed in plaintext on registration (`addNewUser.asp` email body includes `Password: <pwd>`).
-5. **Hardcoded secrets in code:** SQL `sa` password; SMS gateway creds `udaanindia` / `rajan1604` (`SendSMS.asp`); SMTP relay `relay.spectranet.com:25`, from `udaan@spectranet.com`; CDO config; hardcoded agent seckey.
+4. **Plaintext passwords** in `Udaan_users` and `registration`; passwords emailed in plaintext on registration (`addNewUser.asp` email body includes `Password: [REDACTED]`).
+5. **Hardcoded secrets in code:** SQL `sa` password; SMS gateway creds `udaanindia` / `[REDACTED]` (`SendSMS.asp`); SMTP relay `relay.spectranet.com:25`, from `udaan@spectranet.com`; CDO config; hardcoded agent seckey.
 6. **~13 anonymous DB-write endpoints** (see §3.8).
 7. **`on error resume next`** swallows all runtime errors → silent data corruption.
 8. Public `execute.asp` executes arbitrary SQL (anonymously).
@@ -300,7 +300,7 @@ Filename-pattern census (585 files, includes ~700 dated update snapshots counted
 - `searchByInvno.asp`, `searchbymail.asp`, `searchPax*.asp`, `searchEntry*.asp`, `searchResult.asp` — free-text/filter search (all SQLi-prone).
 
 ### 6.7 SMS / Email
-- **SMS:** `SendSMS.asp` POSTs to `http://api.messaging4u.com/india/SendingSMS.aspx?username=udaanindia&pwd=rajan1604&<mobile>&<msg>` (plaintext creds, HTTP). Sender `UdaanIndia`; CDMA number `919818720698`. Logs to `smshistory`; queued via `SendSMSToQueue.asp`/`SendSMStoQueue.asp`→`smsQueue`.
+- **SMS:** `SendSMS.asp` POSTs to `http://api.messaging4u.com/india/SendingSMS.aspx?username=udaanindia&pwd=[REDACTED]&<mobile>&<msg>` (plaintext creds, HTTP). Sender `UdaanIndia`; CDMA number `919818720698`. Logs to `smshistory`; queued via `SendSMSToQueue.asp`/`SendSMStoQueue.asp`→`smsQueue`.
 - **Email:** `contactsendpre.asp:29-41` uses `CDO.Message`/`CDO.Configuration` (SMTP `relay.spectranet.com`, port 25); `addNewUser.asp` uses `OSSMTP.SMTPSession` COM (ActiveX `OSSMTP.dll`, `oSMTP.RaiseError=True`). Logs to `sentmails`/`sentawb`.
 - **Replacement plan:** both CDO and OSSMTP are COM-on-Windows — replace with `SmtpClient`/mail library and a real SMTP provider (or modern HTTP mail API). The `relay.spectranet.com` relay may be defunct — confirm.
 

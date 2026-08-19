@@ -1,0 +1,84 @@
+@page
+@model VisaFusion.Web.Areas.Reporting.Pages.DailyBillModel
+@{
+    ViewData["Title"] = "Daily Bill";
+    ViewData["UseSidebar"] = true;
+}
+
+@section SidebarNav {
+    <a asp-area="Reporting" asp-page="/Pending">Pending</a>
+    <a asp-area="Reporting" asp-page="/TodaySubmission">Today Submission</a>
+    <a asp-area="Reporting" asp-page="/TodayCollection">Today Collection</a>
+    <a asp-area="Reporting" asp-page="/TodayTransaction">Today Transaction</a>
+    <a asp-area="Reporting" asp-page="/DailyVisaFee">Daily Visa Fee</a>
+    <a asp-area="Reporting" asp-page="/DailyBill" aria-current="page">Daily Bill</a>
+}
+
+<div class="vf-content">
+    <h1>Daily Bill</h1>
+    <p>Bills for the selected date range (defaults to today).</p>
+
+    <form method="get" class="vf-inline-form">
+        <div class="form-group">
+            <label for="dateFrom">From</label>
+            <input type="date" id="dateFrom" name="dateFrom" class="form-control"
+                   value="@(Model.Params?.From.ToString("yyyy-MM-dd"))" />
+        </div>
+        <div class="form-group">
+            <label for="dateTo">To</label>
+            <input type="date" id="dateTo" name="dateTo" class="form-control"
+                   value="@(Model.Params?.To is { } to ? to.AddDays(-1).ToString("yyyy-MM-dd") : string.Empty)" />
+        </div>
+        <button type="submit" class="vf-btn vf-btn-primary">Filter</button>
+    </form>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ParamError))
+    {
+        <div class="vf-alert vf-alert-danger" role="alert">@Model.ParamError</div>
+    }
+
+    @if (Model.Rows.Count == 0)
+    {
+        <p>No bills in the selected range.</p>
+    }
+    else
+    {
+        <table class="vf-table">
+            <thead>
+                <tr>
+                    <th scope="col">Ref</th>
+                    <th scope="col">Invoice</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Hotel</th>
+                    <th scope="col">Cab</th>
+                    <th scope="col">POE</th>
+                    <th scope="col">Misc</th>
+                    <th scope="col">Attest</th>
+                    <th scope="col">Courier</th>
+                    <th scope="col">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model.Rows)
+                {
+                    <tr>
+                        <td>@row.Refno</td>
+                        <td>@(row.Invoiceno?.ToString() ?? "—")</td>
+                        <td>@(row.Invoicedate?.ToString("dd-MMM-yyyy") ?? "—")</td>
+                        <td>@(string.IsNullOrWhiteSpace(row.Invtype) ? "—" : row.Invtype)</td>
+                        <td>@(row.Hotelfee?.ToString("0.00") ?? "—")</td>
+                        <td>@(row.Cabfee?.ToString("0.00") ?? "—")</td>
+                        <td>@(row.Poe?.ToString("0.00") ?? "—")</td>
+                        <td>@(row.Misc?.ToString("0.00") ?? "—")</td>
+                        <td>@(row.Attestfee?.ToString("0.00") ?? "—")</td>
+                        <td>@(row.Courierfee?.ToString("0.00") ?? "—")</td>
+                        <td>@(row.Grandtotal?.ToString("0.00") ?? "—")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <p class="vf-muted"><strong>Grand total:</strong> @(Model.GrandTotal?.ToString("0.00") ?? "—")</p>
+    }
+</div>

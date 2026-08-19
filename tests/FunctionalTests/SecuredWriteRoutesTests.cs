@@ -18,8 +18,8 @@ namespace VisaFusion.FunctionalTests;
 ///
 /// For each of the 8 role-secured routes still on the standardized placeholder:
 /// anonymous → 401, wrong role → 403, correct role → 501 (the placeholder until
-/// the module feature delivers the business payload). The 2 public-by-design
-/// routes stay anonymous: register → 201, queries → 501.
+/// the module feature delivers the business payload). The public-by-design
+/// register route stays anonymous → 201.
 ///
 /// The three `/api/v1/entries*` rows from the original 11-route matrix were
 /// removed when SPEC-0006 T027/T028 implemented the Entries endpoints — those
@@ -28,8 +28,16 @@ namespace VisaFusion.FunctionalTests;
 /// SPEC-0007 T014 (implemented; its adm/su matrix is covered by
 /// AgentRbacTests) and the security-day open/close rows on SPEC-0007 T025
 /// (implemented; their adm/su matrix is covered by the SecurityDay functional
-/// tests). The remaining 5 routes (agents/self, billing, holidays, reports)
-/// are still placeholders.
+/// tests). The `POST /api/v1/public/queries` row was removed on SPEC-0008
+/// T019/T020 (implemented; its 201/400/429 contract is covered by
+/// QueriesEndpointTests). The `POST /api/v1/holidays` and
+/// `DELETE /api/v1/holidays/{id}` rows were removed on SPEC-0008 T043
+/// (implemented; their adm/su matrix, 409 duplicates and BR-006 weekday
+/// boundaries are covered by HolidayCrudEndpointTests T040) and the
+/// `POST /api/v1/reports/agent-status/today` row on SPEC-0008 T048
+/// (implemented as the GET report surface; its emp/adm/su matrix and 400
+/// date validation are covered by ReportEndpointTests T044). The remaining 1
+/// route (billing) is still a placeholder.
 ///
 /// Tokens are minted locally with the same development key the host uses
 /// (test-only; production keys come from configuration, NFR-004).
@@ -105,17 +113,6 @@ public class SecuredWriteRoutesTests : IClassFixture<VisaFusionWebApplicationFac
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
-    [Fact]
-    public async Task Public_Queries_Anonymous_Returns_501()
-    {
-        // contracts/auth-api.md §5: anonymous by design; the payload lands with
-        // the Public/Contact module feature — this feature secures the route
-        // and returns the standardized 501 placeholder.
-        var response = await _client.PostAsJsonAsync("/api/v1/public/queries", new { });
-
-        Assert.Equal(HttpStatusCode.NotImplemented, response.StatusCode);
-    }
-
     public static IEnumerable<object[]> SecuredRoutes()
     {
         // Routes + minimum roles verbatim from contracts/secured-write-routes.md §1.
@@ -127,9 +124,6 @@ public class SecuredWriteRoutesTests : IClassFixture<VisaFusionWebApplicationFac
         // the PUT /api/v1/agents/{id}/self row on SPEC-0007 T030 (implemented;
         // covered by the Agent portal functional tests).
         yield return new object[] { HttpMethod.Post, "/api/v1/billing/entries", new[] { "emp", "adm", "su" }, false };
-        yield return new object[] { HttpMethod.Post, "/api/v1/holidays", new[] { "adm", "su" }, false };
-        yield return new object[] { HttpMethod.Delete, "/api/v1/holidays/5", new[] { "adm", "su" }, false };
-        yield return new object[] { HttpMethod.Post, "/api/v1/reports/agent-status/today", new[] { "emp", "adm", "su" }, false };
     }
 
     private string CreateTestToken(string role, int? agentId = null)

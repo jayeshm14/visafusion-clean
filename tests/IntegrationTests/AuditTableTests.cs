@@ -1,4 +1,7 @@
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using VisaFusion.Data.Persistence;
+using VisaFusion.Data.Persistence.Entities;
 using VisaFusion.Migration.Catalog;
 using VisaFusion.Migration.Validation;
 
@@ -98,6 +101,99 @@ public class AuditTableTests
             var sourceChecksum = await ChecksumSql.ExecuteStringAsync(legacy, spec.LegacyTable);
             var targetChecksum = await ChecksumSql.ExecuteStringAsync(target, spec.TargetTable!);
             Assert.Equal(sourceChecksum, targetChecksum);
+        }
+    }
+
+    [Fact]
+    public async Task SmsLog_And_EmailLog_Writes_Flow_Through_The_Same_Legacy_Tables()
+    {
+        // BR-001 (SPEC-0008 T050): the EF entities SmsLog/EmailLog must write
+        // through the SAME tables the legacy app used — smshistory / sentmails.
+        // A write via VisaEntryDbContext must be visible to raw SQL on the
+        // target database, proving the audit-continuity contract (FR-006/BR-003).
+        if (!ServersReachable()) return;
+
+        var options = new DbContextOptionsBuilder<VisaEntryDbContext>()
+            .UseSqlServer(TargetConnectionString)
+            .Options;
+
+        long smsId = 0;
+        long emailId = 0;
+
+        await using (var db = new VisaEntryDbContext(options))
+        {
+            var sms = new SmsLog
+            {
+                Cellno = "01711-000000",
+                Refno = 999999,
+                AgentId = null,
+                Paxname = "BR-001 audit-continuity",
+                Status = "sent",
+                Message = "BR-001 test message",
+                Sentby = "BR001",
+                Sentdate = DateTime.Now,
+            };
+            db.SmsLogs.Add(sms);
+            await db.SaveChangesAsync();
+            smsId = sms.Id;
+
+            var email = new EmailLog
+            {
+                Agentsid = 0,
+                Date = DateTime.Now,
+                Toemail = "br001@test.invalid",
+                Awb = "BR001-AWB",
+            };
+            db.EmailLogs.Add(email);
+            await db.SaveChangesAsync();
+            emailId = email.Id;
+        }
+
+        try
+        {
+            await using var target = new SqlConnection(TargetConnectionString);
+            await target.OpenAsync();
+
+            // smshistory row exists with all 8 fields (AC-003).
+            await using (var cmd = target.CreateCommand())
+            {
+                cmd.CommandText = "SELECT COUNT_BIG(*) FROM smshistory WHERE Id = @id AND cellno = @cellno AND refno = @refno AND paxname = @paxname AND status = @status AND message = @message AND sentby = @sentby";
+                cmd.Parameters.AddWithValue("@id", smsId);
+                cmd.Parameters.AddWithValue("@cellno", "01711-000000");
+                cmd.Parameters.AddWithValue("@refno", 999999);
+                cmd.Parameters.AddWithValue("@paxname", "BR-001 audit-continuity");
+                cmd.Parameters.AddWithValue("@status", "sent");
+                cmd.Parameters.AddWithValue("@message", "BR-001 test message");
+                cmd.Parameters.AddWithValue("@sentby", "BR001");
+                var smsCount = Convert.ToInt64(await cmd.ExecuteScalarAsync());
+                Assert.Equal(1, smsCount);
+            }
+
+            // sentmails row exists with agentsid/date/toemail/awb (AC-005).
+            await using (var cmd = target.CreateCommand())
+            {
+                cmd.CommandText = "SELECT COUNT_BIG(*) FROM sentmails WHERE id = @id AND agentsid = @agentsid AND toemail = @toemail AND awb = @awb";
+                cmd.Parameters.AddWithValue("@id", emailId);
+                cmd.Parameters.AddWithValue("@agentsid", 0);
+                cmd.Parameters.AddWithValue("@toemail", "br001@test.invalid");
+                cmd.Parameters.AddWithValue("@awb", "BR001-AWB");
+                var emailCount = Convert.ToInt64(await cmd.ExecuteScalarAsync());
+                Assert.Equal(1, emailCount);
+            }
+        }
+        finally
+        {
+            // Clean up the audit rows written by this test (append-only tables
+            // must not accumulate test residue; see SPEC-0008 T050).
+            await using var cleanup = new SqlConnection(TargetConnectionString);
+            await cleanup.OpenAsync();
+            await using (var cmd = cleanup.CreateCommand())
+            {
+                cmd.CommandText = "DELETE FROM smshistory WHERE Id = @smsId; DELETE FROM sentmails WHERE id = @emailId;";
+                cmd.Parameters.AddWithValue("@smsId", smsId);
+                cmd.Parameters.AddWithValue("@emailId", emailId);
+                await cmd.ExecuteNonQueryAsync();
+            }
         }
     }
 

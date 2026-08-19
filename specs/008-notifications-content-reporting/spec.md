@@ -106,7 +106,7 @@ Daily embassy/news content is managed through `dailyupdate.asp` (write) and `vie
 - **NFR-001**: SMS/email dispatch MUST NOT block the request lifecycle — enqueue returns immediately and dispatch happens on the background worker (SPEC-0003 Jobs host)
 - **NFR-002**: All data access MUST be parameterized; no string-concatenated SQL (SPEC-0005 NFR-003; fixes the §6.6 report SQLi finding)
 - **NFR-003**: All notification sends and failures MUST emit structured logs (Serilog) and counters (OpenTelemetry), extending the existing observability setup (SPEC-0005 NFR-006)
-- **NFR-004**: Secrets (SMS gateway, SMTP) MUST NOT be stored in source (SPEC-0005 NFR-004; fixes the plaintext `udaanindia`/`rajan1604` SMS creds finding, modernization_plan §2.8)
+- **NFR-004**: Secrets (SMS gateway, SMTP) MUST NOT be stored in source (SPEC-0005 NFR-004; fixes the plaintext `udaanindia`/`[REDACTED]` SMS creds finding, modernization_plan §2.8)
 - **NFR-005**: Notification dispatch MUST be retryable and idempotent per message — a retried message is dispatched once per attempt and logged once per attempt with its status (no duplicate silent sends)
 - **NFR-006**: Report generation MUST be repeatable and deterministic for the same input date range
 
@@ -173,7 +173,7 @@ All report endpoints render on-screen HTML; report dispatch by email is deferred
 - SMS enqueue: recipient mobile required and valid; message required with length limit
 - Email enqueue: recipient email required and valid; subject and body required with length limits
 - Contact query: name, email (valid), subject, message all required with length limits (SPEC-0007 contract `public-api.md` §1); rate limit 5/hour per source (SPEC-0007 FR-011) **enforced in v1** (owner decision 2026-08-18), wired via SPEC-0005 §17/R7
-- dailyUpdate: date and description required; description within the 8,000-character column limit
+- dailyUpdate: date and description required; descriptions exceeding the 8,000-character column limit are rejected at validation (400)
 - Holiday: embassy and holiday date required; no duplicate embassy+date
 - Weekly-off: embassy and weekday (1–7, VBScript numbering per BR-006) required; no duplicate embassy+weekday
 - Reports: date-range inputs validated; invalid dates rejected before query execution
@@ -187,6 +187,8 @@ All report endpoints render on-screen HTML; report dispatch by email is deferred
 
 - Standardized problem-details responses: 400 validation, 401/403 authorization, 404 not found, 409 duplicate (holiday/weekly-off), 429 rate-limited (queries)
 - Dispatch failures are logged with structured details and retried; the failure is visible in the SMS/email history status field and in observability counters — never silently swallowed (FR-006)
+- Retry exhaustion (3 attempts, exponential backoff per Assumptions): the final failure is logged with a `failed` status and the queue row is retained for the next drain cycle — no message loss, no silent drop
+- Worker crash mid-drain is safe: the drain commits the audit insert + queue delete transactionally (research D-3), so a crash between operations leaves the message in the queue and it is retried on the next cycle — no duplicate send, no lost message
 - No stack traces or connection details leaked to clients
 - Queue worker faults are isolated to the worker; a worker crash does not fail request handling
 
@@ -207,10 +209,10 @@ All report endpoints render on-screen HTML; report dispatch by email is deferred
 - **AC-004**: A failed SMS/email dispatch is retried and logged with its failure status — never silently swallowed
 - **AC-005**: Enqueuing an email results in a `sentmails` row with agentsid, date, toemail, awb populated
 - **AC-006**: The `dailyUpdate` CMS is accessible to `adm`/`su` only; non-admin roles receive 403; the public read page stays anonymous and reflects CMS changes
-- **AC-007**: Holiday/weekly-off CRUD is accessible via the `HolidayAdmin` policy (`adm`/`su`) only; created records are immediately honored by the bookable-date rule (parity with `HolidayService`/`fn_IsEmbassyClosed`, SPEC-0006)
+- **AC-007**: Holiday/weekly-off CRUD is accessible via the `HolidayAdmin` policy (`adm`/`su`) only; created records are immediately honored by the bookable-date rule — verified against the authoritative ground truth `IHolidayService.IsEmbassyClosedAsync` (SPEC-0006)
 - **AC-008**: Operational reports render for `emp`/`adm`/`su`; `agt`/`guest` receive 403; all report queries are parameterized (no SQLi)
-- **AC-009**: Notification enqueue returns in under 1 second and does not block request handling
-- **AC-010**: No SMS/SMTP credentials appear in source code or logs
+- **AC-009**: Notification enqueue returns in under 1 second — server-side response time measured at the API boundary (request received → response sent) — and does not block request handling
+- **AC-010**: No SMS/SMTP credentials appear in the committed source tree or in generated logs (secrets-guard scan surface: all committed files + log outputs)
 
 ## 21. Risks
 

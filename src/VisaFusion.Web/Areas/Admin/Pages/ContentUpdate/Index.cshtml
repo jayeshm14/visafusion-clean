@@ -1,0 +1,88 @@
+@page
+@model VisaFusion.Web.Areas.Admin.Pages.ContentUpdate.IndexModel
+@{
+    ViewData["Title"] = "Daily Updates";
+    ViewData["UseSidebar"] = true;
+}
+
+@section SidebarNav {
+    <a asp-area="Admin" asp-page="/ContentUpdate/Index" aria-current="page">Daily Updates</a>
+}
+
+<div class="vf-content">
+    <h1>Daily Updates</h1>
+
+    @if (!string.IsNullOrWhiteSpace(Model.OutcomeMessage))
+    {
+        <div class="vf-alert vf-alert-success" role="status">@Model.OutcomeMessage</div>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.OutcomeError))
+    {
+        <div class="vf-alert vf-alert-danger" role="alert">@Model.OutcomeError</div>
+    }
+
+    <div class="vf-card">
+        <h2>Record a daily update</h2>
+        <form method="post" asp-page-handler="Create">
+            <div class="form-group">
+                <label for="entrydate">Date</label>
+                <input type="date" id="entrydate" name="entrydate" required class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="form-group">
+                <label for="description">Message</label>
+                <textarea id="description" name="description" rows="5" required class="form-control" maxlength="8000"></textarea>
+            </div>
+            <button type="submit" class="vf-btn vf-btn-primary">Record</button>
+        </form>
+    </div>
+
+    <div class="vf-card">
+        @if (Model.Entries.Count == 0)
+        {
+            <p>No daily updates recorded.</p>
+        }
+        else
+        {
+            <table class="vf-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Message</th>
+                        <th scope="col"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var entry in Model.Entries)
+                    {
+                        <tr>
+                            <td>@(entry.Entrydate?.ToString("dd-MMM-yyyy") ?? "—")</td>
+                            <td>@entry.Description</td>
+                            <td>
+                                <details class="vf-inline-edit">
+                                    <summary class="vf-btn vf-btn-secondary">Edit</summary>
+                                    <form method="post" asp-page-handler="Edit">
+                                        <input type="hidden" name="id" value="@entry.Id" />
+                                        <div class="form-group">
+                                            <label for="entrydate-@entry.Id">Date</label>
+                                            <input type="date" id="entrydate-@entry.Id" name="entrydate" required class="form-control"
+                                                   value="@(entry.Entrydate?.ToString("yyyy-MM-dd"))" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="description-@entry.Id">Message</label>
+                                            <textarea id="description-@entry.Id" name="description" rows="3" required class="form-control" maxlength="8000">@entry.Description</textarea>
+                                        </div>
+                                        <button type="submit" class="vf-btn vf-btn-primary">Save</button>
+                                    </form>
+                                </details>
+                                <form method="post" asp-page-handler="Delete" class="vf-inline-form">
+                                    <input type="hidden" name="id" value="@entry.Id" />
+                                    <button type="submit" class="vf-btn vf-btn-secondary">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

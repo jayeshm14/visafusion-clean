@@ -480,6 +480,85 @@
                       "id":  "ENT-TASKS",
                       "type":  "Page",
                       "label":  "specs/006-core-entry-workflow/tasks.md (38 tasks)"
+                  },
+                  {
+                      "id":  "MOD-007",
+                      "type":  "Module",
+                      "label":  "Public Site",
+                      "legacy":  "querieDetail.asp, contact.asp, register.asp"
+                  },
+                  {
+                      "id":  "API-v1-public",
+                      "type":  "API",
+                      "label":  "/api/v1/public/queries"
+                  },
+                  {
+                      "id":  "UI-Public",
+                      "type":  "Page",
+                      "label":  "Public Razor Pages"
+                  },
+                  {
+                      "id":  "TEST-Public",
+                      "type":  "Test Case",
+                      "label":  "Public site parity functional suite"
+                  },
+                  {
+                      "id":  "SPEC-0007",
+                      "type":  "Requirement",
+                      "label":  "Public Site Parity (SPEC-0007)",
+                      "status":  "Accepted"
+                  },
+                  {
+                      "id":  "ADR-0005",
+                      "type":  "ADR",
+                      "label":  "New emailQueue table + Data-backed notification services",
+                      "status":  "Accepted"
+                  },
+                  {
+                      "id":  "SPEC-0008",
+                      "type":  "Requirement",
+                      "label":  "Notifications, Content & Reporting (SPEC-0008)",
+                      "status":  "Accepted"
+                  },
+                  {
+                      "id":  "NTF-API",
+                      "type":  "API",
+                      "label":  "/api/v1/notifications/sms|email + /api/v1/public/queries (enqueue-and-log mode, Q1:C)"
+                  },
+                  {
+                      "id":  "NTF-SERVICE",
+                      "type":  "Domain Entity",
+                      "label":  "SmsService/EmailService (EF-backed, Data project, IHolidayService precedent, D-7)"
+                  },
+                  {
+                      "id":  "TBL-emailQueue",
+                      "type":  "Table",
+                      "label":  "emailQueue (NEW — durable email queue, D-1)"
+                  },
+                  {
+                      "id":  "TBL-queries",
+                      "type":  "Table",
+                      "label":  "queries (NEW — public contact queries, status write-once new)"
+                  },
+                  {
+                      "id":  "CTL-Content",
+                      "type":  "API",
+                      "label":  "/api/v1/admin/content/daily-update CMS (dailyUpdate, FR-010)"
+                  },
+                  {
+                      "id":  "CTL-Holiday",
+                      "type":  "API",
+                      "label":  "/api/v1/holidays + /api/v1/holidays/weekly-off CRUD (FR-011, rule from SPEC-0006)"
+                  },
+                  {
+                      "id":  "RPT-Ops",
+                      "type":  "API",
+                      "label":  "Operational reports (v1 on-screen only, Q2:A, FR-012)"
+                  },
+                  {
+                      "id":  "TEST-Notify",
+                      "type":  "Test Case",
+                      "label":  "SPEC-0008 unit/integration/functional suite (incl. BR-001 audit continuity)"
                   }
               ],
     "edges":  [

@@ -1,7 +1,31 @@
 ﻿@page
+@model VisaFusion.Web.Areas.Reporting.Pages.ReportingIndexModel
 @{
-    ViewData["Title"] = "Reporting Area";
+    ViewData["Title"] = "Operational Reports";
+    ViewData["UseSidebar"] = true;
 }
 
-<h1>Reporting Area</h1>
-<p>Placeholder page for the Reporting area (SPEC-0003 T027, FR-005).</p>
+@section SidebarNav {
+    <a asp-area="Reporting" asp-page="/Index" aria-current="page">Reports</a>
+    <a asp-area="Reporting" asp-page="/Pending">Pending</a>
+    <a asp-area="Reporting" asp-page="/TodaySubmission">Today Submission</a>
+    <a asp-area="Reporting" asp-page="/TodayCollection">Today Collection</a>
+    <a asp-area="Reporting" asp-page="/TodayTransaction">Today Transaction</a>
+    <a asp-area="Reporting" asp-page="/DailyVisaFee">Daily Visa Fee</a>
+    <a asp-area="Reporting" asp-page="/DailyBill">Daily Bill</a>
+}
+
+<div class="vf-content">
+    <h1>Operational Reports</h1>
+    <p>On-screen operational reports (SPEC-0008 US6, FR-012). Available to
+        employee, admin and super-user roles.</p>
+
+    <ul class="vf-link-list">
+        <li><a asp-area="Reporting" asp-page="/Pending">Pending list</a></li>
+        <li><a asp-area="Reporting" asp-page="/TodaySubmission">Today submission</a></li>
+        <li><a asp-area="Reporting" asp-page="/TodayCollection">Today collection</a></li>
+        <li><a asp-area="Reporting" asp-page="/TodayTransaction">Today transaction</a></li>
+        <li><a asp-area="Reporting" asp-page="/DailyVisaFee">Daily visa fee</a></li>
+        <li><a asp-area="Reporting" asp-page="/DailyBill">Daily bill</a></li>
+    </ul>
+</div>

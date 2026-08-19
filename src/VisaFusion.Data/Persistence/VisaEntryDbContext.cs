@@ -62,6 +62,8 @@ public sealed class VisaEntryDbContext : DbContext
     public DbSet<Scheduler> Schedulers => Set<Scheduler>();
     public DbSet<PriWork> PriWorks => Set<PriWork>();
     public DbSet<Subscriber> Subscribers => Set<Subscriber>();
+    public DbSet<ContactQuery> ContactQueries => Set<ContactQuery>();
+    public DbSet<EmailQueue> EmailQueues => Set<EmailQueue>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -106,6 +108,8 @@ public sealed class VisaEntryDbContext : DbContext
         ConfigureScheduler(modelBuilder);
         ConfigurePriWork(modelBuilder);
         ConfigureSubscriber(modelBuilder);
+        ConfigureContactQuery(modelBuilder);
+        ConfigureEmailQueue(modelBuilder);
     }
 
     private static void ConfigureEntry(ModelBuilder mb)
@@ -788,5 +792,42 @@ public sealed class VisaEntryDbContext : DbContext
         e.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();
         e.Property(x => x.Name).HasColumnName("name");
         e.Property(x => x.Email).HasColumnName("email");
+    }
+
+    // SPEC-0008 (T009): NEW additive tables — 'queries' (contact queries) and
+    // 'emailQueue' (email notification queue, research D-1). No existing table is
+    // altered (spec §16 "No change").
+    private static void ConfigureContactQuery(ModelBuilder mb)
+    {
+        var e = mb.Entity<ContactQuery>().ToTable("queries");
+        e.HasKey(x => x.Id);
+        e.Property(x => x.Id).HasColumnName("Id").ValueGeneratedOnAdd();
+        e.Property(x => x.Name).HasColumnName("name").HasMaxLength(256);
+        e.Property(x => x.Email).HasColumnName("email").HasMaxLength(256);
+        e.Property(x => x.Subject).HasColumnName("subject").HasMaxLength(256);
+        e.Property(x => x.Message).HasColumnName("message");
+        e.Property(x => x.Subdate).HasColumnName("subdate");
+        e.Property(x => x.Status).HasColumnName("status").HasMaxLength(16).HasDefaultValue("new");
+        e.Property(x => x.IpAddress).HasColumnName("ip_address").HasMaxLength(64);
+    }
+
+    private static void ConfigureEmailQueue(ModelBuilder mb)
+    {
+        var e = mb.Entity<EmailQueue>().ToTable("emailQueue");
+        e.HasKey(x => x.Id);
+        e.Property(x => x.Id).HasColumnName("Id").ValueGeneratedOnAdd();
+        e.Property(x => x.Toemail).HasColumnName("toemail").HasMaxLength(256);
+        e.Property(x => x.Subject).HasColumnName("subject").HasMaxLength(256);
+        e.Property(x => x.Body).HasColumnName("body");
+        e.Property(x => x.Agentsid).HasColumnName("agentsid");
+        e.Property(x => x.Refno).HasColumnName("refno");
+        e.Property(x => x.Awb).HasColumnName("awb").HasMaxLength(64);
+        e.Property(x => x.Sentby).HasColumnName("sentby").HasMaxLength(64);
+        e.Property(x => x.Sentdate).HasColumnName("sentdate");
+
+        // FK: emailQueue.agentsid -> agents.agentsID (mirrors smsQueue.agentID).
+        e.HasOne<Agent>().WithMany().HasForeignKey(x => x.Agentsid).OnDelete(DeleteBehavior.Restrict);
+
+        e.HasIndex(x => x.Agentsid).HasDatabaseName("IX_emailQueue_agentsid");
     }
 }
