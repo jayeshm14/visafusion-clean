@@ -1,7 +1,16 @@
 ﻿@page
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Notifications Area";
+
+    // Notifications placeholder — SPEC-0009 T078; maps to the _InfoPage
+    // component (COREUI_VISA_FUSION_MAPPING.md). Content unchanged
+    // (SPEC-0003 T027, FR-005 placeholder); CoreUI presentation only.
+    var info = new InfoPageModel
+    {
+        Title = "Notifications Area",
+        Subtitle = "Placeholder page for the Notifications area (SPEC-0003 T027, FR-005).",
+    };
 }
 
-<h1>Notifications Area</h1>
-<p>Placeholder page for the Notifications area (SPEC-0003 T027, FR-005).</p>
+<partial name="~/Components/_InfoPage.cshtml" model="info" />

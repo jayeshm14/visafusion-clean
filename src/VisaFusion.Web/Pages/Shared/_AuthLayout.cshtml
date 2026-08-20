@@ -1,0 +1,28 @@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en" data-coreui-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - VisaFusion</title>
+    <link rel="stylesheet" href="~/lib/coreui/vendors/coreui.min.css" />
+    <link rel="stylesheet" href="~/lib/coreui/vendors/simplebar.min.css" />
+    <link rel="stylesheet" href="~/css/vf-coreui.css" />
+    <link rel="stylesheet" href="~/css/vf-component-styles.css" />
+</head>
+<body>
+    @* CoreUI standalone `pages` layout (SPEC-0009 T027; COREUI_DESIGN_SYSTEM.md §4
+       pages.pug): no header/sidebar/footer — the auth and error surfaces render
+       their centered AuthCard/ErrorPage component inside the body wrapper. *@
+    <div class="bg-body-tertiary min-vh-100 d-flex flex-row align-items-center">
+        @RenderBody()
+    </div>
+
+    @await RenderSectionAsync("Scripts", required: false)
+    <script src="~/lib/coreui/vendors/coreui.bundle.min.js"></script>
+    <script src="~/lib/coreui/vendors/simplebar.min.js"></script>
+    <script src="~/js/vf-coreui.js"></script>
+</body>
+</html>

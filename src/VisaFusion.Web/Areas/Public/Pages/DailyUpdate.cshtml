@@ -3,18 +3,18 @@
 @{
     ViewData["Title"] = "Daily Updates";
 }
-<div class="vf-content">
-    <h1>Daily Updates</h1>
+<h1>Daily Updates</h1>
 
-    @if (Model.Entries.Count == 0)
-    {
-        <p>No updates found for this month.</p>
-    }
-    else
-    {
-        <div class="vf-card">
-            <table class="vf-table">
-                <thead>
+@if (Model.Entries.Count == 0)
+{
+    <p>No updates found for this month.</p>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead class="table-light">
                     <tr>
                         <th scope="col">Date</th>
                         <th scope="col">Update</th>
@@ -31,5 +31,5 @@
                 </tbody>
             </table>
         </div>
-    }
-</div>
+    </div>
+}

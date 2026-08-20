@@ -1,12 +1,16 @@
-@using System.Security.Claims
+﻿@using System.Security.Claims
+@using VisaFusion.Web.Services
+@inject IRoleAwareNavigation NavigationService
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-coreui-theme="light">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - VisaFusion</title>
-    <link rel="stylesheet" href="~/css/tokens.css" />
-    <link rel="stylesheet" href="~/css/theme.css" />
+    <link rel="stylesheet" href="~/lib/coreui/vendors/coreui.min.css" />
+    <link rel="stylesheet" href="~/lib/coreui/vendors/simplebar.min.css" />
+    <link rel="stylesheet" href="~/css/vf-coreui.css" />
+    <link rel="stylesheet" href="~/css/vf-component-styles.css" />
 </head>
 <body>
     @{
@@ -18,8 +22,7 @@
         // register, public site) default to the top-nav.
         var isAuthenticated = User.Identity?.IsAuthenticated == true;
         var useSidebar = (bool?)ViewData["UseSidebar"] ?? isAuthenticated;
-        var userName = User.Identity?.Name;
-        var role = User.FindFirstValue(ClaimTypes.Role);
+        var navGroups = NavigationService.GetNavigationGroups(User);
     }
 
     <a class="vf-skip-link" href="#vf-content">Skip to main content</a>
@@ -27,66 +30,36 @@
     @if (useSidebar)
     {
         <div class="vf-shell">
-            <aside class="vf-sidebar" aria-label="Primary">
-                <a class="vf-sidebar-brand" asp-page="/Index">VisaFusion</a>
-                <nav class="vf-sidebar-nav" aria-label="Main navigation">
-                    <a asp-page="/Index">Home</a>
-                    @if (isAuthenticated)
-                    {
-                        <a asp-page="/Auth/ChangePassword">Change password</a>
-                    }
-                    @await RenderSectionAsync("SidebarNav", required: false)
-                </nav>
-            </aside>
+            @* Sidebar rendered from the canonical _Sidebar partial (SPEC-0009
+               T081; FR-003/AC-004) — nav content comes from the centralized
+               RoleAwareNavigation service, never from per-page sections. *@
+            @await Html.PartialAsync("_Sidebar", navGroups)
             <div class="vf-main">
-                <header class="vf-topbar">
-                    <div aria-hidden="true"></div>
-                    @if (isAuthenticated)
-                    {
-                        <div class="vf-topbar-user">
-                            <span>@userName</span>
-                            @if (!string.IsNullOrEmpty(role))
-                            {
-                                <span class="vf-role">@role</span>
-                            }
-                        </div>
-                    }
-                </header>
+                @await Html.PartialAsync("_Header", new { User = User, IsAuthenticated = isAuthenticated })
+                @* Page header (title + breadcrumb) is part of the shell
+                   composition (SPEC-0009 T081; Addendum §6/§12). *@
+                @await Html.PartialAsync("_PageHeader")
                 <main id="vf-content" class="vf-content" tabindex="-1">
                     @RenderBody()
                 </main>
-                <footer class="vf-footer">
-                    &copy; @DateTime.Now.Year VisaFusion
-                </footer>
+                @await Html.PartialAsync("_Footer")
             </div>
         </div>
     }
     else
     {
-        <header class="vf-topnav">
-            <a class="vf-topnav-brand" asp-page="/Index">VisaFusion</a>
-            <nav class="vf-topnav-links" aria-label="Main navigation">
-                @if (isAuthenticated)
-                {
-                    <a asp-page="/Auth/ChangePassword">Change password</a>
-                }
-                else
-                {
-                    <a asp-page="/Auth/Login">Log in</a>
-                    <a asp-page="/Auth/Register">Register</a>
-                }
-            </nav>
-        </header>
+        @await Html.PartialAsync("_Header", new { User = User, IsAuthenticated = isAuthenticated })
         <main id="vf-content" tabindex="-1">
             <div class="vf-content">
                 @RenderBody()
             </div>
         </main>
-        <footer class="vf-footer">
-            &copy; @DateTime.Now.Year VisaFusion
-        </footer>
+        @await Html.PartialAsync("_Footer")
     }
 
     @await RenderSectionAsync("Scripts", required: false)
+    <script src="~/lib/coreui/vendors/coreui.bundle.min.js"></script>
+    <script src="~/lib/coreui/vendors/simplebar.min.js"></script>
+    <script src="~/js/vf-coreui.js"></script>
 </body>
 </html>

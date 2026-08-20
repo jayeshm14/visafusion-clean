@@ -1,0 +1,239 @@
+@model VisaFusion.Web.Components.DataTableModel
+@{
+    var tableId = Model.Id ?? "data-table";
+    var columns = Model.Columns ?? new List<DataTableColumn>();
+    var rows = Model.Rows ?? new List<Dictionary<string, object>>();
+    var showPagination = Model.ShowPagination;
+    var pageSize = Model.PageSize;
+    var currentPage = Model.CurrentPage;
+    var totalRows = Model.TotalRows;
+    var totalPages = (int)Math.Ceiling((double)totalRows / pageSize);
+    var sortable = Model.Sortable;
+    var searchable = Model.Searchable;
+    var rowActions = Model.RowActions ?? new List<DataTableAction>();
+    var emptyMessage = Model.EmptyMessage ?? "No data available";
+    var striped = Model.Striped;
+    var hover = Model.Hover;
+    var bordered = Model.Bordered;
+    var small = Model.Small;
+    var responsive = Model.Responsive;
+    var responsiveOpen = responsive ? "<div class=\"table-responsive\">" : string.Empty;
+    var responsiveClose = responsive ? "</div>" : string.Empty;
+}
+
+@* DataTable Component - CoreUI Table Pattern *@
+@* Maps to: CoreUI Tables (COREUI_COMPONENT_CATALOG §3.2), Pagination (§2.3), Badges (§3.6), Dropdowns (§2.2) *@
+@* Uses: .table, .table-responsive, .table-striped, .table-hover, .table-bordered, .table-sm, .pagination, .dropdown *@
+
+<div class="data-table">
+@if (searchable)
+{
+    <div class="mb-3">
+        <label for="@(tableId)-search" class="visually-hidden">Search table</label>
+        <div class="input-group input-group-sm">
+            <span class="input-group-text" aria-hidden="true"><svg class="icon icon-sm" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 1a5 5 0 1 0 0-10 5 5 0 0 0 0 10z"/></svg></span>
+            <input type="search" id="@(tableId)-search" class="form-control" placeholder="Search..." aria-label="Search table" data-table-search="@tableId">
+        </div>
+    </div>
+}
+
+@Html.Raw(responsiveOpen)
+
+<table id="@tableId" class="table @(striped ? "table-striped" : "") @(hover ? "table-hover" : "") @(bordered ? "table-bordered" : "") @(small ? "table-sm" : "")" role="grid" aria-label="@(Model.AriaLabel ?? "Data table")">
+    <thead class="table-light">
+        <tr role="row">
+            @foreach (var column in columns)
+            {
+                var sortAttr = sortable && column.Sortable ? "data-sortable=\"true\" data-sort-column=\"" + column.Key + "\"" : string.Empty;
+                var thClass = column.HeaderClass ?? string.Empty;
+                <th scope="col" class="@thClass" @sortAttr style="width: @(column.Width ?? "auto")">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span>@column.Title</span>
+                        @if (sortable && column.Sortable)
+                        {
+                            <svg class="icon icon-xs ms-1" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                                <path d="M4.646 7.646a.5.5 0 0 1 .708 0L8 10.293l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708zm0-4.292a.5.5 0 0 0 .708 0L8 5.707l2.646 2.647a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 0 0 0 .708z"/>
+                            </svg>
+                        }
+                    </div>
+                </th>
+            }
+            @if (rowActions.Any())
+            {
+                <th scope="col" class="text-end" style="width: 1px; white-space: nowrap;">Actions</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @if (rows.Any())
+        {
+            @foreach (var row in rows)
+            {
+                <tr role="row" data-row-id="@(row.ContainsKey("Id") ? row["Id"]?.ToString() : "")">
+                    @foreach (var column in columns)
+                    {
+                        var value = row.ContainsKey(column.Key) ? row[column.Key] : null;
+                        var displayValue = column.Formatter != null ? column.Formatter(value!) : (value?.ToString() ?? string.Empty);
+                        var tdClass = column.CellClass ?? string.Empty;
+                        <td class="@tdClass" data-column="@column.Key">
+                            @if (column.Template != null)
+                            {
+                                @column.Template(value!, row)
+                            }
+                            else
+                            {
+                                @displayValue
+                            }
+                        </td>
+                    }
+                    @if (rowActions.Any())
+                    {
+                        <td class="text-end">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-coreui-toggle="dropdown" aria-expanded="false" aria-label="Row actions">
+                                    <svg class="icon icon-xs" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 4.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1 0-1zm0 3h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1 0-1zm0 3h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1 0-1z"/></svg>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    @foreach (var action in rowActions)
+                                    {
+                                        var actionId = row.ContainsKey("Id") ? row["Id"]?.ToString() : string.Empty;
+                                        var actionUrl = action.UrlTemplate != null ? string.Format(action.UrlTemplate, actionId) : "#";
+                                        <li>
+                                            <a class="dropdown-item @(action.CssClass ?? "")" href="@actionUrl" @(action.OnClick != null ? "onclick=\"" + action.OnClick + "(event, '" + actionId + "')\"" : "") data-action="@action.Name">
+                                                @if (action.Icon != null)
+                                                {
+                                                    <svg class="icon icon-sm me-2" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="@action.Icon"/></svg>
+                                                }
+                                                @action.Title
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </td>
+                    }
+                </tr>
+            }
+        }
+        else
+        {
+            var colSpan = columns.Count + (rowActions.Any() ? 1 : 0);
+            <tr>
+                <td colspan="@colSpan" class="text-center text-body-secondary py-4">
+                    @emptyMessage
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@Html.Raw(responsiveClose)
+
+@if (showPagination && totalPages > 1)
+{
+    <nav aria-label="Table pagination" class="mt-3">
+        <ul class="pagination pagination-sm justify-content-center">
+            <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                <a class="page-link" href="#" data-page="@(currentPage - 1)" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            @for (var i = 1; i <= totalPages; i++)
+            {
+                var isActive = i == currentPage;
+                var showPage = isActive || i == 1 || i == totalPages || (i >= currentPage - 1 && i <= currentPage + 1);
+                if (showPage)
+                {
+                    <li class="page-item @(isActive ? "active" : "")" aria-current="@(isActive ? "page" : "")">
+                        <a class="page-link" href="#" data-page="@i">@i</a>
+                    </li>
+                }
+                else if (i == currentPage - 2 || i == currentPage + 2)
+                {
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                }
+            }
+            <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                <a class="page-link" href="#" data-page="@(currentPage + 1)" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <div class="d-flex justify-content-between align-items-center mt-2">
+        <small class="text-body-secondary">
+            Showing @(((currentPage - 1) * pageSize) + 1) to @(Math.Min(currentPage * pageSize, totalRows)) of @totalRows entries
+        </small>
+        <select class="form-select form-select-sm w-auto" data-page-size aria-label="Page size">
+            <option value="10" @(pageSize == 10 ? "selected" : "")>10</option>
+            <option value="25" @(pageSize == 25 ? "selected" : "")>25</option>
+            <option value="50" @(pageSize == 50 ? "selected" : "")>50</option>
+            <option value="100" @(pageSize == 100 ? "selected" : "")>100</option>
+        </select>
+    </div>
+}
+</div>
+
+<script>
+(function() {
+    // DataTable client-side enhancements (search, sort, pagination events)
+    const table = document.getElementById('@tableId');
+    if (!table) return;
+
+    // Search functionality
+    const searchInput = document.getElementById('@(tableId)-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const filter = this.value.toLowerCase();
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
+            });
+        });
+    }
+
+    // Sort functionality
+    if (@(sortable.ToString().ToLower())) {
+        table.querySelectorAll('th[data-sortable="true"]').forEach(th => {
+            th.style.cursor = 'pointer';
+            th.addEventListener('click', function() {
+                const column = this.dataset.sortColumn;
+                const tbody = table.querySelector('tbody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                const isAsc = this.classList.toggle('sort-asc');
+                this.classList.toggle('sort-desc', !isAsc);
+
+                rows.sort((a, b) => {
+                    const aVal = a.querySelector('td[data-column="' + column + '"]')?.textContent.trim() || '';
+                    const bVal = b.querySelector('td[data-column="' + column + '"]')?.textContent.trim() || '';
+                    return isAsc ? aVal.localeCompare(bVal, undefined, { numeric: true }) : bVal.localeCompare(aVal, undefined, { numeric: true });
+                });
+
+                rows.forEach(row => tbody.appendChild(row));
+            });
+        });
+    }
+
+    // Pagination
+    table.querySelectorAll('.pagination .page-link[data-page]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const page = parseInt(this.dataset.page);
+            if (!isNaN(page)) {
+                const event = new CustomEvent('dataTablePageChange', { detail: { tableId: '@tableId', page: page } });
+                document.dispatchEvent(event);
+            }
+        });
+    });
+
+    // Page size change
+    const pageSizeSelect = table.querySelector('[data-page-size]');
+    if (pageSizeSelect) {
+        pageSizeSelect.addEventListener('change', function() {
+            const event = new CustomEvent('dataTablePageSizeChange', { detail: { tableId: '@tableId', pageSize: parseInt(this.value) } });
+            document.dispatchEvent(event);
+        });
+    }
+})();
+</script>

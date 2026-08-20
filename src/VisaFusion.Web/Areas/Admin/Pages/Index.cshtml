@@ -1,7 +1,18 @@
-﻿@page
+@page
+@model VisaFusion.Web.Areas.Admin.Pages.IndexModel
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Admin Area";
+
+    // Admin landing/dashboard — SPEC-0009 T035/T038, FR-005; Addendum §7.
+    // Content/data unchanged (SPEC-0003 T027, FR-005 placeholder); CoreUI
+    // presentation only. The page model carries the explicit AdminPanel
+    // authorization rule (adm/su) that the model-less page previously lacked.
+    var dashboard = new RoleDashboardModel
+    {
+        Title = "Admin Area",
+        Subtitle = "Placeholder page for the Admin area (SPEC-0003 T027, FR-005).",
+    };
 }
 
-<h1>Admin Area</h1>
-<p>Placeholder page for the Admin area (SPEC-0003 T027, FR-005).</p>
+<partial name="~/Components/_RoleDashboard.cshtml" model="dashboard" />

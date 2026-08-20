@@ -1,36 +1,53 @@
 @page
 @model VisaFusion.Web.Pages.Auth.RegisterModel
+@using Microsoft.AspNetCore.Html
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Register";
+    Layout = "_AuthLayout";
 }
-
-<h1>Register</h1>
 
 @if (Model.Registered)
 {
-    <p role="status">@Model.OutcomeMessage</p>
-    <p><a asp-page="/Auth/Login">Log in</a></p>
+    // Success mirrors the legacy `regsubdone.asp` page: confirmation with a
+    // link to log in (RegisterModel.OnPostAsync).
+    var successCard = new AuthCardModel
+    {
+        Id = "register-card",
+        Title = "Register",
+        Subtitle = "Create your VisaFusion account",
+        BodyContent = new HtmlString(
+            $"<p role=\"status\">{Model.OutcomeMessage}</p><p><a href=\"/Auth/Login\">Log in</a></p>")
+    };
+    <partial name="~/Components/_AuthCard.cshtml" model="successCard" />
 }
 else
 {
-    <form method="post">
-        <div asp-validation-summary="ModelOnly"></div>
-        <div>
-            <label asp-for="UserName"></label>
-            <input asp-for="UserName" autocomplete="username" />
-        </div>
-        <div>
-            <label asp-for="Email"></label>
-            <input asp-for="Email" type="email" autocomplete="email" />
-        </div>
-        <div>
-            <label asp-for="Password"></label>
-            <input asp-for="Password" type="password" autocomplete="new-password" />
-        </div>
-        <div>
-            <label asp-for="ConfirmPassword"></label>
-            <input asp-for="ConfirmPassword" type="password" autocomplete="new-password" />
-        </div>
-        <button type="submit">Register</button>
-    </form>
+    var authCard = new AuthCardModel
+    {
+        Id = "register-card",
+        Title = "Register",
+        Subtitle = "Create your VisaFusion account",
+        ValidationSummary = Html.ValidationSummary(true),
+        Form = new AuthCardForm
+        {
+            Id = "register-form",
+            Method = "post",
+            AntiForgeryToken = Html.AntiForgeryToken()
+        },
+        Fields = new List<AuthCardField>
+        {
+            new() { Name = "UserName", Label = "Username", Type = FormFieldType.Text, Value = Model.UserName ?? string.Empty, Placeholder = "Username", Autocomplete = "username", Required = true },
+            new() { Name = "Email", Label = "Email", Type = FormFieldType.Email, InputType = "email", Value = Model.Email ?? string.Empty, Placeholder = "you@example.com", Autocomplete = "email", Required = true },
+            new() { Name = "Password", Label = "Password", Type = FormFieldType.Password, Value = string.Empty, Placeholder = "Password", Autocomplete = "new-password", Required = true },
+            new() { Name = "ConfirmPassword", Label = "Confirm password", Type = FormFieldType.Password, Value = string.Empty, Placeholder = "Confirm password", Autocomplete = "new-password", Required = true },
+        },
+        ShowPasswordToggle = true,
+        SubmitButton = new AuthCardSubmitButton { Title = "Register" },
+        FooterLinks = new List<AuthCardFooterLink>
+        {
+            new() { Text = "Already have an account? Log in", Url = "/Auth/Login" }
+        }
+    };
+    <partial name="~/Components/_AuthCard.cshtml" model="authCard" />
 }

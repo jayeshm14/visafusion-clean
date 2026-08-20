@@ -1,0 +1,115 @@
+@model VisaFusion.Web.Components.ErrorPageModel
+@{
+    var errorCode = Model.ErrorCode;
+    var title = string.IsNullOrEmpty(Model.Title) ? GetDefaultTitle(errorCode) : Model.Title;
+    var message = string.IsNullOrEmpty(Model.Message) ? GetDefaultMessage(errorCode) : Model.Message;
+    var description = Model.Description ?? string.Empty;
+    var actions = Model.Actions ?? new List<ErrorPageAction>();
+    var illustration = Model.Illustration ?? GetDefaultIllustration(errorCode);
+    var showDetails = Model.ShowDetails;
+    var details = Model.Details ?? string.Empty;
+    var cardClass = Model.CardClass ?? "shadow-sm";
+}
+
+@* ErrorPage Component - CoreUI Error Page Pattern *@
+@* Maps to: CoreUI Error Pages (COREUI_COMPONENT_CATALOG §9) *@
+@* Uses: CoreUI pages.pug layout + centered card, display-3 numeral *@
+
+<div class="min-vh-100 d-flex flex-row align-items-center justify-content-center bg-body-tertiary px-3">
+    <div class="error-page w-100" style="max-width: 540px;">
+        <div class="card @Model.CardClass">
+            <div class="card-body p-5 text-center">
+                @if (!string.IsNullOrEmpty(Model.Illustration))
+                {
+                    <div class="mb-4">
+                        <img src="@Model.Illustration" alt="" class="img-fluid" style="max-height: 160px;" />
+                    </div>
+                }
+                else
+                {
+                    <div class="error-illustration mb-4">
+                        <span class="display-1 fw-bold text-body-tertiary">@errorCode</span>
+                    </div>
+                }
+
+                <h1 class="h3 mb-3">@title</h1>
+
+                @if (!string.IsNullOrEmpty(message))
+                {
+                    <p class="lead text-body-secondary mb-4">@message</p>
+                }
+
+                @if (!string.IsNullOrEmpty(description))
+                {
+                    <p class="text-body-secondary mb-4">@description</p>
+                }
+
+                @if (showDetails && !string.IsNullOrEmpty(details))
+                {
+                    <details class="mb-4 text-start">
+                        <summary class="text-body-secondary small cursor-pointer">Show technical details</summary>
+                        <pre class="mt-2 p-3 bg-body-tertiary rounded small overflow-auto" style="max-height: 200px;">@details</pre>
+                    </details>
+                }
+
+                @if (actions.Any())
+                {
+                    <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+                        @foreach (var action in actions)
+                        {
+                            <a class="btn @(action.CssClass ?? "btn-primary")" href="@action.Url" @(action.OnClick != null ? $"onclick=\"{action.OnClick}\"" : "")>
+                                @if (!string.IsNullOrEmpty(action.Icon))
+                                {
+                                    <svg class="icon icon-sm me-2" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="@action.Icon"/></svg>
+                                }
+                                @action.Title
+                            </a>
+                        }
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.FooterText))
+                {
+                    <p class="text-body-secondary small mt-4 mb-0">@Model.FooterText</p>
+                }
+            </div>
+        </div>
+
+        <p class="text-center text-body-secondary small mt-3">
+            VisaFusion &mdash; Visa Processing & Tour System
+        </p>
+    </div>
+</div>
+
+@functions {
+    private string GetDefaultTitle(int code) => code switch
+    {
+        400 => "Bad Request",
+        401 => "Unauthorized",
+        403 => "Access Denied",
+        404 => "Page Not Found",
+        500 => "Internal Server Error",
+        502 => "Bad Gateway",
+        503 => "Service Unavailable",
+        _ => "Error"
+    };
+
+    private string GetDefaultMessage(int code) => code switch
+    {
+        400 => "The request could not be understood by the server.",
+        401 => "You need to sign in to access this resource.",
+        403 => "You don't have permission to access this resource.",
+        404 => "The page you're looking for doesn't exist or has been moved.",
+        500 => "Something went wrong on our end. Please try again later.",
+        502 => "The server received an invalid response from the upstream server.",
+        503 => "The service is temporarily unavailable. Please try again later.",
+        _ => "An unexpected error occurred."
+    };
+
+    private string GetDefaultIllustration(int code) => code switch
+    {
+        404 => "/images/404.svg",
+        500 => "/images/500.svg",
+        _ => string.Empty
+    };
+}

@@ -5,51 +5,45 @@
     ViewData["UseSidebar"] = true;
 }
 
-@section SidebarNav {
-    <a asp-area="Admin" asp-page="/Agents/List" aria-current="page">Agents</a>
+@if (Model.IsNotFound)
+{
+    <div class="alert alert-danger" role="alert">
+        Agent @Model.Id was not found.
+    </div>
+    <a class="btn btn-outline-secondary" href="/Admin/Agents/List">Back to agents</a>
 }
-
-<div class="vf-content">
-    <h1>Agent detail</h1>
-
-    @if (Model.IsNotFound)
+else
+{
+    @if (Model.OutcomeMessage is not null)
     {
-        <div class="vf-alert vf-alert-danger" role="alert">
-            Agent @Model.Id was not found.
-        </div>
-        <a class="vf-btn vf-btn-secondary" href="/Admin/Agents/List">Back to agents</a>
+        <div class="alert alert-success" role="alert">@Model.OutcomeMessage</div>
     }
-    else
-    {
-        @if (Model.OutcomeMessage is not null)
-        {
-            <div class="vf-alert vf-alert-success" role="alert">@Model.OutcomeMessage</div>
-        }
 
-        <div class="vf-card">
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
             <p>
                 @if (Model.Agent!.Active == "Y")
                 {
-                    <span class="vf-badge vf-badge-success">Active</span>
+                    <span class="badge text-bg-success">Active</span>
                 }
                 else
                 {
-                    <span class="vf-badge vf-badge-danger">Deactivated</span>
+                    <span class="badge text-bg-danger">Deactivated</span>
                 }
             </p>
 
-            <dl>
-                <dt>ID</dt>
-                <dd>@Model.Agent.Id</dd>
+            <dl class="row mb-0">
+                <dt class="col-sm-3">ID</dt>
+                <dd class="col-sm-9">@Model.Agent.Id</dd>
 
-                <dt>Company name</dt>
-                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.Companyname) ? "—" : Model.Agent.Companyname)</dd>
+                <dt class="col-sm-3">Company name</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.Companyname) ? "—" : Model.Agent.Companyname)</dd>
 
-                <dt>Description</dt>
-                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.Description) ? "—" : Model.Agent.Description)</dd>
+                <dt class="col-sm-3">Description</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.Description) ? "—" : Model.Agent.Description)</dd>
 
-                <dt>Address</dt>
-                <dd>
+                <dt class="col-sm-3">Address</dt>
+                <dd class="col-sm-9">
                     @(string.IsNullOrWhiteSpace(Model.Agent.Street1) ? "—" : Model.Agent.Street1)
                     @(string.IsNullOrWhiteSpace(Model.Agent.Street2) ? "" : ", " + Model.Agent.Street2)
                     @(string.IsNullOrWhiteSpace(Model.Agent.Area) ? "" : ", " + Model.Agent.Area)
@@ -57,73 +51,73 @@
                     @(string.IsNullOrWhiteSpace(Model.Agent.Pincode) ? "" : " — " + Model.Agent.Pincode)
                 </dd>
 
-                <dt>Phone</dt>
-                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.Phoneno) ? "—" : Model.Agent.Phoneno)</dd>
+                <dt class="col-sm-3">Phone</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.Phoneno) ? "—" : Model.Agent.Phoneno)</dd>
 
-                <dt>Fax</dt>
-                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.Faxno) ? "—" : Model.Agent.Faxno)</dd>
+                <dt class="col-sm-3">Fax</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.Faxno) ? "—" : Model.Agent.Faxno)</dd>
 
-                <dt>Email</dt>
-                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.Emailid) ? "—" : Model.Agent.Emailid)</dd>
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.Emailid) ? "—" : Model.Agent.Emailid)</dd>
 
-                <dt>SMS number</dt>
-                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.Smsno) ? "—" : Model.Agent.Smsno)</dd>
+                <dt class="col-sm-3">SMS number</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.Smsno) ? "—" : Model.Agent.Smsno)</dd>
 
-                <dt>Director</dt>
-                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.Directorname) ? "—" : Model.Agent.Directorname)</dd>
+                <dt class="col-sm-3">Director</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.Directorname) ? "—" : Model.Agent.Directorname)</dd>
 
-                <dt>Director phone</dt>
-                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.DirectorPH) ? "—" : Model.Agent.DirectorPH)</dd>
+                <dt class="col-sm-3">Director phone</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.DirectorPH) ? "—" : Model.Agent.DirectorPH)</dd>
 
-                <dt>Accounts manager phone</dt>
-                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.AcMgrPH) ? "—" : Model.Agent.AcMgrPH)</dd>
+                <dt class="col-sm-3">Accounts manager phone</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.AcMgrPH) ? "—" : Model.Agent.AcMgrPH)</dd>
 
-                <dt>Visa in-charge</dt>
-                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.VisaInchargeName) ? "—" : Model.Agent.VisaInchargeName)</dd>
+                <dt class="col-sm-3">Visa in-charge</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.VisaInchargeName) ? "—" : Model.Agent.VisaInchargeName)</dd>
 
-                <dt>Visa in-charge phone</dt>
-                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.VisaInchargePH) ? "—" : Model.Agent.VisaInchargePH)</dd>
+                <dt class="col-sm-3">Visa in-charge phone</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.VisaInchargePH) ? "—" : Model.Agent.VisaInchargePH)</dd>
 
-                <dt>Account number</dt>
-                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.Acno) ? "—" : Model.Agent.Acno)</dd>
+                <dt class="col-sm-3">Account number</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.Acno) ? "—" : Model.Agent.Acno)</dd>
 
-                <dt>Payment</dt>
-                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.Payment) ? "—" : Model.Agent.Payment)</dd>
+                <dt class="col-sm-3">Payment</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.Payment) ? "—" : Model.Agent.Payment)</dd>
 
-                <dt>TAAI</dt>
-                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.TAAI) ? "—" : Model.Agent.TAAI)</dd>
+                <dt class="col-sm-3">TAAI</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.TAAI) ? "—" : Model.Agent.TAAI)</dd>
 
-                <dt>TAFI</dt>
-                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.TAFI) ? "—" : Model.Agent.TAFI)</dd>
+                <dt class="col-sm-3">TAFI</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.TAFI) ? "—" : Model.Agent.TAFI)</dd>
 
-                <dt>Membership</dt>
-                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.Membership) ? "—" : Model.Agent.Membership)</dd>
+                <dt class="col-sm-3">Membership</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.Membership) ? "—" : Model.Agent.Membership)</dd>
 
-                <dt>IATA</dt>
-                <dd>@(string.IsNullOrWhiteSpace(Model.Agent.IATA) ? "—" : Model.Agent.IATA)</dd>
+                <dt class="col-sm-3">IATA</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.IATA) ? "—" : Model.Agent.IATA)</dd>
 
-                <dt>Created</dt>
-                <dd>@(Model.Agent.Creationdate?.ToString("yyyy-MM-dd") ?? "—") by @(string.IsNullOrWhiteSpace(Model.Agent.Enteredby) ? "—" : Model.Agent.Enteredby)</dd>
+                <dt class="col-sm-3">Created</dt>
+                <dd class="col-sm-9">@(Model.Agent.Creationdate?.ToString("yyyy-MM-dd") ?? "—") by @(string.IsNullOrWhiteSpace(Model.Agent.Enteredby) ? "—" : Model.Agent.Enteredby)</dd>
             </dl>
         </div>
+    </div>
 
-        <p>
-            <a class="vf-btn vf-btn-secondary" href="/Admin/Agents/List">Back to agents</a>
-            <a class="vf-btn vf-btn-primary" href="/Admin/Agents/Edit?id=@Model.Agent.Id">Edit</a>
-            @if (Model.Agent.Active == "Y")
-            {
-                <form method="post" asp-page-handler="Deactivate" style="display: inline;">
-                    <input type="hidden" asp-for="Id" />
-                    <button type="submit" class="vf-btn vf-btn-danger">Deactivate</button>
-                </form>
-            }
-            else
-            {
-                <form method="post" asp-page-handler="Reactivate" style="display: inline;">
-                    <input type="hidden" asp-for="Id" />
-                    <button type="submit" class="vf-btn vf-btn-primary">Reactivate</button>
-                </form>
-            }
-        </p>
-    }
-</div>
+    <p>
+        <a class="btn btn-outline-secondary" href="/Admin/Agents/List">Back to agents</a>
+        <a class="btn btn-primary" href="/Admin/Agents/Edit?id=@Model.Agent.Id">Edit</a>
+        @if (Model.Agent.Active == "Y")
+        {
+            <form method="post" asp-page-handler="Deactivate" style="display: inline;">
+                <input type="hidden" asp-for="Id" />
+                <button type="submit" class="btn btn-danger">Deactivate</button>
+            </form>
+        }
+        else
+        {
+            <form method="post" asp-page-handler="Reactivate" style="display: inline;">
+                <input type="hidden" asp-for="Id" />
+                <button type="submit" class="btn btn-primary">Reactivate</button>
+            </form>
+        }
+    </p>
+}

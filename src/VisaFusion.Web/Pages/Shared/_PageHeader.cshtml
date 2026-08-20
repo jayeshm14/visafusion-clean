@@ -1,0 +1,20 @@
+@using VisaFusion.Web.Services
+@inject IBreadcrumbService BreadcrumbService
+@{
+    var breadcrumbs = BreadcrumbService.GetBreadcrumbs(ViewContext);
+}
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="page-header-title">
+                @ViewData["Title"]
+            </h1>
+        </div>
+        <div class="col-auto">
+            @if (breadcrumbs.Any())
+            {
+                @await Html.PartialAsync("_Breadcrumb", breadcrumbs)
+            }
+        </div>
+    </div>
+</div>

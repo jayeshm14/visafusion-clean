@@ -146,7 +146,7 @@ body
 | Table horizontal scroll | `.table-responsive` | `index.pug` |
 | Search button labels hidden | `d-none.d-sm-block` / `d-none.d-sm-inline-flex` | `search-button.pug` |
 | Docs banner responsive cols | `col-xl-auto d-none.d-xl-block` | `docs-components.pug` |
-| Nav group items `compact` | mobile-friendly compact list | `sidebar-nav.pug` |
+| Navigation Group items `compact` | mobile-friendly compact list | `sidebar-nav.pug` |
 | Unfoldable narrow sidebar | hover state (`:not(:hover)`) | `style.scss` |
 
 `.browserslistrc`: Chrome/FF ≥60, iOS/Safari ≥12, no IE ≤11 — ES2015+ safe
@@ -200,7 +200,11 @@ VisaFusion.
 | Charts for reporting | Chart.js + `@coreui/chartjs` (`main.js`, `charts.js`, `widgets.js`) | Reporting dashboards (entry volume, agent activity) |
 
 **Contradiction note** (ties to `docs/analysis/GAP_REPORT.md` GAP-002): the
-current VisaFusion UI ships a bespoke `vf-*` system (`tokens.css`,
-`theme.css`) with no CoreUI assets. These docs are the analysis input for the
-owner decision: adopt CoreUI (re-skin `wwwroot`) or amend constitution v1.4.1
-Principle IV. Nothing here is implemented yet — analysis only.
+phase-2 VisaFusion UI shipped a bespoke `vf-*` system (`tokens.css`,
+`theme.css`) with no CoreUI assets. **RESOLVED 2026-08-20** — ADR-0006 ratifies
+CoreUI as the design reference; the re-skin is complete (SPEC-0009 T076–T085).
+`tokens.css`/`theme.css` are deleted; the shell keeps its structural wrappers
+(`vf-shell`/`vf-main`/`vf-content`/`vf-skip-link`) ported into
+`wwwroot/css/vf-component-styles.css` with `--cui-*` tokens. The `--cui-*`
+token names and class conventions in this document are the implemented
+reference.

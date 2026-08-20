@@ -1,0 +1,81 @@
+﻿/* VisaFusion CoreUI Design Token Overrides (T005)
+ * Rebrands CoreUI --cui-* tokens to VisaFusion brand
+ * Source: COREUI_DESIGN_SYSTEM.md §2, research.md D-2
+ * No hard-coded brand colors outside tokens; no bespoke --vf-* tokens
+ */
+
+:root {
+  /* ---- Color palette: VisaFusion brand (navy primary) ---- */
+  --cui-primary: #1e3a5f;
+  --cui-primary-rgb: 30, 58, 95;
+  --cui-primary-hover: #162c49;
+  --cui-primary-active: #122640;
+  
+  --cui-secondary: #475467;
+  --cui-secondary-rgb: 71, 84, 103;
+  
+  --cui-success: #027a48;
+  --cui-success-rgb: 2, 122, 72;
+  
+  --cui-danger: #b42318;
+  --cui-danger-rgb: 180, 35, 24;
+  
+  --cui-warning: #7a5600;
+  --cui-warning-rgb: 122, 86, 0;
+  
+  --cui-info: #155e9c;
+  --cui-info-rgb: 21, 94, 156;
+  
+  /* ---- Body & surfaces ---- */
+  --cui-body-color: #101828;
+  --cui-body-bg: #f7f8fa;
+  --cui-tertiary-bg: #f7f8fa;
+  --cui-dark-bg-subtle: #101828;
+  
+  --cui-border-color: #d0d5dd;
+  --cui-border-color-translucent: rgba(16, 24, 40, 0.12);
+  
+  --cui-sidebar-bg: #101828;
+  
+  /* ---- Component-level tokens ---- */
+  --cui-card-cap-bg: #1e3a5f;
+  --cui-dropdown-min-width: 8rem;
+  --cui-nav-underline-border-link-padding-x: 1rem;
+  --cui-nav-underline-border-gap: 0.5rem;
+  --cui-footer-bg: #ffffff;
+  --cui-sidebar-occupy-start: 15rem;
+  --cui-sidebar-occupy-end: 0;
+  
+  /* ---- Chart theming ---- */
+  --cui-chart-primary: #1e3a5f;
+  --cui-chart-info: #155e9c;
+  --cui-chart-success: #027a48;
+  --cui-chart-danger: #b42318;
+  --cui-chart-warning: #7a5600;
+}
+
+/* Dark mode overrides */
+[data-coreui-theme='dark'] {
+  --cui-body-color: #f2f4f7;
+  --cui-body-bg: #101828;
+  --cui-tertiary-bg: #101828;
+  --cui-dark-bg-subtle: #1d2939;
+  --cui-border-color: #344054;
+  --cui-sidebar-bg: #0b1320;
+  --cui-card-cap-bg: #1e3a5f;
+  --cui-footer-bg: #101828;
+}
+
+/* Auto mode follows system preference */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-coreui-theme='light']) {
+    --cui-body-color: #f2f4f7;
+    --cui-body-bg: #101828;
+    --cui-tertiary-bg: #101828;
+    --cui-dark-bg-subtle: #1d2939;
+    --cui-border-color: #344054;
+    --cui-sidebar-bg: #0b1320;
+    --cui-card-cap-bg: #1e3a5f;
+    --cui-footer-bg: #101828;
+  }
+}

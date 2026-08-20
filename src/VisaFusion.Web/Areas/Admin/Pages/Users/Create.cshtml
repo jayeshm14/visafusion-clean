@@ -5,60 +5,56 @@
     ViewData["UseSidebar"] = true;
 }
 
-@section SidebarNav {
-    <a asp-area="Admin" asp-page="/Users/List" aria-current="page">Users</a>
-}
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-<div class="vf-content">
-    <h1>New user</h1>
-
-    <form method="post">
-        <div asp-validation-summary="ModelOnly" class="vf-validation-summary-errors"></div>
-
-        <div class="vf-card">
-            <h2>Login</h2>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="Username">Login username</label>
-                <input class="vf-form-control" asp-for="Username" autocomplete="off" />
-                <span asp-validation-for="Username" class="vf-field-validation-error"></span>
+    <div class="card shadow-sm mb-4">
+        <div class="card-header"><h2 class="h5 card-title mb-0">Login</h2></div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label" asp-for="Username">Login username</label>
+                <input class="form-control" asp-for="Username" autocomplete="off" />
+                <span asp-validation-for="Username" class="text-danger"></span>
             </div>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="Password">Initial password</label>
-                <input class="vf-form-control" asp-for="Password" type="password" autocomplete="new-password" />
-                <span asp-validation-for="Password" class="vf-field-validation-error"></span>
-                <small>The password is hashed and never stored in plaintext; hand it to the user out-of-band.</small>
+            <div class="mb-3">
+                <label class="form-label" asp-for="Password">Initial password</label>
+                <input class="form-control" asp-for="Password" type="password" autocomplete="new-password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+                <small class="text-body-secondary">The password is hashed and never stored in plaintext; hand it to the user out-of-band.</small>
             </div>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="Email">Email</label>
-                <input class="vf-form-control" asp-for="Email" type="email" />
+            <div class="mb-3">
+                <label class="form-label" asp-for="Email">Email</label>
+                <input class="form-control" asp-for="Email" type="email" />
             </div>
         </div>
+    </div>
 
-        <div class="vf-card">
-            <h2>Role</h2>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="Role">Role</label>
-                <select class="vf-form-control" asp-for="Role">
+    <div class="card shadow-sm mb-4">
+        <div class="card-header"><h2 class="h5 card-title mb-0">Role</h2></div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label" asp-for="Role">Role</label>
+                <select class="form-select" asp-for="Role">
                     <option value="">Select a role</option>
                     @foreach (var role in Model.AllowedRoles)
                     {
                         <option value="@role">@role</option>
                     }
                 </select>
-                <span asp-validation-for="Role" class="vf-field-validation-error"></span>
-                <small>Super-user is not offered here; it is provisioned separately by a super-user.</small>
+                <span asp-validation-for="Role" class="text-danger"></span>
+                <small class="text-body-secondary">Super-user is not offered here; it is provisioned separately by a super-user.</small>
             </div>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="AgentId">Agent ID</label>
-                <input class="vf-form-control" asp-for="AgentId" type="number" />
-                <span asp-validation-for="AgentId" class="vf-field-validation-error"></span>
-                <small>Required when the role is <code>agt</code> — links the login to the agent account.</small>
+            <div class="mb-3">
+                <label class="form-label" asp-for="AgentId">Agent ID</label>
+                <input class="form-control" asp-for="AgentId" type="number" />
+                <span asp-validation-for="AgentId" class="text-danger"></span>
+                <small class="text-body-secondary">Required when the role is <code>agt</code> — links the login to the agent account.</small>
             </div>
         </div>
+    </div>
 
-        <p>
-            <button type="submit" class="vf-btn vf-btn-primary">Create user</button>
-            <a class="vf-btn vf-btn-secondary" href="/Admin/Users/List">Cancel</a>
-        </p>
-    </form>
-</div>
+    <p>
+        <button type="submit" class="btn btn-primary">Create user</button>
+        <a class="btn btn-outline-secondary" href="/Admin/Users/List">Cancel</a>
+    </p>
+</form>

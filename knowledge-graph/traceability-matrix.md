@@ -318,3 +318,63 @@ Visa Processing (MOD-001): the Entries module API backs the legacy pages
 final script-08 definition (supersedes 06/07 per GR-0004); the super-user
 endpoint is a documented-only deferred contract (spec §15). No legacy business
 behavior changes (Constitution Mission §2 item 4 — preserve legacy business behaviour).
+
+---
+
+## SPEC-0009 — Integrate CoreUI as the Canonical VisaFusion UI Foundation
+
+Generated: 2026-08-19 | Source: \specs/009-coreui-ui-foundation/spec.md\, plan.md, tasks.md
+
+| Requirement | Architecture | Domain | Database | API | UI | Test | Migration |
+|-------------|--------------|--------|----------|-----|----|------|-----------|
+| FR-001      | Addendum §19; Constitution IV | — | — | — | COREUI_INVENTORY.md | TS-006 | — |
+| FR-002      | Addendum §1–§2, §7; Constitution III | ROLE_*_MATRIX.md | — | ROLE_ROUTE_MATRIX.md | ROLE_BASED_NATIVE_PAGES_INVENTORY.md | TS-011 | — |
+| FR-003      | Addendum §5–§6, §12 | ROLE_NAVIGATION_MATRIX.md | — | — | shell components | TS-001 | — |
+| FR-004      | Addendum §8, §13 | — | — | — | COREUI_VISA_FUSION_MAPPING.md | TS-006 | — |
+| FR-005      | COREUI_DESIGN_SYSTEM.md §4.2 | — | — | — | auth/error pages | TS-006 | — |
+| FR-006      | COREUI_DESIGN_SYSTEM.md §3 | — | — | — | theme system | TS-007 | — |
+| FR-007      | Constitution XIV; Addendum §9 | — | — | — | canonical components | TS-002 | — |
+| FR-008      | Constitution XV; Addendum §10 | ROLE_PAGE_PERMISSION_MATRIX.md | — | AuthorizationPolicies.cs | — | TS-003, TS-005 | — |
+| FR-009      | Addendum §11 | ROLE_ROUTE_MATRIX.md | — | ROLE_ROUTE_MATRIX.md | — | TS-004 | — |
+| FR-010      | Constitution XVI | — | — | — | COREUI_DESIGN_SYSTEM.md §7 | TS-009 | — |
+| FR-011      | Constitution XVII | — | — | — | COREUI_DESIGN_SYSTEM.md §6 | TS-008 | — |
+| FR-012      | Constitution IV | — | — | — | wwwroot assets | TS-006 | GAP-002 |
+| FR-013      | Constitution XII–XIII; Addendum §14–§15 | — | — | — | — | TS-014 | kg.json |
+| FR-014      | — | — | — | — | COREUI_DEPENDENCY_MAP.md | — | — |
+| BR-001..006 | Constitution IV–V, VI, XV, XXIV | — | — | — | — | TS-010 | — |
+| NFR-001..007 | COREUI_INVENTORY.md §2 | — | — | — | COREUI_DESIGN_SYSTEM.md | TS-008 | — |
+| AC-001..017 | Constitution III–IV, VI–VIII, XII–XIII, XVI–XVII; Addendum §1–§2, §5–§7, §10–§11, §14–§18 | ROLE_*_MATRIX.md | 52 tables | ROLE_ROUTE_MATRIX.md | all pages | TS-001..TS-014 | — |
+
+### Module → Legacy Mapping (this feature)
+
+Presentation-only feature: re-skins \VisaFusion.Web\ (Razor Pages + wwwroot) onto CoreUI v5.6.0.
+No legacy business behavior changes (Constitution Mission §2 item 4).
+Touches only: \src/VisaFusion.Web/Pages/\, \src/VisaFusion.Web/wwwroot/\, \src/VisaFusion.Web/Components/\, \src/VisaFusion.Web/Navigation/\, tests, docs, KG.
+No changes to \VisaFusion.Core\/\Data\/\Api\/\Identity\/\Jobs\/\Migration\.
+Legacy pages mapped via \docs/ui/COREUI_VISA_FUSION_MAPPING.md\ (41 pages) and \ROLE_BASED_NATIVE_PAGES_INVENTORY.md\.
+
+### Resolved gaps (this feature)
+
+- **GAP-002** — CoreUI adoption vs bespoke \f-*\ shell: RESOLVED by this feature (FR-001/FR-012).
+- **GAP-004** — Employee/Billing/Notifications placeholders: presentation-only for Notifications (PARTIAL); Employee/Billing (BLOCKED) untouched.
+- **GAP-010** — stray \Areas/Public/Pages.Forms.cshtml\: NOT_REQUIRED, untouched.
+
+### Open gaps (deferred, not resolved by this feature)
+
+- Admin Index no policy (ROLE_PAGE_PERMISSION_MATRIX §6.1)
+- Employee/Billing/Notifications policy gaps (ROLE_PAGE_PERMISSION_MATRIX §6.2–6.4)
+- AgentLedger page/API policy mismatch (ROLE_PAGE_PERMISSION_MATRIX §6.5)
+- Search/PasswordSelf unused policies (ROLE_PAGE_PERMISSION_MATRIX §6.6)
+- SuperUserOnly no page (ROLE_PAGE_PERMISSION_MATRIX §6.7)
+- Guest vs guest role (ROLE_PAGE_PERMISSION_MATRIX §6.8)
+- ChangePassword bare \[Authorize]\ (ROLE_PAGE_PERMISSION_MATRIX §6.9)
+- Day-gate asymmetry (ROLE_PAGE_PERMISSION_MATRIX §6.10)
+- Public pages unreachable from shell (ROLE_NAVIGATION_MATRIX §5.1)
+- Admin nav module-scoped (ROLE_NAVIGATION_MATRIX §5.2)
+- Employee nav group missing (ROLE_NAVIGATION_MATRIX §5.3)
+- Billing/Notifications unreachable (ROLE_NAVIGATION_MATRIX §5.4)
+- Role badge display rule (ROLE_NAVIGATION_MATRIX §5.5)
+- Submenu grouping conceptual (ROLE_NAVIGATION_MATRIX §5.6)
+- Legacy cutover routing partial (GAP-006)
+- Notification transports log-only (GAP-008)
+- Data quality defects (GAP-009)

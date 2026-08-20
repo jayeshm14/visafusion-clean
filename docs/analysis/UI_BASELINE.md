@@ -1,7 +1,8 @@
 # UI Baseline — VisaFusion
 
 **Scope**: Read-only discovery (2026-08-19). Every claim verified this session.
-**Sources**: glob/read of `src/VisaFusion.Web` (46 `.cshtml`), `_Layout.cshtml`,
+**Sources**: glob/read of `src/VisaFusion.Web` (50 `.cshtml` = 41 pages + 8
+`_ViewStart`/`_ViewImports` + 1 `_Layout`), `_Layout.cshtml`,
 `_ViewImports.cshtml`, `_ViewStart.cshtml`, `wwwroot/`, and root-level legacy
 UI directories.
 
@@ -17,14 +18,15 @@ UI directories.
 
 ## 2. Page inventory
 
-- Total `.cshtml`: **46** (Web/Pages + all Areas). Page-model `.cs`:
-  4 under `Web/Pages`, 24 under `Web/Areas`.
+- Total `.cshtml`: **50** (41 pages + 8 `_ViewStart`/`_ViewImports` + 1
+  `_Layout`). Page-model `.cs`: **26** (4 under `Web/Pages`, 22 under
+  `Web/Areas`).
 - **Public** (10 anonymous pages): public query + contact surface
   (SPEC-0007 parity target; `PublicSiteParityTests.cs` in FunctionalTests).
 - **Auth**: `Login`, `Register`, `ChangePassword`, `AccessDenied`.
 - **Admin**: `Agents`, `Users`, `Holidays`, `ContentUpdate`, `SecurityDay`.
 - **Agent**: agent portal (shared `AgentPortalPageModel`, `AgentSelf`).
-- **Reporting**: 8 pages (shared `ReportingPageModel`, `EntryOperations`).
+- **Reporting**: 7 pages (shared `ReportingPageModel`, `EntryOperations`).
 - **Placeholder areas** (markup-only `Index.cshtml`, **no page model** —
   verified `Index.cshtml.cs` does not exist): `Employee`, `Billing`,
   `Notifications`. These render but have no logic; do not assume behavior.
@@ -44,20 +46,23 @@ Single layout, dual shell driven by `ViewData["UseSidebar"]`:
 - `forms/`: embedded legacy form files (PDF/doc).
 - `images/`, `updateimg/stm31.js` (the only JS file in `wwwroot`).
 
-## 5. UI framework reconciliation — CRITICAL
+## 5. UI framework reconciliation — RESOLVED (2026-08-20)
 
-- The current new UI is a **bespoke `vf-*` design system** built on
+- The phase-2 UI shipped a **bespoke `vf-*` design system** built on
   `tokens.css`/`theme.css`/`bootstrap-icons.css`.
 - The constitution (`.specify/memory/constitution.md` **v1.4.1**, Principle IV)
   **mandates CoreUI**
   (`https://github.com/coreui/coreui-free-bootstrap-admin-template.git`) as the
   design reference.
-- **No CoreUI assets exist anywhere in `wwwroot/`**; no AdminLTE either (the
-  legacy `js/adminlte.js` lives in the root legacy tree, not in the new app;
-  phase-2 release notes confirm AdminLTE removal AC-008).
-- This is a live contradiction between the governing constitution and the
-  shipped UI → GAP_REPORT GAP-002 (owner decision required: adopt CoreUI or
-  amend the constitution).
+- **RESOLVED** — ADR-0006 ratifies the constitution: CoreUI is the design
+  reference and the bespoke `vf-*` UI was re-skinned to CoreUI classes
+  (SPEC-0009 T076–T085). `tokens.css`/`theme.css` and the demo assets
+  (charts.js, widgets.js, style.scss, simplebar.scss) are deleted; the shell
+  keeps its structural wrappers (`vf-shell`/`vf-main`/`vf-content`/
+  `vf-skip-link`) ported into `wwwroot/css/vf-component-styles.css` with
+  `--cui-*` tokens. Behavior preserved: page models, data, and server-side
+  pagination unchanged. See GAP_REPORT GAP-002 (resolved) and
+  `docs/ui/COREUI_VISA_FUSION_MAPPING.md`.
 
 ## 6. Legacy UI assets at repository root (unmigrated, retained)
 

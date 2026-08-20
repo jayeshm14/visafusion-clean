@@ -32,8 +32,6 @@ public class Phase0E2ETests : IClassFixture<VisaFusionWebApplicationFactory>
 
     [Theory]
     [InlineData("/forms/Argentina.pdf")]
-    [InlineData("/css/tokens.css")]
-    [InlineData("/css/theme.css")]
     [InlineData("/images/1.jpg")]
     [InlineData("/fonts/source-sans-3-latin-400-normal.woff2")]
     [InlineData("/updateimg/abullet3.gif")]
@@ -42,8 +40,9 @@ public class Phase0E2ETests : IClassFixture<VisaFusionWebApplicationFactory>
         // TS-008 (AC-008/FR-004): no CDN — every legacy asset directory is
         // served by the single VisaFusion.Web host. The AdminLTE css/js
         // entries were replaced by the SPEC-0007 design-token system
-        // (tokens.css/theme.css, T008) after the AdminLTE assets were removed
-        // (T009, AC-008).
+        // (tokens.css/theme.css, T008), which was in turn superseded by the
+        // CoreUI integration (SPEC-0009 T077) — the legacy tokens/theme files
+        // are removed and the CoreUI assets are covered by CoreUIAssetTests.
         var response = await _client.GetAsync(assetPath);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

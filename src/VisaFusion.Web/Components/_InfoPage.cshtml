@@ -1,0 +1,148 @@
+@model VisaFusion.Web.Components.InfoPageModel
+@{
+    var title = Model.Title ?? string.Empty;
+    var subtitle = Model.Subtitle ?? string.Empty;
+    var content = Model.Content ?? string.Empty;
+    var sections = Model.Sections ?? new List<InfoPageSection>();
+    var cards = Model.Cards ?? new List<InfoPageCard>();
+    var accordionItems = Model.AccordionItems ?? new List<InfoPageAccordionItem>();
+    var table = Model.Table;
+    var actions = Model.Actions ?? new List<InfoPageAction>();
+    var cardClass = Model.CardClass ?? "shadow-sm";
+    var headerClass = Model.HeaderClass ?? string.Empty;
+    var bodyClass = Model.BodyClass ?? string.Empty;
+    var footerClass = Model.FooterClass ?? string.Empty;
+}
+
+@* InfoPage Component - CoreUI Card/Content Pattern *@
+@* Maps to: CoreUI Cards (COREUI_COMPONENT_CATALOG §3.1), Accordion (COREUI_COMPONENT_CATALOG §5.2) *@
+@* Uses: .card, .card-header, .card-body, .accordion, .accordion-item, .accordion-button, .accordion-collapse *@
+
+<div class="info-page card @cardClass">
+    @if (!string.IsNullOrEmpty(Model.HeaderHtml))
+    {
+        <div class="card-header @Model.HeaderClass">
+            @Html.Raw(Model.HeaderHtml)
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(title))
+    {
+        <div class="card-header @headerClass">
+            <h5 class="card-title mb-0">@title</h5>
+            @if (!string.IsNullOrEmpty(subtitle))
+            {
+                <p class="card-subtitle text-body-secondary small mb-0">@subtitle</p>
+            }
+        </div>
+    }
+
+    <div class="card-body @bodyClass">
+        @if (!string.IsNullOrEmpty(Model.BodyHtml))
+        {
+            @Html.Raw(Model.BodyHtml)
+        }
+        else
+        {
+            @if (!string.IsNullOrEmpty(content))
+            {
+                <div class="info-content">@content</div>
+            }
+
+            @if (cards.Any())
+            {
+                <div class="row g-3 mb-4">
+                    @foreach (var card in cards)
+                    {
+                        var colClass = card.ColClass ?? "col-md-6 col-lg-4";
+                        <div class="@colClass">
+                            <div class="card h-100 @card.CardClass">
+                                @if (!string.IsNullOrEmpty(card.Icon))
+                                {
+                                    <div class="card-header bg-transparent border-0 pt-3 pb-0 text-center">
+                                        <svg class="icon icon-3xl text-primary" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="@card.Icon"/></svg>
+                                    </div>
+                                }
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">@card.Title</h6>
+                                    @if (!string.IsNullOrEmpty(card.Content))
+                                    {
+                                        <p class="card-text text-body-secondary small">@card.Content</p>
+                                    }
+                                    @if (card.Actions.Any())
+                                    {
+                                        <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
+                                            @foreach (var action in card.Actions)
+                                            {
+                                                <a class="btn @(action.CssClass ?? "btn-sm btn-outline-primary")" href="@action.Url" @(action.OnClick != null ? $"onclick=\"{action.OnClick}\"" : "")>
+                                                    @if (!string.IsNullOrEmpty(action.Icon))
+                                                    {
+                                                        <svg class="icon icon-sm me-1" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="@action.Icon"/></svg>
+                                                    }
+                                                    @action.Title
+                                                </a>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (accordionItems.Any())
+            {
+                <div class="accordion" id="@(Model.Id ?? "info-accordion")">
+                    @foreach (var item in accordionItems)
+                    {
+                        var itemId = $"{Model.Id ?? "info"}-accordion-{accordionItems.IndexOf(item)}";
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="@(itemId + "-heading")">
+                                <button class="accordion-button @(item.IsOpen ? "" : "collapsed")" type="button" data-coreui-toggle="collapse" data-coreui-target="#@itemId" aria-expanded="@item.IsOpen" aria-controls="@itemId">
+                                    @item.Title
+                                </button>
+                            </h2>
+                            <div id="@itemId" class="accordion-collapse collapse @(item.IsOpen ? "show" : "")" aria-labelledby="@(itemId + "-heading")" data-coreui-parent="#@(Model.Id ?? "info-accordion")">
+                                <div class="accordion-body">
+                                    @item.Content
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (table != null)
+            {
+                <div class="table-responsive mt-4">
+                    @await Html.PartialAsync("_DataTable", table)
+                </div>
+            }
+        }
+    </div>
+
+    @if (Model.FooterHtml != null || actions.Any())
+    {
+        <div class="card-footer @footerClass">
+            @if (!string.IsNullOrEmpty(Model.FooterHtml))
+            {
+                @Html.Raw(Model.FooterHtml)
+            }
+            else if (actions.Any())
+            {
+                <div class="d-flex flex-wrap justify-content-end gap-2">
+                    @foreach (var action in actions)
+                    {
+                        <a class="btn @(action.CssClass ?? "btn-primary")" href="@action.Url" @(action.OnClick != null ? $"onclick=\"{action.OnClick}\"" : "")>
+                            @if (!string.IsNullOrEmpty(action.Icon))
+                            {
+                                <svg class="icon icon-sm me-2" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="@action.Icon"/></svg>
+                            }
+                            @action.Title
+                        </a>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -1,61 +1,64 @@
-﻿@page
+@page
 @model VisaFusion.Web.Areas.Agent.Pages.IndexModel
+@using VisaFusion.Web.Components
+@using System.Net
+@using System.Text
 @{
     ViewData["Title"] = "Agent portal";
     ViewData["UseSidebar"] = true;
-}
 
-@section SidebarNav {
-    <a asp-area="Agent" asp-page="/Index" aria-current="page">Portal home</a>
-    <a asp-area="Agent" asp-page="/Entries">My entries</a>
-    <a asp-area="Agent" asp-page="/Statuses">Passenger statuses</a>
-    <a asp-area="Agent" asp-page="/Statement">Statement</a>
-    <a asp-area="Agent" asp-page="/Account">My account</a>
-}
+    // Agent landing/dashboard — SPEC-0009 T033/T036, FR-005; Addendum §7.
+    // Content/data unchanged (legacy `agentHome.asp`); CoreUI presentation only.
+    // No KPI cards, charts or progress groups: the existing page exposes no
+    // metric/chart data, and inventing any would violate the feature constraint.
+    // The sidebar nav is rendered by the centralized RoleAwareNavigation service
+    // (Agent Portal group), so no per-page SidebarNav section is defined here.
+    var body = new StringBuilder();
 
-<div class="vf-content">
-    <h1>Agent portal</h1>
-
-    @if (Model.HasNoLinkedAgent)
+    if (Model.HasNoLinkedAgent)
     {
-        <div class="vf-alert vf-alert-danger" role="alert">
-            This account has no linked agent (CHK026). Contact the office to have
-            an agent bound to this login before using the portal.
-        </div>
+        body.Append("<div class=\"alert alert-danger\" role=\"alert\">This account has no linked agent (CHK026). Contact the office to have an agent bound to this login before using the portal.</div>");
     }
     else if (Model.Agent is null)
     {
-        <div class="vf-alert vf-alert-danger" role="alert">
-            The linked agent record could not be found.
-        </div>
+        body.Append("<div class=\"alert alert-danger\" role=\"alert\">The linked agent record could not be found.</div>");
     }
     else
     {
-        <div class="vf-card">
-            <h2>@(string.IsNullOrWhiteSpace(Model.Agent.Companyname) ? "Agent" : Model.Agent.Companyname)</h2>
-            <p>
-                @if (!string.IsNullOrWhiteSpace(Model.Agent.Street1)) { @Model.Agent.Street1<br /> }
-                @if (!string.IsNullOrWhiteSpace(Model.Agent.Area)) { @Model.Agent.Area<br /> }
-                @if (!string.IsNullOrWhiteSpace(Model.Agent.City)) { @Model.Agent.City }
-                @if (!string.IsNullOrWhiteSpace(Model.Agent.Pincode)) { @(" — " + Model.Agent.Pincode) }
-            </p>
-            <p>
-                @if (!string.IsNullOrWhiteSpace(Model.Agent.Phoneno))
-                {
-                    <span>Phone: @Model.Agent.Phoneno</span><br />
-                }
-                @if (!string.IsNullOrWhiteSpace(Model.Agent.Emailid))
-                {
-                    <span>Email: @Model.Agent.Emailid</span>
-                }
-            </p>
-        </div>
+        var company = string.IsNullOrWhiteSpace(Model.Agent.Companyname) ? "Agent" : Model.Agent.Companyname;
 
-        <ul class="vf-list">
-            <li><a asp-area="Agent" asp-page="/Entries">My entries</a> — the entries submitted under this agent.</li>
-            <li><a asp-area="Agent" asp-page="/Statuses">Passenger statuses</a> — the current status of each passenger.</li>
-            <li><a asp-area="Agent" asp-page="/Statement">Statement</a> — the ledger of debits, credits and balance.</li>
-            <li><a asp-area="Agent" asp-page="/Account">My account</a> — review and update the agent's contact details.</li>
-        </ul>
+        body.Append("<div class=\"card shadow-sm mb-4\">");
+        body.Append("<div class=\"card-body\">");
+        body.Append("<h2 class=\"card-title h5\">").Append(WebUtility.HtmlEncode(company)).Append("</h2>");
+        body.Append("<p class=\"card-text mb-1\">");
+        if (!string.IsNullOrWhiteSpace(Model.Agent.Street1)) { body.Append(WebUtility.HtmlEncode(Model.Agent.Street1)).Append("<br />"); }
+        if (!string.IsNullOrWhiteSpace(Model.Agent.Area)) { body.Append(WebUtility.HtmlEncode(Model.Agent.Area)).Append("<br />"); }
+        if (!string.IsNullOrWhiteSpace(Model.Agent.City)) { body.Append(WebUtility.HtmlEncode(Model.Agent.City)); }
+        if (!string.IsNullOrWhiteSpace(Model.Agent.Pincode)) { body.Append(" — ").Append(WebUtility.HtmlEncode(Model.Agent.Pincode)); }
+        body.Append("</p>");
+        body.Append("<p class=\"card-text mb-0\">");
+        if (!string.IsNullOrWhiteSpace(Model.Agent.Phoneno)) { body.Append("Phone: ").Append(WebUtility.HtmlEncode(Model.Agent.Phoneno)).Append("<br />"); }
+        if (!string.IsNullOrWhiteSpace(Model.Agent.Emailid)) { body.Append("Email: ").Append(WebUtility.HtmlEncode(Model.Agent.Emailid)); }
+        body.Append("</p>");
+        body.Append("</div>");
+        body.Append("</div>");
+
+        body.Append("<div class=\"card shadow-sm\">");
+        body.Append("<div class=\"card-header\"><h6 class=\"card-title mb-0\">Portal</h6></div>");
+        body.Append("<div class=\"list-group list-group-flush\">");
+        body.Append("<a class=\"list-group-item list-group-item-action\" href=\"").Append(Url.Page("/Entries", new { area = "Agent" })).Append("\">My entries <span class=\"text-body-secondary\">— the entries submitted under this agent.</span></a>");
+        body.Append("<a class=\"list-group-item list-group-item-action\" href=\"").Append(Url.Page("/Statuses", new { area = "Agent" })).Append("\">Passenger statuses <span class=\"text-body-secondary\">— the current status of each passenger.</span></a>");
+        body.Append("<a class=\"list-group-item list-group-item-action\" href=\"").Append(Url.Page("/Statement", new { area = "Agent" })).Append("\">Statement <span class=\"text-body-secondary\">— the ledger of debits, credits and balance.</span></a>");
+        body.Append("<a class=\"list-group-item list-group-item-action\" href=\"").Append(Url.Page("/Account", new { area = "Agent" })).Append("\">My account <span class=\"text-body-secondary\">— review and update the agent's contact details.</span></a>");
+        body.Append("</div>");
+        body.Append("</div>");
     }
-</div>
+
+    var dashboard = new RoleDashboardModel
+    {
+        Title = "Agent portal",
+        BodyHtml = body.ToString(),
+    };
+}
+
+<partial name="~/Components/_RoleDashboard.cshtml" model="dashboard" />

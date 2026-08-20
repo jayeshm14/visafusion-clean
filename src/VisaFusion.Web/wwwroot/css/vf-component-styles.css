@@ -1,0 +1,638 @@
+/* VisaFusion Component Styles (T025)
+ * Component-level stylesheet for canonical components
+ * Layered on design tokens (--cui-* tokens only; no hard-coded colors)
+ * Source: COREUI_DESIGN_SYSTEM.md Â§9, research.md D-2
+ */
+
+/* ==========================================================================
+   DataTable Component
+   ========================================================================== */
+
+.data-table {
+  --dt-header-bg: var(--cui-tertiary-bg);
+  --dt-row-hover-bg: var(--cui-tertiary-bg);
+  --dt-border-color: var(--cui-border-color);
+}
+
+.data-table .table {
+  margin-bottom: 0;
+}
+
+.data-table .table th {
+  background-color: var(--dt-header-bg);
+  border-bottom: 2px solid var(--dt-border-color);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--cui-body-color);
+  white-space: nowrap;
+}
+
+.data-table .table td {
+  vertical-align: middle;
+}
+
+.data-table .table-striped > tbody > tr:nth-of-type(odd) > * {
+  background-color: var(--dt-row-hover-bg);
+}
+
+.data-table .table-hover > tbody > tr:hover > * {
+  background-color: var(--cui-primary-bg-subtle, rgba(var(--cui-primary-rgb), 0.05));
+}
+
+.data-table .dropdown-menu {
+  min-width: 12rem;
+}
+
+.data-table .dropdown-item {
+  padding: 0.375rem 1rem;
+  font-size: 0.875rem;
+}
+
+.data-table .pagination {
+  --bs-pagination-padding-x: 0.75rem;
+  --bs-pagination-padding-y: 0.375rem;
+  --bs-pagination-font-size: 0.875rem;
+  --bs-pagination-border-radius: var(--cui-border-radius);
+}
+
+.data-table .page-link {
+  color: var(--cui-primary);
+  border-color: var(--dt-border-color);
+}
+
+.data-table .page-item.active .page-link {
+  background-color: var(--cui-primary);
+  border-color: var(--cui-primary);
+}
+
+.data-table .form-select {
+  min-width: 8rem;
+}
+
+.data-table .input-group-text {
+  background-color: var(--cui-tertiary-bg);
+  border-color: var(--dt-border-color);
+}
+
+/* Sortable column headers */
+.data-table th[data-sortable="true"] {
+  cursor: pointer;
+  user-select: none;
+}
+
+.data-table th.sort-asc::after {
+  content: " â–²";
+}
+
+.data-table th.sort-desc::after {
+  content: " â–¼";
+}
+
+/* ==========================================================================
+   FormCard Component
+   ========================================================================== */
+
+.form-card {
+  --fc-border-radius: var(--cui-border-radius);
+  --fc-header-bg: var(--cui-tertiary-bg);
+  --fc-footer-bg: var(--cui-tertiary-bg);
+}
+
+.form-card .card-header {
+  background-color: var(--fc-header-bg);
+  border-bottom: 1px solid var(--cui-border-color);
+}
+
+.form-card .card-footer {
+  background-color: var(--fc-footer-bg);
+  border-top: 1px solid var(--cui-border-color);
+}
+
+.form-card .form-section-title {
+  color: var(--cui-secondary);
+  border-bottom: 1px solid var(--cui-border-color);
+  padding-bottom: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.form-card .form-floating > label {
+  color: var(--cui-secondary);
+}
+
+.form-card .form-control:focus,
+.form-card .form-select:focus,
+.form-card .form-floating > .form-control:focus {
+  border-color: var(--cui-primary);
+  box-shadow: 0 0 0 0.25rem rgba(var(--cui-primary-rgb), 0.25);
+}
+
+.form-card .form-check-input:checked {
+  background-color: var(--cui-primary);
+  border-color: var(--cui-primary);
+}
+
+.form-card .form-check-input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(var(--cui-primary-rgb), 0.25);
+}
+
+.form-card .btn {
+  font-weight: 500;
+}
+
+.form-card .btn-primary {
+  --bs-btn-bg: var(--cui-primary);
+  --bs-btn-border-color: var(--cui-primary);
+  --bs-btn-hover-bg: var(--cui-primary-hover, var(--cui-primary));
+  --bs-btn-hover-border-color: var(--cui-primary-hover, var(--cui-primary));
+}
+
+.form-card .btn-outline-secondary {
+  --bs-btn-color: var(--cui-secondary);
+  --bs-btn-border-color: var(--cui-secondary);
+  --bs-btn-hover-bg: var(--cui-secondary-bg-subtle, rgba(var(--cui-secondary-rgb), 0.1));
+}
+
+.form-card .form-text {
+  font-size: 0.75rem;
+  color: var(--cui-secondary);
+}
+
+.form-card .invalid-feedback {
+  font-size: 0.75rem;
+}
+
+.form-card .form-floating > .form-control-plaintext::placeholder,
+.form-card .form-floating > .form-control::placeholder {
+  color: var(--cui-secondary);
+}
+
+/* ==========================================================================
+   AuthCard Component
+   ========================================================================== */
+
+.auth-card {
+  --ac-border-radius: var(--cui-border-radius-lg);
+  --ac-shadow: var(--cui-box-shadow-sm);
+}
+
+.auth-card .card {
+  border-radius: var(--ac-border-radius);
+  box-shadow: var(--ac-shadow);
+}
+
+.auth-card .card-header {
+  background-color: transparent;
+  border-bottom: none;
+  padding-top: 1.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.auth-card .card-body {
+  padding: 1.5rem;
+}
+
+.auth-card .card-footer {
+  background-color: transparent;
+  border-top: none;
+  padding-bottom: 1.5rem;
+}
+
+.auth-card .input-group-text {
+  background-color: var(--cui-tertiary-bg);
+  border-color: var(--cui-border-color);
+  color: var(--cui-secondary);
+}
+
+.auth-card .password-toggle {
+  background-color: var(--cui-tertiary-bg);
+  border-color: var(--cui-border-color);
+  color: var(--cui-secondary);
+}
+
+.auth-card .password-toggle:hover {
+  background-color: var(--cui-secondary-bg-subtle, rgba(var(--cui-secondary-rgb), 0.1));
+  color: var(--cui-body-color);
+}
+
+.auth-card .form-floating > label {
+  color: var(--cui-secondary);
+}
+
+.auth-card .form-control:focus {
+  border-color: var(--cui-primary);
+  box-shadow: 0 0 0 0.25rem rgba(var(--cui-primary-rgb), 0.25);
+}
+
+.auth-card .btn-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+}
+
+.auth-card .btn-outline-secondary {
+  --bs-btn-color: var(--cui-secondary);
+  --bs-btn-border-color: var(--cui-border-color);
+}
+
+.auth-card .btn-outline-secondary:hover {
+  background-color: var(--cui-tertiary-bg);
+  border-color: var(--cui-secondary);
+}
+
+.auth-card .form-check-input:checked {
+  background-color: var(--cui-primary);
+  border-color: var(--cui-primary);
+}
+
+.auth-card .form-check-label {
+  color: var(--cui-body-color);
+}
+
+.auth-card .form-check-input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(var(--cui-primary-rgb), 0.25);
+}
+
+/* ==========================================================================
+   ErrorPage Component
+   ========================================================================== */
+
+.error-page {
+  --ep-border-radius: var(--cui-border-radius-lg);
+  --ep-shadow: var(--cui-box-shadow);
+}
+
+.error-page .card {
+  border-radius: var(--ep-border-radius);
+  box-shadow: var(--ep-shadow);
+}
+
+.error-page .error-illustration {
+  font-size: 6rem;
+  line-height: 1;
+}
+
+.error-page .stat-card {
+  border: none;
+  background-color: var(--cui-tertiary-bg);
+}
+
+.error-page .stat-value {
+  color: var(--cui-primary);
+}
+
+.error-page .feature-card {
+  border: none;
+  background-color: var(--cui-tertiary-bg);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.error-page .feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--cui-box-shadow-sm);
+}
+
+.error-page .feature-icon {
+  font-size: 2.5rem;
+}
+
+/* ==========================================================================
+   InfoPage Component
+   ========================================================================== */
+
+.info-page {
+  --ip-border-radius: var(--cui-border-radius);
+}
+
+.info-page .card-header {
+  background-color: var(--cui-tertiary-bg);
+  border-bottom: 1px solid var(--cui-border-color);
+}
+
+.info-page .card-footer {
+  background-color: var(--cui-tertiary-bg);
+  border-top: 1px solid var(--cui-border-color);
+}
+
+.info-page .stat-card {
+  border: none;
+  background-color: var(--cui-tertiary-bg);
+}
+
+.info-page .stat-icon {
+  font-size: 2rem;
+}
+
+.info-page .stat-value {
+  color: var(--cui-primary);
+}
+
+.info-page .feature-card {
+  border: none;
+  background-color: var(--cui-tertiary-bg);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.info-page .feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--cui-box-shadow-sm);
+}
+
+.info-page .feature-icon {
+  font-size: 2.5rem;
+}
+
+.info-page .accordion-button {
+  font-weight: 500;
+  color: var(--cui-body-color);
+}
+
+.info-page .accordion-button:not(.collapsed) {
+  background-color: var(--cui-primary-bg-subtle, rgba(var(--cui-primary-rgb), 0.1));
+  color: var(--cui-primary);
+}
+
+.info-page .accordion-button:focus {
+  box-shadow: 0 0 0 0.25rem rgba(var(--cui-primary-rgb), 0.25);
+  border-color: var(--cui-primary);
+}
+
+/* ==========================================================================
+   PublicLanding Component
+   ========================================================================== */
+
+.public-landing {
+  --pl-border-radius: var(--cui-border-radius);
+}
+
+.public-landing .stat-card {
+  border: none;
+  background-color: var(--cui-tertiary-bg);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.public-landing .stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--cui-box-shadow-sm);
+}
+
+.public-landing .stat-icon {
+  font-size: 2.5rem;
+}
+
+.public-landing .stat-value {
+  color: var(--cui-primary);
+}
+
+.public-landing .feature-card {
+  border: none;
+  background-color: var(--cui-tertiary-bg);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.public-landing .feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--cui-box-shadow-sm);
+}
+
+.public-landing .feature-icon {
+  font-size: 2.5rem;
+}
+
+.public-landing .btn-lg {
+  padding: 0.875rem 2rem;
+  font-size: 1.125rem;
+}
+
+/* ==========================================================================
+   PublicQueryForm Component
+   ========================================================================== */
+
+.public-query-form {
+  --pqf-border-radius: var(--cui-border-radius);
+}
+
+.public-query-form .card-header {
+  background-color: var(--cui-tertiary-bg);
+  border-bottom: 1px solid var(--cui-border-color);
+}
+
+.public-query-form .card-footer {
+  background-color: var(--cui-tertiary-bg);
+  border-top: 1px solid var(--cui-border-color);
+}
+
+/* ==========================================================================
+   ConfirmModal Component
+   ========================================================================== */
+
+.confirm-modal {
+  --cm-border-radius: var(--cui-border-radius-lg);
+}
+
+.confirm-modal .modal-content {
+  border-radius: var(--cm-border-radius);
+  border: none;
+  box-shadow: var(--cui-box-shadow-lg);
+}
+
+.confirm-modal .modal-header {
+  border-bottom: 1px solid var(--cui-border-color);
+  padding: 1rem 1.5rem;
+}
+
+.confirm-modal .modal-body {
+  padding: 1.5rem;
+}
+
+.confirm-modal .modal-footer {
+  border-top: 1px solid var(--cui-border-color);
+  padding: 1rem 1.5rem;
+}
+
+.confirm-modal .btn-close-white {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* ==========================================================================
+   ToastHost Component
+   ========================================================================== */
+
+.toast-host {
+  --th-border-radius: var(--cui-border-radius);
+}
+
+.toast-host .toast {
+  border-radius: var(--th-border-radius);
+  border: none;
+  box-shadow: var(--cui-box-shadow-lg);
+  background-color: var(--cui-body-bg);
+}
+
+.toast-host .toast-header {
+  border-bottom: 1px solid var(--cui-border-color);
+  border-radius: var(--th-border-radius) var(--th-border-radius) 0 0;
+}
+
+.toast-host .toast-body {
+  padding: 0.75rem 1rem;
+}
+
+.toast-host .btn-close-white {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.toast-host .toast-container {
+  max-width: 350px;
+}
+
+/* Toast type colors */
+.toast-host .bg-primary { background-color: var(--cui-primary) !important; }
+.toast-host .bg-success { background-color: var(--cui-success) !important; }
+.toast-host .bg-danger { background-color: var(--cui-danger) !important; }
+.toast-host .bg-warning { background-color: var(--cui-warning) !important; }
+.toast-host .bg-info { background-color: var(--cui-info) !important; }
+
+.toast-host .toast.showing,
+.toast-host .toast.show {
+  opacity: 1;
+}
+
+.toast-host .toast.hide {
+  opacity: 0;
+}
+
+/* ==========================================================================
+   RoleDashboard Component
+   ========================================================================== */
+
+.role-dashboard {
+  --rd-border-radius: var(--cui-border-radius);
+}
+
+.role-dashboard .card-header {
+  background-color: var(--cui-tertiary-bg);
+  border-bottom: 1px solid var(--cui-border-color);
+}
+
+.role-dashboard .card-footer {
+  background-color: var(--cui-tertiary-bg);
+  border-top: 1px solid var(--cui-border-color);
+}
+
+.role-dashboard .kpi-card {
+  border: none;
+  background-color: var(--cui-tertiary-bg);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.role-dashboard .kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--cui-box-shadow-sm);
+}
+
+.role-dashboard .kpi-icon {
+  font-size: 2rem;
+  opacity: 0.8;
+}
+
+.role-dashboard .stat-card {
+  border: none;
+  background-color: var(--cui-tertiary-bg);
+}
+
+.role-dashboard .stat-icon {
+  font-size: 2.5rem;
+}
+
+.role-dashboard .stat-value {
+  color: var(--cui-primary);
+}
+
+.role-dashboard .feature-card {
+  border: none;
+  background-color: var(--cui-tertiary-bg);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.role-dashboard .feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--cui-box-shadow-sm);
+}
+
+.role-dashboard .feature-icon {
+  font-size: 2.5rem;
+}
+
+.role-dashboard .chart-card {
+  border: none;
+  background-color: var(--cui-tertiary-bg);
+}
+
+.role-dashboard .chart-wrapper {
+  width: 100%;
+}
+
+.role-dashboard .progress-group {
+  margin-bottom: 1rem;
+}
+
+.role-dashboard .progress-thin {
+  height: 6px !important;
+}
+
+.role-dashboard .chart-card {
+  border: none;
+  background-color: var(--cui-tertiary-bg);
+}
+
+/* ==========================================================================
+   Application Shell (SPEC-0009 T081; replaces the legacy theme.css shell)
+   ========================================================================== */
+
+/* Skip link (WCAG 2.4.1) — retained from the legacy shell. */
+.vf-skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--cui-body-bg);
+  color: var(--cui-body-color);
+  padding: 0.5rem 1rem;
+  z-index: 1000;
+}
+
+.vf-skip-link:focus {
+  left: 0;
+}
+
+/* Sidebar + main column shell. */
+.vf-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.vf-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Content wrapper padding (1.5rem 1rem — the legacy --vf-space-5/--vf-space-4). */
+.vf-content {
+  padding: 1.5rem 1rem;
+  flex: 1;
+}
+
+/* Page header (SPEC-0009 T081; Addendum §6). */
+.page-header {
+  padding: 1rem 1rem 0;
+}
+
+.page-header-title {
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: var(--cui-body-color);
+  margin: 0;
+}
+

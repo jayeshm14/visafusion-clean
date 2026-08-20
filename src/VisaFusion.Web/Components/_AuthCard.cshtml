@@ -1,0 +1,237 @@
+@model VisaFusion.Web.Components.AuthCardModel
+@{
+    var cardId = Model.Id ?? "auth-card";
+    var title = Model.Title ?? string.Empty;
+    var subtitle = Model.Subtitle ?? string.Empty;
+    var cardClass = Model.CardClass ?? "shadow-sm";
+    var headerClass = Model.HeaderClass ?? string.Empty;
+    var bodyClass = Model.BodyClass ?? string.Empty;
+    var footerClass = Model.FooterClass ?? string.Empty;
+    var formId = Model.Form?.Id ?? cardId + "-form";
+    var formAction = Model.Form?.Action ?? string.Empty;
+    var formMethod = Model.Form?.Method ?? "post";
+    var formCssClass = Model.Form?.CssClass ?? string.Empty;
+    var useFloatingLabels = Model.Form?.UseFloatingLabels ?? false;
+    var form = Model.Form;
+    var showPasswordToggle = Model.ShowPasswordToggle;
+    var rememberMe = Model.RememberMe;
+    var socialButtons = Model.SocialButtons ?? new List<AuthCardSocialButton>();
+    var footerLinks = Model.FooterLinks ?? new List<AuthCardFooterLink>();
+    var illustration = Model.Illustration ?? string.Empty;
+}
+
+@* AuthCard Component - CoreUI Authentication Card Pattern *@
+@* Maps to: CoreUI Authentication Pages (COREUI_COMPONENT_CATALOG §9) *@
+@* Uses: CoreUI pages.pug layout + centered card, form-floating, input-group, show-password toggle *@
+
+<div class="min-vh-100 d-flex flex-row align-items-center justify-content-center bg-body-tertiary px-3">
+    <div class="auth-card w-100" style="max-width: 420px;">
+        @if (!string.IsNullOrEmpty(illustration))
+        {
+            <div class="text-center mb-4">
+                <img src="@illustration" alt="" class="img-fluid" style="max-height: 120px;" />
+            </div>
+        }
+
+        <div class="card @cardClass">
+            @if (!string.IsNullOrEmpty(Model.HeaderHtml))
+            {
+                <div class="card-header @Model.HeaderClass bg-transparent border-0 pt-4 pb-2">
+                    @Html.Raw(Model.HeaderHtml)
+                </div>
+            }
+            else if (!string.IsNullOrEmpty(title))
+            {
+                <div class="card-header @headerClass bg-transparent border-0 pt-4 pb-2 text-center">
+                    <h4 class="card-title mb-1">@title</h4>
+                    @if (!string.IsNullOrEmpty(subtitle))
+                    {
+                        <p class="text-body-secondary small mb-0">@subtitle</p>
+                    }
+                </div>
+            }
+
+            <div class="card-body @bodyClass">
+                @if (form != null)
+                {
+                    <form method="@formMethod" action="@formAction" id="@formId" class="@formCssClass" novalidate>
+                        @form.AntiForgeryToken
+
+                        @if (Model.ValidationSummary != null)
+                        {
+                            @Model.ValidationSummary
+                        }
+
+                        @foreach (var field in Model.Fields)
+                        {
+                            var fieldId = $"{cardId}-{field.Name}";
+                            var isRequired = field.Required;
+                            var isDisabled = field.Disabled;
+
+                            if (field.Type == FormFieldType.Hidden)
+                            {
+                                <input type="hidden" name="@field.Name" value="@field.Value" />
+                                continue;
+                            }
+
+                            <div class="mb-3">
+                                @if (field.Type == FormFieldType.Checkbox || field.Type == FormFieldType.Switch)
+                                {
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="@field.Name" id="@(cardId + "-" + field.Name)" value="true" @(field.Value?.ToString() == "true" ? "checked" : "") @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") />
+                                        <label class="form-check-label" for="@(cardId + "-" + field.Name)">@field.Label</label>
+                                    </div>
+                                }
+                                else if (field.Type == FormFieldType.Password && showPasswordToggle)
+                                {
+                                    <label for="@(cardId + "-" + field.Name)" class="form-label">@field.Label @if (field.Required) { <span class="text-danger">*</span> }</label>
+                                    <div class="input-group has-validation">
+                                        <span class="input-group-text" aria-hidden="true"><svg class="icon icon-sm" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 1a5 5 0 1 0 0-10 5 5 0 0 0 0 10z"/></svg></span>
+                                        <input type="password" class="form-control @(field.CssClass ?? "")" name="@field.Name" id="@(cardId + "-" + field.Name)" value="@field.Value" placeholder="@field.Placeholder" @(isDisabled ? "disabled" : "") @(isRequired ? "required" : "") autocomplete="@field.Autocomplete" />
+                                        <button class="btn btn-outline-secondary password-toggle" type="button" data-target="@(cardId + "-" + field.Name)" aria-label="Show password">
+                                            <svg class="icon icon-sm" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.112.174-.165.26-.053.086-.106.172-.16.26C11.879 11.168 10.12 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/></svg>
+                                        </button>
+                                    </div>
+                                    @if (field.Required)
+                                    {
+                                        <div class="invalid-feedback">This field is required.</div>
+                                    }
+                                }
+                                else if (useFloatingLabels)
+                                {
+                                    <div class="form-floating has-validation mb-3">
+                                        <input type="@(field.InputType ?? "text")" class="form-control @(field.CssClass ?? "")" name="@field.Name" id="@(cardId + "-" + field.Name)" value="@field.Value" placeholder="@field.Placeholder" @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") autocomplete="@field.Autocomplete" @(field.MaxLength != null ? $"maxlength=\"{field.MaxLength}\"" : "") />
+                                        <label for="@(cardId + "-" + field.Name)">@field.Label</label>
+                                        @if (field.Required)
+                                        {
+                                            <div class="invalid-feedback">This field is required.</div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <label for="@(cardId + "-" + field.Name)" class="form-label">@field.Label @if (field.Required) { <span class="text-danger">*</span> }</label>
+                                    <input type="@(field.InputType ?? "text")" class="form-control @(field.CssClass ?? "")" name="@field.Name" id="@(cardId + "-" + field.Name)" value="@field.Value" placeholder="@field.Placeholder" @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") autocomplete="@field.Autocomplete" @(field.MaxLength != null ? $"maxlength=\"{field.MaxLength}\"" : "") />
+                                    @if (field.Required)
+                                    {
+                                        <div class="invalid-feedback">This field is required.</div>
+                                    }
+                                }
+
+                                @if (!string.IsNullOrEmpty(field.HelpText))
+                                {
+                                    <div class="form-text">@field.HelpText</div>
+                                }
+                            </div>
+                        }
+
+                        @if (rememberMe)
+                        {
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" name="rememberMe" id="@(cardId + "-remember")" value="true" />
+                                <label class="form-check-label" for="@(cardId + "-remember")">Remember me</label>
+                            </div>
+                        }
+
+                        @if (Model.SubmitButton != null)
+                        {
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn @(Model.SubmitButton.CssClass ?? "btn-primary btn-lg")" @(Model.SubmitButton.Disabled ? "disabled" : "")>
+                                    @if (!string.IsNullOrEmpty(Model.SubmitButton.Icon))
+                                    {
+                                        <svg class="icon icon-sm me-2" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="@Model.SubmitButton.Icon"/></svg>
+                                    }
+                                    @Model.SubmitButton.Title
+                                </button>
+                            </div>
+                        }
+
+                        @if (socialButtons.Any())
+                        {
+                            <div class="text-center mb-3">
+                                <span class="text-body-secondary small">Or continue with</span>
+                            </div>
+                            <div class="d-grid gap-2 mb-3">
+                                @foreach (var btn in socialButtons)
+                                {
+                                    <a class="btn @(btn.CssClass ?? "btn-outline-secondary")" href="@btn.Url" @(btn.OnClick != null ? $"onclick=\"{btn.OnClick}\"" : "")>
+                                        @if (!string.IsNullOrEmpty(btn.Icon))
+                                        {
+                                            <svg class="icon icon-sm me-2" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="@btn.Icon"/></svg>
+                                        }
+                                        @btn.Title
+                                    </a>
+                                }
+                            </div>
+                            <hr class="my-3" />
+                        }
+                    </form>
+                }
+                else
+                {
+                    @Model.BodyContent
+                }
+            </div>
+
+            @if (footerLinks.Any() || !string.IsNullOrEmpty(Model.FooterHtml))
+            {
+                <div class="card-footer @footerClass bg-transparent border-0 pb-4">
+                    @if (!string.IsNullOrEmpty(Model.FooterHtml))
+                    {
+                        @Html.Raw(Model.FooterHtml)
+                    }
+                    else
+                    {
+                        <div class="text-center">
+                            @foreach (var link in footerLinks)
+                            {
+                                <a class="@(link.CssClass ?? "text-decoration-none")" href="@link.Url" @(link.OnClick != null ? $"onclick=\"{link.OnClick}\"" : "")>@link.Text</a>
+                                @if (link != footerLinks.Last())
+                                {
+                                    <span class="mx-2 text-body-secondary">|</span>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // Password toggle functionality
+    document.querySelectorAll('.password-toggle').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const targetId = this.dataset.target;
+            const input = document.getElementById(targetId);
+            if (!input) return;
+
+            const type = input.type === 'password' ? 'text' : 'password';
+            input.type = type;
+
+            // Toggle eye icon
+            const icon = this.querySelector('svg');
+            if (icon) {
+                if (type === 'password') {
+                    icon.innerHTML = '<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.112.174-.165.26-.053.086-.106.172-.16.26C11.879 11.168 10.12 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>';
+                } else {
+                    icon.innerHTML = '<path d="M13.742 13.742a3.5 3.5 0 0 1-4.95 0L6.218 9.782a3.5 3.5 0 0 1 0-4.95L9.782 6.218a3.5 3.5 0 0 1 4.95 0l3.536 3.536a3.5 3.5 0 0 1 0 4.95zM12 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/>';
+                }
+            }
+        });
+    });
+
+    // Form validation styling
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            this.classList.add('was-validated');
+        });
+    });
+})();
+</script>

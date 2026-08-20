@@ -1,0 +1,22 @@
+@model IEnumerable<VisaFusion.Web.Services.BreadcrumbItem>
+@{
+    var items = Model ?? Enumerable.Empty<VisaFusion.Web.Services.BreadcrumbItem>();
+}
+@if (items.Any())
+{
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb mb-0">
+            @foreach (var item in items)
+            {
+                if (item.IsCurrent)
+                {
+                    <li class="breadcrumb-item active" aria-current="page">@item.Title</li>
+                }
+                else
+                {
+                    <li class="breadcrumb-item"><a href="@item.Route">@item.Title</a></li>
+                }
+            }
+        </ol>
+    </nav>
+}

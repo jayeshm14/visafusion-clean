@@ -1,31 +1,36 @@
-﻿@page
+@page
 @model VisaFusion.Web.Areas.Reporting.Pages.ReportingIndexModel
+@using VisaFusion.Web.Components
+@using System.Text
 @{
     ViewData["Title"] = "Operational Reports";
     ViewData["UseSidebar"] = true;
+
+    // Reporting landing/dashboard — SPEC-0009 T034/T037, FR-005; Addendum §7.
+    // Content/data unchanged (SPEC-0008 US6, FR-012); CoreUI presentation only.
+    // No KPI cards, charts or progress groups: the existing page exposes no
+    // metric/chart data, and inventing any would violate the feature constraint.
+    // The sidebar nav is rendered by the centralized RoleAwareNavigation service
+    // (Reporting group), so no per-page SidebarNav section is defined here.
+    var body = new StringBuilder();
+    body.Append("<p class=\"text-body-secondary\">On-screen operational reports (SPEC-0008 US6, FR-012). Available to employee, admin and super-user roles.</p>");
+    body.Append("<div class=\"card shadow-sm\">");
+    body.Append("<div class=\"card-header\"><h6 class=\"card-title mb-0\">Reports</h6></div>");
+    body.Append("<div class=\"list-group list-group-flush\">");
+    body.Append("<a class=\"list-group-item list-group-item-action\" href=\"").Append(Url.Page("/Pending", new { area = "Reporting" })).Append("\">Pending list</a>");
+    body.Append("<a class=\"list-group-item list-group-item-action\" href=\"").Append(Url.Page("/TodaySubmission", new { area = "Reporting" })).Append("\">Today submission</a>");
+    body.Append("<a class=\"list-group-item list-group-item-action\" href=\"").Append(Url.Page("/TodayCollection", new { area = "Reporting" })).Append("\">Today collection</a>");
+    body.Append("<a class=\"list-group-item list-group-item-action\" href=\"").Append(Url.Page("/TodayTransaction", new { area = "Reporting" })).Append("\">Today transaction</a>");
+    body.Append("<a class=\"list-group-item list-group-item-action\" href=\"").Append(Url.Page("/DailyVisaFee", new { area = "Reporting" })).Append("\">Daily visa fee</a>");
+    body.Append("<a class=\"list-group-item list-group-item-action\" href=\"").Append(Url.Page("/DailyBill", new { area = "Reporting" })).Append("\">Daily bill</a>");
+    body.Append("</div>");
+    body.Append("</div>");
+
+    var dashboard = new RoleDashboardModel
+    {
+        Title = "Operational Reports",
+        BodyHtml = body.ToString(),
+    };
 }
 
-@section SidebarNav {
-    <a asp-area="Reporting" asp-page="/Index" aria-current="page">Reports</a>
-    <a asp-area="Reporting" asp-page="/Pending">Pending</a>
-    <a asp-area="Reporting" asp-page="/TodaySubmission">Today Submission</a>
-    <a asp-area="Reporting" asp-page="/TodayCollection">Today Collection</a>
-    <a asp-area="Reporting" asp-page="/TodayTransaction">Today Transaction</a>
-    <a asp-area="Reporting" asp-page="/DailyVisaFee">Daily Visa Fee</a>
-    <a asp-area="Reporting" asp-page="/DailyBill">Daily Bill</a>
-}
-
-<div class="vf-content">
-    <h1>Operational Reports</h1>
-    <p>On-screen operational reports (SPEC-0008 US6, FR-012). Available to
-        employee, admin and super-user roles.</p>
-
-    <ul class="vf-link-list">
-        <li><a asp-area="Reporting" asp-page="/Pending">Pending list</a></li>
-        <li><a asp-area="Reporting" asp-page="/TodaySubmission">Today submission</a></li>
-        <li><a asp-area="Reporting" asp-page="/TodayCollection">Today collection</a></li>
-        <li><a asp-area="Reporting" asp-page="/TodayTransaction">Today transaction</a></li>
-        <li><a asp-area="Reporting" asp-page="/DailyVisaFee">Daily visa fee</a></li>
-        <li><a asp-area="Reporting" asp-page="/DailyBill">Daily bill</a></li>
-    </ul>
-</div>
+<partial name="~/Components/_RoleDashboard.cshtml" model="dashboard" />

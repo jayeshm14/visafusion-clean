@@ -1,26 +1,43 @@
 @page
 @model VisaFusion.Web.Pages.Auth.LoginModel
+@using Microsoft.AspNetCore.Html
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Log in";
+    Layout = "_AuthLayout";
+
+    // Legacy `relogin.asp?rsn=` reason rendered inline (deepanalysis §1.2) —
+    // the day-gate rejection (rsn=O) and every other reason code surface here.
+    var reasonHtml = Model.ReasonMessage is not null
+        ? $"<div class=\"alert alert-warning\" role=\"alert\">{Model.ReasonMessage}</div>"
+        : string.Empty;
+
+    var authCard = new AuthCardModel
+    {
+        Id = "login-card",
+        Title = "Log in",
+        Subtitle = "Sign in to your VisaFusion account",
+        HeaderHtml = reasonHtml,
+        ValidationSummary = Html.ValidationSummary(true),
+        Form = new AuthCardForm
+        {
+            Id = "login-form",
+            Method = "post",
+            AntiForgeryToken = Html.AntiForgeryToken()
+        },
+        Fields = new List<AuthCardField>
+        {
+            new() { Name = "UserName", Label = "Username", Type = FormFieldType.Text, Value = Model.UserName ?? string.Empty, Placeholder = "Username", Autocomplete = "username", Required = true },
+            new() { Name = "Password", Label = "Password", Type = FormFieldType.Password, Value = string.Empty, Placeholder = "Password", Autocomplete = "current-password", Required = true },
+            new() { Name = "returnUrl", Type = FormFieldType.Hidden, Value = Model.ReturnUrl ?? string.Empty },
+        },
+        RememberMe = false,
+        ShowPasswordToggle = true,
+        SubmitButton = new AuthCardSubmitButton { Title = "Log in" },
+        FooterLinks = new List<AuthCardFooterLink>
+        {
+            new() { Text = "Register", Url = "/Auth/Register" }
+        }
+    };
 }
-
-<h1>Log in</h1>
-
-@if (Model.ReasonMessage is not null)
-{
-    <p role="alert">@Model.ReasonMessage</p>
-}
-
-<form method="post">
-    <div asp-validation-summary="ModelOnly"></div>
-    <div>
-        <label asp-for="UserName"></label>
-        <input asp-for="UserName" autocomplete="username" />
-    </div>
-    <div>
-        <label asp-for="Password"></label>
-        <input asp-for="Password" type="password" autocomplete="current-password" />
-    </div>
-    <button type="submit">Log in</button>
-    <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
-</form>
+<partial name="~/Components/_AuthCard.cshtml" model="authCard" />

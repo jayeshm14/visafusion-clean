@@ -30,6 +30,14 @@ Every item below was verified by a tool call this session.
 - Impact: the UI contradicts the governing constitution. Owner decision
   required: adopt CoreUI (re-skin) or amend the constitution to ratify the
   bespoke system.
+- **RESOLVED 2026-08-20** — ADR-0006 ratifies the constitution: CoreUI is the
+  design reference and the bespoke `vf-*` UI was re-skinned to CoreUI classes
+  (SPEC-0009 T076–T085). `tokens.css`/`theme.css` and the demo assets
+  (charts.js, widgets.js, style.scss, simplebar.scss) are deleted; the shell
+  keeps its structural wrappers (`vf-shell`/`vf-main`/`vf-content`) ported into
+  `wwwroot/css/vf-component-styles.css` with `--cui-*` tokens. Behavior
+  preserved: page models, data, and server-side pagination unchanged; 8 new
+  test suites cover the re-skin (UnitTests 254/254, IntegrationTests 44/44).
 
 ## GAP-003 — `README.md` is stale (MEDIUM)
 

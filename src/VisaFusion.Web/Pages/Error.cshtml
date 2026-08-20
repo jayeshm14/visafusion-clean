@@ -1,0 +1,22 @@
+@page "/Error/{code:int?}"
+@model VisaFusion.Web.Pages.ErrorModel
+@using VisaFusion.Web.Components
+@{
+    ViewData["Title"] = "Error";
+    Layout = "_AuthLayout";
+
+    // ErrorPage component (SPEC-0009 T031): default title/message per status
+    // code; the trace id is shown for 500s (Request Id parity with the
+    // previous generic error page).
+    var errorPage = new ErrorPageModel
+    {
+        ErrorCode = Model.Code,
+        ShowDetails = Model.Code == 500,
+        Details = Model.TraceId ?? string.Empty,
+        Actions = new List<ErrorPageAction>
+        {
+            new() { Title = "Back to home", Url = "/", CssClass = "btn-primary" }
+        }
+    };
+}
+<partial name="~/Components/_ErrorPage.cshtml" model="errorPage" />

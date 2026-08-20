@@ -153,4 +153,8 @@ file. `.map` files copied when present. Dedup by URL (`seen` set).
 Adoption paths (decision needed — see `docs/analysis/GAP_REPORT.md` GAP-002):
 (a) npm-managed front-end with MSBuild/npm restore producing `wwwroot`
 vendors, or (b) vendored static copies of the pinned dist files committed to
-`wwwroot/` (no node toolchain in the .NET pipeline).
+`wwwroot/` (no node toolchain in the .NET pipeline). **RESOLVED 2026-08-20** —
+ADR-0006: CoreUI is adopted as the design reference via its class conventions
+and `--cui-*` design tokens (no vendored CoreUI dist assets, no node
+toolchain); the bespoke `vf-*` system was re-skinned to CoreUI classes
+(SPEC-0009 T076–T085).

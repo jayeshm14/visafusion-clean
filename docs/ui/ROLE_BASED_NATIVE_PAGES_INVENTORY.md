@@ -65,10 +65,10 @@ carries `[Authorize]` (verified `Pages/Auth/ChangePassword.cshtml.cs:21`).
 Columns: `Role | Native Page | Route | Menu | Permission | Workflow | CoreUI Target | Status`.
 Role abbreviations: **AGT**=Agent, **EMP**=Employee, **ADM**=Admin, **SU**=SuperUser,
 **G**=Guest (anonymous). Statuses: IMPLEMENTED / MAPPED / PARTIAL / BLOCKED / NOT_REQUIRED.
-Cross-cutting note: the global re-skin of the current bespoke `vf-*` shell to
-CoreUI is gated on the owner decision recorded in **GAP-002**; every
-IMPLEMENTED row below is functionally complete in the modern app with its
-CoreUI target identified.
+Cross-cutting note: the global re-skin of the bespoke `vf-*` shell to CoreUI
+was gated on the owner decision recorded in **GAP-002** — **RESOLVED
+2026-08-20** (ADR-0006, SPEC-0009 T076–T085). Every IMPLEMENTED row below is
+functionally complete in the modern app with its CoreUI target applied.
 
 ### 4.1 Navigation Group: Public Site (Guest)
 
@@ -144,10 +144,10 @@ CoreUI target identified.
 
 | Artifact | Route/Path | Menu | Permission | Workflow | CoreUI Target | Status |
 |---|---|---|---|---|---|---|
-| `Pages/Shared/_Layout.cshtml` | all pages | — | role-aware shell | Dual shell: sidebar mode for authenticated, top-nav for anonymous (verified lines 16/20/38) | CoreUI Sidebar §1.1 (`sidebar.pug` + data-driven `sidebar-nav.pug`), Header §1.2 (`header.pug`), Footer §1.3, Breadcrumb §1.4 | IMPLEMENTED (native) → CoreUI shell pending GAP-002 |
-| `wwwroot/css/tokens.css` | static | — | — | design tokens | Replace with CoreUI `--cui-*` CSS custom properties (DESIGN_SYSTEM §3) | MAPPED |
-| `wwwroot/css/theme.css` (49 verified `vf-*` classes: shell/sidebar/topnav/btn/form/alert/card/table/badge/list/numeric) | static | — | — | bespoke component styles | Map per component to CoreUI equivalents (Buttons §5.1, Forms §6.x, Tables §3.2, Badges §3.6, Alerts §3.5, Cards §3.1) | MAPPED — re-skin pending GAP-002 |
-| `wwwroot/css/bootstrap-icons.css` | static | — | — | icon source | Replace with CoreUI Icons §8 (`cil-*`/`cif-*` SVGs into `wwwroot/icons`) | MAPPED |
+| `Pages/Shared/_Layout.cshtml` | all pages | — | role-aware shell | Dual shell: sidebar mode for authenticated, top-nav for anonymous (verified lines 16/20/38) | CoreUI Sidebar §1.1, Header §1.2, Footer §1.3, Breadcrumb §1.4 | IMPLEMENTED — CoreUI shell (re-skin complete 2026-08-20, ADR-0006) |
+| `wwwroot/css/tokens.css` | static | — | — | design tokens | Replace with CoreUI `--cui-*` CSS custom properties (DESIGN_SYSTEM §3) | RESOLVED — deleted (T077); `--cui-*` tokens in `wwwroot/css/vf-component-styles.css` |
+| `wwwroot/css/theme.css` (49 verified `vf-*` classes: shell/sidebar/topnav/btn/form/alert/card/table/badge/list/numeric) | static | — | — | bespoke component styles | Map per component to CoreUI equivalents (Buttons §5.1, Forms §6.x, Tables §3.2, Badges §3.6, Alerts §3.5, Cards §3.1) | RESOLVED — deleted (T077); classes mapped to CoreUI equivalents (re-skin T078) |
+| `wwwroot/css/bootstrap-icons.css` | static | — | — | icon source | Replace with CoreUI Icons §8 (`cil-*`/`cif-*` SVGs into `wwwroot/icons`) | RETAINED (icons in use; no CoreUI vendored asset required) |
 | `wwwroot/updateimg/**` (legacy) | static | — | — | legacy images served for parity (Phase0E2ETests 200) | No CoreUI equivalent — legacy asset | NOT_REQUIRED |
 
 ## 5. ROLE-BASED NAVIGATION MODEL (addendum §5)
@@ -196,7 +196,8 @@ VisaFusion Shell (replaces vf-shell)
 ```
 
 The shell is reusable; only content and navigation are role-aware. Adoption is
-gated on GAP-002.
+gated on GAP-002. **RESOLVED 2026-08-20** — ADR-0006; the shell is implemented
+(`_Layout` + `_Sidebar` + `_PageHeader` + `_Breadcrumb`, T081).
 
 ## 7. EXISTING COMPONENT → COREUI MAPPING (addendum §8, steps 9–14)
 
@@ -273,7 +274,8 @@ server-side policy (verified attributes in §3).
   under the Public area root, outside `Areas/Public/Pages/`; has `@page` but no
   discoverable Razor route and no model. Verified via glob + grep. Disposition
   pending owner: delete, or move into `Areas/Public/Pages/` with a model.
-- Cross-references: **GAP-002** (CoreUI adoption vs bespoke `vf-*` — gates §5–§7),
+- Cross-references: **GAP-002** (CoreUI adoption vs bespoke `vf-*` — **RESOLVED
+  2026-08-20**, ADR-0006; re-skin complete SPEC-0009 T076–T085),
   **GAP-004** (Employee/Billing/Notifications placeholders — §4.6 BLOCKED rows),
   **GAP-008** (notification transports log-only — §4.6 Notifications row).
 
@@ -284,16 +286,16 @@ server-side policy (verified attributes in §3).
 | Every role identified | ✅ §3 (Agent, Employee, Admin, SuperUser, Guest) |
 | Every permission identified | ✅ §3 (11 policies) |
 | Every native role page identified | ✅ §4 (41 pages + cross-cutting artifacts) |
-| Every role-based navigation item mapped | ✅ §5 (proposed centralized model) |
+| Every role-based navigation item mapped | ✅ §5 (centralized model implemented — `RoleAwareNavigation`) |
 | Every role-specific landing page mapped | ✅ §4 (Agent/Reporting/Admin/Public) |
 | Every role-specific workflow preserved | ✅ §4 workflow column (legacy parity) |
 | Every protected route preserved | ✅ §3/§4 (policy per page) |
 | Every protected API preserved | ✅ §8 API column |
-| Role-aware navigation implemented | ⏳ pending GAP-002 (currently per-page `SidebarNav` sections) |
-| Role-aware breadcrumbs implemented | ⏳ pending GAP-002 |
-| Role-specific pages migrated | ✅ functional; CoreUI presentation pending GAP-002 |
-| Role-based tests implemented | ✅ §9 (test files exist and run) |
-| Knowledge Graph updated | ⏳ to be regenerated with role/navigation nodes per §14 |
+| Role-aware navigation implemented | ✅ `Services/RoleAwareNavigation.cs` (T016) + `_Sidebar` partial; per-page `SidebarNav` sections removed (T079) |
+| Role-aware breadcrumbs implemented | ✅ `_Breadcrumb` partial + `BreadcrumbService` (all pages) |
+| Role-specific pages migrated | ✅ functional + CoreUI presentation (re-skin T078, ADR-0006) |
+| Role-based tests implemented | ✅ §9 (test files exist and run) + 8 new CoreUI suites (T080) |
+| Knowledge Graph updated | ✅ `knowledge-graph/kg.json` reconciled to the 8-group nav model (2026-08-20) |
 | SpecKit updated | ⏳ referenced specs cited; addendum integration pending |
 | Traceability complete | ✅ §8 |
 

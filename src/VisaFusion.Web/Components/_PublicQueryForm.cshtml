@@ -1,0 +1,200 @@
+@model VisaFusion.Web.Components.PublicQueryFormModel
+@{
+    var formId = Model.Form?.Id ?? "public-query-form";
+    var formAction = Model.Form?.Action ?? "/api/v1/public/queries";
+    var formMethod = Model.Form?.Method ?? "post";
+    var formCssClass = Model.Form?.CssClass ?? string.Empty;
+    var useFloatingLabels = Model.Form?.UseFloatingLabels ?? false;
+    var form = Model.Form;
+    var cardClass = Model.CardClass ?? "shadow-sm";
+    var headerClass = Model.HeaderClass ?? string.Empty;
+    var bodyClass = Model.BodyClass ?? string.Empty;
+    var footerClass = Model.FooterClass ?? string.Empty;
+}
+
+@* PublicQueryForm Component - CoreUI Form Pattern *@
+@* Maps to: CoreUI Forms (COREUI_COMPONENT_CATALOG §6.1-6.6) *@
+@* Uses: .card, .form-floating, .form-control, .form-select, .input-group, .btn, validation *@
+
+<div class="public-query-form card @cardClass">
+    @if (!string.IsNullOrEmpty(Model.HeaderHtml))
+    {
+        <div class="card-header @Model.HeaderClass">
+            @Html.Raw(Model.HeaderHtml)
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(Model.Title))
+    {
+        <div class="card-header @headerClass">
+            <h5 class="card-title mb-0">@Model.Title</h5>
+            @if (!string.IsNullOrEmpty(Model.Subtitle))
+            {
+                <p class="card-subtitle text-body-secondary small mb-0">@Model.Subtitle</p>
+            }
+        </div>
+    }
+
+    <div class="card-body @bodyClass">
+        @if (form != null)
+        {
+            <form method="@formMethod" action="@formAction" id="@formId" class="@formCssClass" novalidate>
+                @form.AntiForgeryToken
+
+                @foreach (var field in Model.Fields)
+                {
+                    var fieldId = $"{formId}-{field.Name}";
+                    var isRequired = field.Required;
+                    var isDisabled = field.Disabled;
+
+                    if (field.Type == FormFieldType.Hidden)
+                    {
+                        <input type="hidden" name="@field.Name" value="@field.Value" />
+                        continue;
+                    }
+
+                    <div class="mb-3">
+                        @if (field.Type == FormFieldType.Checkbox || field.Type == FormFieldType.Switch)
+                        {
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="@field.Name" id="@(formId + "-" + field.Name)" value="true" @(field.Value?.ToString() == "true" ? "checked" : "") @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") />
+                                <label class="form-check-label" for="@(formId + "-" + field.Name)">@field.Label</label>
+                            </div>
+                        }
+                        else if (field.Type == FormFieldType.Select)
+                        {
+                            @if (useFloatingLabels)
+                            {
+                                <div class="form-floating has-validation mb-3">
+                                    <select class="form-select @(field.CssClass ?? "")" name="@field.Name" id="@(formId + "-" + field.Name)" @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") @(field.Multiple ? "multiple" : "")>
+                                        @if (!string.IsNullOrEmpty(field.Placeholder))
+                                        {
+                                            <option value="" disabled selected>@field.Placeholder</option>
+                                        }
+                                        @foreach (var option in field.Options)
+                                        {
+                                            <option value="@option.Value" @(field.Value?.ToString() == option.Value ? "selected" : "")>@option.Text</option>
+                                        }
+                                    </select>
+                                    <label for="@(formId + "-" + field.Name)">@field.Label</label>
+                                    @if (field.Required)
+                                    {
+                                        <div class="invalid-feedback">Please select an option.</div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <label for="@(formId + "-" + field.Name)" class="form-label">@field.Label @if (field.Required) { <span class="text-danger">*</span> }</label>
+                                <select class="form-select @(field.CssClass ?? "")" name="@field.Name" id="@(formId + "-" + field.Name)" @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") @(field.Multiple ? "multiple" : "")>
+                                    @if (!string.IsNullOrEmpty(field.Placeholder))
+                                    {
+                                        <option value="" disabled selected>@field.Placeholder</option>
+                                    }
+                                    @foreach (var option in field.Options)
+                                    {
+                                        <option value="@option.Value" @(field.Value?.ToString() == option.Value ? "selected" : "")>@option.Text</option>
+                                    }
+                                </select>
+                                @if (field.Required)
+                                {
+                                    <div class="invalid-feedback">Please select an option.</div>
+                                }
+                            }
+                        }
+                        else if (field.Type == FormFieldType.TextArea)
+                        {
+                            @if (useFloatingLabels)
+                            {
+                                <div class="form-floating has-validation mb-3">
+                                    <textarea class="form-control @(field.CssClass ?? "")" name="@field.Name" id="@(formId + "-" + field.Name)" rows="@(field.Rows ?? 4)" @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") placeholder="@field.Placeholder"></textarea>
+                                    <label for="@(formId + "-" + field.Name)">@field.Label</label>
+                                    @if (field.Required)
+                                    {
+                                        <div class="invalid-feedback">This field is required.</div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <label for="@(formId + "-" + field.Name)" class="form-label">@field.Label @if (field.Required) { <span class="text-danger">*</span> }</label>
+                                <textarea class="form-control @(field.CssClass ?? "")" name="@field.Name" id="@(formId + "-" + field.Name)" rows="@(field.Rows ?? 4)" @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") placeholder="@field.Placeholder"></textarea>
+                                @if (field.Required)
+                                {
+                                    <div class="invalid-feedback">This field is required.</div>
+                                }
+                            }
+                        }
+                        else if (useFloatingLabels)
+                        {
+                            <div class="form-floating has-validation mb-3">
+                                <input type="@(field.InputType ?? "text")" class="form-control @(field.CssClass ?? "")" name="@field.Name" id="@(formId + "-" + field.Name)" value="@field.Value" placeholder="@field.Placeholder" @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") autocomplete="@field.Autocomplete" @(field.MaxLength != null ? $"maxlength=\"{field.MaxLength}\"" : "") />
+                                <label for="@(formId + "-" + field.Name)">@field.Label</label>
+                                @if (field.Required)
+                                {
+                                    <div class="invalid-feedback">This field is required.</div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <label for="@(formId + "-" + field.Name)" class="form-label">@field.Label @if (field.Required) { <span class="text-danger">*</span> }</label>
+                            <input type="@(field.InputType ?? "text")" class="form-control @(field.CssClass ?? "")" name="@field.Name" id="@(formId + "-" + field.Name)" value="@field.Value" placeholder="@field.Placeholder" @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") autocomplete="@field.Autocomplete" @(field.MaxLength != null ? $"maxlength=\"{field.MaxLength}\"" : "") />
+                            @if (field.Required)
+                            {
+                                <div class="invalid-feedback">This field is required.</div>
+                            }
+                        }
+
+                        @if (!string.IsNullOrEmpty(field.HelpText))
+                        {
+                            <div class="form-text">@field.HelpText</div>
+                        }
+                        @if (field.Required)
+                        {
+                            <div class="invalid-feedback">This field is required.</div>
+                        }
+                    </div>
+                }
+
+                @if (Model.SubmitButton != null)
+                {
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn @(Model.SubmitButton.CssClass ?? "btn-primary btn-lg")" @(Model.SubmitButton.Disabled ? "disabled" : "")>
+                            @if (!string.IsNullOrEmpty(Model.SubmitButton.Icon))
+                            {
+                                <svg class="icon icon-sm me-2" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="@Model.SubmitButton.Icon"/></svg>
+                            }
+                            @Model.SubmitButton.Title
+                        </button>
+                    </div>
+                }
+            </form>
+        }
+        else
+        {
+            @Html.Raw(Model.BodyContent)
+        }
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.FooterHtml))
+    {
+        <div class="card-footer @footerClass">
+            @Html.Raw(Model.FooterHtml)
+        </div>
+    }
+</div>
+
+<script>
+(function() {
+    // Form validation styling
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            this.classList.add('was-validated');
+        });
+    });
+})();
+</script>

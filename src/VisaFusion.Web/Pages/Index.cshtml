@@ -1,8 +1,27 @@
 @page
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Home";
+
+    // Public landing (root `/`) — SPEC-0009 T032, FR-005; Addendum §7.
+    // Content/data unchanged (SPEC-0003 FR-002 welcome text); CoreUI presentation only.
+    var landing = new PublicLandingModel
+    {
+        Hero = new PublicLandingHero
+        {
+            Title = "VisaFusion",
+            Subtitle = "Welcome to the VisaFusion single-process host (SPEC-0003, FR-002).",
+        },
+        FeaturesTitle = "Areas",
+        Features = new List<PublicLandingFeature>
+        {
+            new()
+            {
+                Title = "Application areas",
+                Description = "Use the navigation to reach the Public, Auth, Employee, Agent, Admin, Billing, Reporting, and Notifications areas.",
+            },
+        },
+    };
 }
 
-<h1>VisaFusion</h1>
-<p>Welcome to the VisaFusion single-process host (SPEC-0003, FR-002).</p>
-<p>Use the navigation to reach the Public, Auth, Employee, Agent, Admin, Billing, Reporting, and Notifications areas.</p>
+<partial name="~/Components/_PublicLanding.cshtml" model="landing" />

@@ -5,147 +5,153 @@
     ViewData["UseSidebar"] = true;
 }
 
-@section SidebarNav {
-    <a asp-area="Admin" asp-page="/Agents/List" aria-current="page">Agents</a>
-}
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-<div class="vf-content">
-    <h1>New agent</h1>
-
-    <form method="post">
-        <div asp-validation-summary="ModelOnly" class="vf-validation-summary-errors"></div>
-
-        <div class="vf-card">
-            <h2>Login</h2>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="Username">Login username</label>
-                <input class="vf-form-control" asp-for="Username" autocomplete="off" />
-                <span asp-validation-for="Username" class="vf-field-validation-error"></span>
+    <div class="card shadow-sm mb-4">
+        <div class="card-header"><h2 class="h5 card-title mb-0">Login</h2></div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label" asp-for="Username">Login username</label>
+                <input class="form-control" asp-for="Username" autocomplete="off" />
+                <span asp-validation-for="Username" class="text-danger"></span>
             </div>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="Password">Initial password</label>
-                <input class="vf-form-control" asp-for="Password" type="password" autocomplete="new-password" />
-                <span asp-validation-for="Password" class="vf-field-validation-error"></span>
-                <small>The password is hashed and never stored in plaintext; hand it to the agent out-of-band.</small>
+            <div class="mb-3">
+                <label class="form-label" asp-for="Password">Initial password</label>
+                <input class="form-control" asp-for="Password" type="password" autocomplete="new-password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+                <small class="text-body-secondary">The password is hashed and never stored in plaintext; hand it to the agent out-of-band.</small>
             </div>
         </div>
+    </div>
 
-        <div class="vf-card">
-            <h2>Company</h2>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="Companyname">Company name</label>
-                <input class="vf-form-control" asp-for="Companyname" />
-                <span asp-validation-for="Companyname" class="vf-field-validation-error"></span>
+    <div class="card shadow-sm mb-4">
+        <div class="card-header"><h2 class="h5 card-title mb-0">Company</h2></div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label" asp-for="Companyname">Company name</label>
+                <input class="form-control" asp-for="Companyname" />
+                <span asp-validation-for="Companyname" class="text-danger"></span>
             </div>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="Description">Description</label>
-                <input class="vf-form-control" asp-for="Description" />
+            <div class="mb-3">
+                <label class="form-label" asp-for="Description">Description</label>
+                <input class="form-control" asp-for="Description" />
             </div>
         </div>
+    </div>
 
-        <div class="vf-card">
-            <h2>Address</h2>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="Street1">Street 1</label>
-                <input class="vf-form-control" asp-for="Street1" />
+    <div class="card shadow-sm mb-4">
+        <div class="card-header"><h2 class="h5 card-title mb-0">Address</h2></div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label" asp-for="Street1">Street 1</label>
+                <input class="form-control" asp-for="Street1" />
             </div>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="Street2">Street 2</label>
-                <input class="vf-form-control" asp-for="Street2" />
+            <div class="mb-3">
+                <label class="form-label" asp-for="Street2">Street 2</label>
+                <input class="form-control" asp-for="Street2" />
             </div>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="Area">Area</label>
-                <input class="vf-form-control" asp-for="Area" />
+            <div class="mb-3">
+                <label class="form-label" asp-for="Area">Area</label>
+                <input class="form-control" asp-for="Area" />
             </div>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="City">City</label>
-                <input class="vf-form-control" asp-for="City" />
+            <div class="mb-3">
+                <label class="form-label" asp-for="City">City</label>
+                <input class="form-control" asp-for="City" />
             </div>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="Pincode">PIN code</label>
-                <input class="vf-form-control" asp-for="Pincode" />
+            <div class="mb-3">
+                <label class="form-label" asp-for="Pincode">PIN code</label>
+                <input class="form-control" asp-for="Pincode" />
             </div>
         </div>
+    </div>
 
-        <div class="vf-card">
-            <h2>Contact</h2>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="Phoneno">Phone</label>
-                <input class="vf-form-control" asp-for="Phoneno" />
+    <div class="card shadow-sm mb-4">
+        <div class="card-header"><h2 class="h5 card-title mb-0">Contact</h2></div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label" asp-for="Phoneno">Phone</label>
+                <input class="form-control" asp-for="Phoneno" />
             </div>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="Faxno">Fax</label>
-                <input class="vf-form-control" asp-for="Faxno" />
+            <div class="mb-3">
+                <label class="form-label" asp-for="Faxno">Fax</label>
+                <input class="form-control" asp-for="Faxno" />
             </div>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="Emailid">Email</label>
-                <input class="vf-form-control" asp-for="Emailid" type="email" />
+            <div class="mb-3">
+                <label class="form-label" asp-for="Emailid">Email</label>
+                <input class="form-control" asp-for="Emailid" type="email" />
             </div>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="Smsno">SMS number</label>
-                <input class="vf-form-control" asp-for="Smsno" />
+            <div class="mb-3">
+                <label class="form-label" asp-for="Smsno">SMS number</label>
+                <input class="form-control" asp-for="Smsno" />
             </div>
         </div>
+    </div>
 
-        <div class="vf-card">
-            <h2>People</h2>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="Directorname">Director</label>
-                <input class="vf-form-control" asp-for="Directorname" />
+    <div class="card shadow-sm mb-4">
+        <div class="card-header"><h2 class="h5 card-title mb-0">People</h2></div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label" asp-for="Directorname">Director</label>
+                <input class="form-control" asp-for="Directorname" />
             </div>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="DirectorPH">Director phone</label>
-                <input class="vf-form-control" asp-for="DirectorPH" />
+            <div class="mb-3">
+                <label class="form-label" asp-for="DirectorPH">Director phone</label>
+                <input class="form-control" asp-for="DirectorPH" />
             </div>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="AcMgrPH">Accounts manager phone</label>
-                <input class="vf-form-control" asp-for="AcMgrPH" />
+            <div class="mb-3">
+                <label class="form-label" asp-for="AcMgrPH">Accounts manager phone</label>
+                <input class="form-control" asp-for="AcMgrPH" />
             </div>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="VisaInchargeName">Visa in-charge</label>
-                <input class="vf-form-control" asp-for="VisaInchargeName" />
+            <div class="mb-3">
+                <label class="form-label" asp-for="VisaInchargeName">Visa in-charge</label>
+                <input class="form-control" asp-for="VisaInchargeName" />
             </div>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="VisaInchargePH">Visa in-charge phone</label>
-                <input class="vf-form-control" asp-for="VisaInchargePH" />
+            <div class="mb-3">
+                <label class="form-label" asp-for="VisaInchargePH">Visa in-charge phone</label>
+                <input class="form-control" asp-for="VisaInchargePH" />
             </div>
         </div>
+    </div>
 
-        <div class="vf-card">
-            <h2>Financial</h2>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="Acno">Account number</label>
-                <input class="vf-form-control" asp-for="Acno" />
+    <div class="card shadow-sm mb-4">
+        <div class="card-header"><h2 class="h5 card-title mb-0">Financial</h2></div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label" asp-for="Acno">Account number</label>
+                <input class="form-control" asp-for="Acno" />
             </div>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="Payment">Payment</label>
-                <input class="vf-form-control" asp-for="Payment" />
+            <div class="mb-3">
+                <label class="form-label" asp-for="Payment">Payment</label>
+                <input class="form-control" asp-for="Payment" />
             </div>
         </div>
+    </div>
 
-        <div class="vf-card">
-            <h2>Memberships</h2>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="TAAI">TAAI</label>
-                <input class="vf-form-control" asp-for="TAAI" />
+    <div class="card shadow-sm mb-4">
+        <div class="card-header"><h2 class="h5 card-title mb-0">Memberships</h2></div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label" asp-for="TAAI">TAAI</label>
+                <input class="form-control" asp-for="TAAI" />
             </div>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="TAFI">TAFI</label>
-                <input class="vf-form-control" asp-for="TAFI" />
+            <div class="mb-3">
+                <label class="form-label" asp-for="TAFI">TAFI</label>
+                <input class="form-control" asp-for="TAFI" />
             </div>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="Membership">Membership</label>
-                <input class="vf-form-control" asp-for="Membership" />
+            <div class="mb-3">
+                <label class="form-label" asp-for="Membership">Membership</label>
+                <input class="form-control" asp-for="Membership" />
             </div>
-            <div class="vf-form-group">
-                <label class="vf-form-label" asp-for="IATA">IATA</label>
-                <input class="vf-form-control" asp-for="IATA" />
+            <div class="mb-3">
+                <label class="form-label" asp-for="IATA">IATA</label>
+                <input class="form-control" asp-for="IATA" />
             </div>
         </div>
+    </div>
 
-        <p>
-            <button type="submit" class="vf-btn vf-btn-primary">Create agent</button>
-            <a class="vf-btn vf-btn-secondary" href="/Admin/Agents/List">Cancel</a>
-        </p>
-    </form>
-</div>
+    <p>
+        <button type="submit" class="btn btn-primary">Create agent</button>
+        <a class="btn btn-outline-secondary" href="/Admin/Agents/List">Cancel</a>
+    </p>
+</form>

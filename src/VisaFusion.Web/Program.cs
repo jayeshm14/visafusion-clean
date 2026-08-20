@@ -21,6 +21,7 @@ using VisaFusion.Data.Persistence;
 using VisaFusion.Identity;
 using VisaFusion.Identity.Persistence;
 using VisaFusion.Web.Middleware;
+using VisaFusion.Web.Services;
 
 namespace VisaFusion.Web;
 
@@ -242,6 +243,11 @@ public partial class Program
         builder.Services.AddScoped<ISmsDispatchProvider, LogOnlySmsDispatchProvider>();
         builder.Services.AddScoped<IEmailDispatchProvider, LogOnlyEmailDispatchProvider>();
 
+        // ---- Role-aware navigation & breadcrumbs (SPEC-0009 Phases 6, 8) ----
+        // Stateless services - use Singleton to avoid per-request allocation
+        builder.Services.AddSingleton<IRoleAwareNavigation, RoleAwareNavigation>();
+        builder.Services.AddSingleton<IBreadcrumbService, BreadcrumbService>();
+
         // ---- EF Core over the legacy VisaEntry database (T035, FR-006) ----
         builder.Services.AddDbContext<VisaEntryDbContext>(options =>
             options.UseSqlServer(
@@ -317,6 +323,16 @@ public partial class Program
         // Self-hosted static assets (T030, spec §14): forms/, updateimg/, images/,
         // css/, js/, fonts/ under wwwroot/ (no CDN).
         app.UseStaticFiles();
+
+        // Status-code error pages (SPEC-0009 T031): non-API 4xx/5xx responses
+        // without a body (e.g. 404 for an unmatched route) re-execute to the
+        // CoreUI ErrorPage component at /Error/{code}. Registered BEFORE
+        // UseRouting so the re-executed request re-runs routing and reaches
+        // the Error page. API responses keep their existing behavior
+        // (problem-details / empty body) — the API error contract is unchanged.
+        app.UseWhen(
+            ctx => !ctx.Request.Path.StartsWithSegments("/api"),
+            app2 => app2.UseStatusCodePagesWithReExecute("/Error/{0}"));
 
         app.UseRouting();
 

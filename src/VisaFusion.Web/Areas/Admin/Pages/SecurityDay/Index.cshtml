@@ -5,30 +5,24 @@
     ViewData["UseSidebar"] = true;
 }
 
-@section SidebarNav {
-    <a asp-area="Admin" asp-page="/SecurityDay/Index" aria-current="page">Security day</a>
+@if (!string.IsNullOrWhiteSpace(Model.OutcomeMessage))
+{
+    <div class="alert alert-success" role="status">@Model.OutcomeMessage</div>
+}
+@if (!string.IsNullOrWhiteSpace(Model.OutcomeError))
+{
+    <div class="alert alert-danger" role="alert">@Model.OutcomeError</div>
 }
 
-<div class="vf-content">
-    <h1>Security day</h1>
-
-    @if (!string.IsNullOrWhiteSpace(Model.OutcomeMessage))
-    {
-        <div class="vf-alert vf-alert-success" role="status">@Model.OutcomeMessage</div>
-    }
-    @if (!string.IsNullOrWhiteSpace(Model.OutcomeError))
-    {
-        <div class="vf-alert vf-alert-danger" role="alert">@Model.OutcomeError</div>
-    }
-
-    <div class="vf-card">
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
         @if (Model.Today is null)
         {
-            <p>Today has not been opened.</p>
+            <p class="mb-0">Today has not been opened.</p>
         }
         else if (Model.Today.ClosingTime is not null)
         {
-            <p>
+            <p class="mb-0">
                 Today was opened at <strong>@Model.Today.OpeningTime?.ToString("HH:mm")</strong>
                 by @Model.Today.OpenedBy and closed at
                 <strong>@Model.Today.ClosingTime.Value.ToString("HH:mm")</strong>
@@ -37,25 +31,25 @@
         }
         else
         {
-            <p>
+            <p class="mb-0">
                 Today is open (opened at <strong>@Model.Today.OpeningTime?.ToString("HH:mm")</strong>
                 by @Model.Today.OpenedBy).
             </p>
         }
     </div>
-
-    <p>
-        @if (Model.Today is not null && Model.Today.ClosingTime is null)
-        {
-            <form method="post" asp-page-handler="Close" class="vf-inline">
-                <button type="submit" class="vf-btn vf-btn-primary">Close the day</button>
-            </form>
-        }
-        else
-        {
-            <form method="post" asp-page-handler="Open" class="vf-inline">
-                <button type="submit" class="vf-btn vf-btn-primary">Open the day</button>
-            </form>
-        }
-    </p>
 </div>
+
+<p>
+    @if (Model.Today is not null && Model.Today.ClosingTime is null)
+    {
+        <form method="post" asp-page-handler="Close" class="d-inline">
+            <button type="submit" class="btn btn-primary">Close the day</button>
+        </form>
+    }
+    else
+    {
+        <form method="post" asp-page-handler="Open" class="d-inline">
+            <button type="submit" class="btn btn-primary">Open the day</button>
+        </form>
+    }
+</p>

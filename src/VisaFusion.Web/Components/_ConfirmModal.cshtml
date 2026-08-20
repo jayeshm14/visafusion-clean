@@ -1,0 +1,91 @@
+@model VisaFusion.Web.Components.ConfirmModalModel
+@{
+    var modalId = Model.Id ?? "confirm-modal";
+    var title = Model.Title ?? "Confirm Action";
+    var message = Model.Message ?? "Are you sure you want to proceed?";
+    var confirmText = Model.ConfirmText ?? "Confirm";
+    var cancelText = Model.CancelText ?? "Cancel";
+    var confirmCssClass = Model.ConfirmCssClass ?? "btn-danger";
+    var cancelCssClass = Model.CancelCssClass ?? "btn-secondary";
+    var size = Model.Size ?? "modal-md";
+    var centered = Model.Centered;
+    var scrollable = Model.Scrollable;
+    var staticBackdrop = Model.StaticBackdrop;
+    var keyboard = Model.Keyboard;
+    var icon = Model.Icon ?? string.Empty;
+    var iconColor = Model.IconColor ?? "text-warning";
+}
+
+@* ConfirmModal Component - CoreUI Modal Pattern *@
+@* Maps to: CoreUI Modals (COREUI_COMPONENT_CATALOG §4.1) *@
+@* Uses: .modal, .modal-dialog, .modal-content, .modal-header, .modal-body, .modal-footer *@
+
+<div class="confirm-modal modal fade" id="@modalId" tabindex="-1" aria-labelledby="@(modalId + "-label")" aria-hidden="true" @(staticBackdrop ? "data-coreui-backdrop=\"static\"" : "") @(keyboard ? "data-coreui-keyboard=\"true\"" : "")>
+    <div class="modal-dialog @size @(centered ? "modal-dialog-centered" : "") @(scrollable ? "modal-dialog-scrollable" : "")" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                @if (!string.IsNullOrEmpty(Model.Icon))
+                {
+                    <div class="me-3">
+                        <svg class="icon icon-lg @Model.IconColor" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="@Model.Icon"/></svg>
+                    </div>
+                }
+                <h5 class="modal-title" id="@(modalId + "-label")">@Model.Title</h5>
+                <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @if (!string.IsNullOrEmpty(Model.Icon))
+                {
+                    <div class="text-center mb-3">
+                        <svg class="icon icon-3xl @Model.IconColor" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="@Model.Icon"/></svg>
+                    </div>
+                }
+                <p class="@(string.IsNullOrEmpty(Model.Icon) ? "" : "text-center ")">@Model.Message</p>
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <p class="text-body-secondary small">@Model.Description</p>
+                }
+                @if (!string.IsNullOrEmpty(Model.BodyHtml))
+                {
+                    @Model.BodyHtml
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn @Model.CancelCssClass" data-coreui-dismiss="modal">@Model.CancelText</button>
+                <button type="button" class="btn @Model.ConfirmCssClass" id="@(modalId + "-confirm")" @(Model.ConfirmOnClick != null ? $"onclick=\"{Model.ConfirmOnClick}\"" : "")>@Model.ConfirmText</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    const modal = document.getElementById('@modalId');
+    if (!modal) return;
+
+    // Handle confirm button click
+    const confirmBtn = document.getElementById('@(modalId + "-confirm")');
+    if (confirmBtn && '@Model.ConfirmOnClick') {
+        confirmBtn.addEventListener('click', function() {
+            @Model.ConfirmOnClick
+        });
+    }
+
+    // Focus management
+    modal.addEventListener('shown.bs.modal', function() {
+        const cancelBtn = modal.querySelector('[data-coreui-dismiss="modal"]');
+        if (cancelBtn) cancelBtn.focus();
+    });
+
+    // Return focus to trigger element on close
+    let triggerElement = null;
+    document.addEventListener('click', function(e) {
+        const trigger = e.target.closest('[data-coreui-toggle="modal"][data-coreui-target="#@modalId"]');
+        if (trigger) triggerElement = trigger;
+    });
+
+    modal.addEventListener('hidden.bs.modal', function() {
+        if (triggerElement) triggerElement.focus();
+    });
+})();
+</script>

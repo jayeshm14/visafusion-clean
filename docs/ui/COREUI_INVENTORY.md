@@ -170,7 +170,71 @@ tables 23, navs-tabs 19, checks-radios 17, cards 29, etc. — see
 - No `node_modules/` (shallow clone, no `npm install` run — dependency analysis is
   from `package.json`/`package-lock.json` + `build/vendors.mjs` contract).
 
-## 13. Provenance
+## 13. VisaFusion Vendored Assets (Phase 1-2 Implementation)
+
+The following CoreUI assets have been vendored into `src/VisaFusion.Web/wwwroot/lib/coreui/` as part of SPEC-0009 Phase 1-2:
+
+### Vendored Vendor Files (`wwwroot/lib/coreui/vendors/`)
+
+| File | Source Package | Version | Purpose |
+|------|----------------|---------|---------|
+| `coreui.min.css` | `@coreui/coreui` | 5.9.0 | CoreUI compiled CSS |
+| `coreui.bundle.min.js` | `@coreui/coreui` | 5.9.0 | CoreUI compiled JS bundle |
+| `simplebar.min.css` | `simplebar` | 6.3.3 | Custom scrollbar CSS |
+| `simplebar.min.js` | `simplebar` | 6.3.3 | Custom scrollbar JS |
+| `chart.umd.min.js` | `chart.js` | 4.5.1 | Chart.js engine |
+| `coreui-chartjs.min.css` | `@coreui/chartjs` | 4.2.0 | CoreUI Chart.js CSS |
+| `coreui-chartjs.min.js` | `@coreui/chartjs` | 4.2.0 | CoreUI Chart.js JS |
+| `coreui-utils.min.js` | `@coreui/utils` | 2.0.2 | CoreUI utils (getStyle, rgbToHex) |
+
+### Vendored Source Files (`wwwroot/lib/coreui/`)
+
+| Path | Source | Purpose |
+|------|--------|---------|
+| `css/style.scss` | `src/scss/style.scss` | CoreUI main SCSS entry |
+| `css/vendors/` | `src/scss/vendors/` | Vendor SCSS partials (simplebar) |
+| `js/config.js` | `src/js/config.js` | Theme URL param → localStorage |
+| `js/color-modes.js` | `src/js/color-modes.js` | Light/dark/auto theme switcher |
+| `js/tooltips.js` | `src/js/tooltips.js` | Auto-init tooltips (excluded from bundle) |
+| `js/popovers.js` | `src/js/popovers.js` | Auto-init popovers (excluded from bundle) |
+| `js/toasts.js` | `src/js/toasts.js` | Toast initialization |
+| `js/main.js` | `src/js/main.js` | Chart initialization |
+
+### Application Assets (`wwwroot/`)
+
+| Path | Purpose |
+|------|---------|
+| `css/vf-coreui.css` | VisaFusion `--cui-*` token overrides (DesignTokens) |
+| `js/vf-coreui.js` | Bundled CoreUI JS (config, color-modes, toasts, main + vendors) |
+| `icons/cil/` | CoreUI free icons (cil-*) |
+| `icons/cif/` | CoreUI flag icons (cif-*) |
+
+### Excluded Assets (per spec §6)
+
+- Demo-only: `examples.scss`, `charts.js`, `widgets.js`
+- PRO components: External links to PRO versions
+- Build toolchain: pug, sass, postcss, eslint, stylelint, prettier, etc.
+- `node_modules/` (not committed)
+
+### Version Pinning
+
+All versions pinned to match CoreUI Free Admin Template v5.6.0 (commit d4003cd) package.json:
+- `@coreui/coreui`: ^5.9.0
+- `@coreui/icons`: ^3.1.0
+- `@coreui/chartjs`: ^4.2.0
+- `@coreui/utils`: ^2.0.2
+- `chart.js`: ^4.5.1
+- `simplebar`: ^6.3.3
+
+### Verification
+
+Run `CoreUIAssetTests` (TS-001) to verify:
+- All assets present in wwwroot/
+- No CDN references in .cshtml files
+- No demo/PRO content included
+- Icon set scope matches VisaFusion usage
+
+## 14. Provenance
 
 All listings produced by `git`/`Get-ChildItem`/`Select-String`/`read` tool calls
 against the local reference copy this session. Component example counts from

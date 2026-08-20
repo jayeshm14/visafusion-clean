@@ -52,7 +52,31 @@ public sealed class ExceptionHandlingMiddleware
             }
             else
             {
-                await WriteGenericErrorPageAsync(context, traceId);
+                // Non-API: re-execute the pipeline to the CoreUI ErrorPage
+                // component (SPEC-0009 T031). The 500 status and the trace id
+                // are preserved by the Error page (HttpContext.TraceIdentifier).
+                context.Response.Clear();
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                context.Request.Path = "/Error/500";
+                context.Request.QueryString = QueryString.Empty;
+                try
+                {
+                    await _next(context);
+                }
+                catch (Exception errorPageEx)
+                {
+                    // The Error page itself failed during re-execution. Fall
+                    // back to a static generic body so the client always
+                    // receives a response (review finding 2026-08-20 — the
+                    // previous WriteGenericErrorPageAsync could not fail).
+                    _logger.LogError(errorPageEx,
+                        "Error page failed while handling {Method} {Path}",
+                        context.Request.Method, context.Request.Path);
+                    if (!context.Response.HasStarted)
+                    {
+                        await WriteGenericErrorPageAsync(context, traceId);
+                    }
+                }
             }
         }
     }
@@ -76,10 +100,17 @@ public sealed class ExceptionHandlingMiddleware
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
         context.Response.ContentType = "text/html; charset=utf-8";
 
-        await context.Response.WriteAsync(
-            "<!DOCTYPE html><html><head><title>Error</title></head><body>" +
-            "<h1>An error occurred while processing your request.</h1>" +
-            $"<p>Request Id: {System.Net.WebUtility.HtmlEncode(traceId)}</p>" +
-            "</body></html>");
+        var html = $"""
+            <!DOCTYPE html>
+            <html lang="en">
+            <head><meta charset="utf-8" /><title>Error - VisaFusion</title></head>
+            <body>
+                <h1>An error occurred while processing your request.</h1>
+                <p>Reference: {System.Net.WebUtility.HtmlEncode(traceId)}</p>
+            </body>
+            </html>
+            """;
+
+        await context.Response.WriteAsync(html);
     }
 }
