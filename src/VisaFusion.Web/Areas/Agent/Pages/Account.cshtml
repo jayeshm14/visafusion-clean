@@ -1,8 +1,95 @@
 @page
 @model VisaFusion.Web.Areas.Agent.Pages.AccountModel
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "My account";
     ViewData["UseSidebar"] = true;
+
+    var formCard = new FormCardModel
+    {
+        Id = "account-form",
+        Title = "My account",
+        Subtitle = "Update your agent profile details",
+        CardClass = "shadow-sm",
+        Form = new FormCardForm
+        {
+            Id = "account-form",
+            Method = "post",
+            AntiForgeryToken = Html.AntiForgeryToken()
+        },
+        Sections = new List<FormCardSection>
+        {
+            new()
+            {
+                Title = "Company",
+                Fields = new List<FormField>
+                {
+                    new() { Name = "Companyname", Label = "Company name", Type = FormFieldType.Text, Value = Model.Companyname ?? string.Empty, Required = true },
+                    new() { Name = "Description", Label = "Description", Type = FormFieldType.Text, Value = Model.Description ?? string.Empty }
+                }
+            },
+            new()
+            {
+                Title = "Address",
+                Fields = new List<FormField>
+                {
+                    new() { Name = "Street1", Label = "Address line 1", Type = FormFieldType.Text, Value = Model.Street1 ?? string.Empty },
+                    new() { Name = "Street2", Label = "Address line 2", Type = FormFieldType.Text, Value = Model.Street2 ?? string.Empty },
+                    new() { Name = "Area", Label = "Area", Type = FormFieldType.Text, Value = Model.Area ?? string.Empty },
+                    new() { Name = "City", Label = "City", Type = FormFieldType.Text, Value = Model.City ?? string.Empty },
+                    new() { Name = "Pincode", Label = "Pincode", Type = FormFieldType.Text, Value = Model.Pincode ?? string.Empty }
+                }
+            },
+            new()
+            {
+                Title = "Contact",
+                Fields = new List<FormField>
+                {
+                    new() { Name = "Phoneno", Label = "Phone", Type = FormFieldType.Text, Value = Model.Phoneno ?? string.Empty },
+                    new() { Name = "Faxno", Label = "Fax", Type = FormFieldType.Text, Value = Model.Faxno ?? string.Empty },
+                    new() { Name = "Emailid", Label = "Email", Type = FormFieldType.Email, Value = Model.Emailid ?? string.Empty },
+                    new() { Name = "Smsno", Label = "SMS number", Type = FormFieldType.Text, Value = Model.Smsno ?? string.Empty }
+                }
+            },
+            new()
+            {
+                Title = "People",
+                Fields = new List<FormField>
+                {
+                    new() { Name = "Directorname", Label = "Director name", Type = FormFieldType.Text, Value = Model.Directorname ?? string.Empty },
+                    new() { Name = "DirectorPH", Label = "Director phone", Type = FormFieldType.Text, Value = Model.DirectorPH ?? string.Empty },
+                    new() { Name = "AcMgrPH", Label = "Accounts manager phone", Type = FormFieldType.Text, Value = Model.AcMgrPH ?? string.Empty },
+                    new() { Name = "VisaInchargeName", Label = "Visa in-charge name", Type = FormFieldType.Text, Value = Model.VisaInchargeName ?? string.Empty },
+                    new() { Name = "VisaInchargePH", Label = "Visa in-charge phone", Type = FormFieldType.Text, Value = Model.VisaInchargePH ?? string.Empty }
+                }
+            },
+            new()
+            {
+                Title = "Financial",
+                Fields = new List<FormField>
+                {
+                    new() { Name = "Acno", Label = "Account no.", Type = FormFieldType.Text, Value = Model.Acno ?? string.Empty },
+                    new() { Name = "Payment", Label = "Payment", Type = FormFieldType.Text, Value = Model.Payment ?? string.Empty }
+                }
+            },
+            new()
+            {
+                Title = "Memberships",
+                Fields = new List<FormField>
+                {
+                    new() { Name = "TAAI", Label = "TAAI", Type = FormFieldType.Text, Value = Model.TAAI ?? string.Empty },
+                    new() { Name = "TAFI", Label = "TAFI", Type = FormFieldType.Text, Value = Model.TAFI ?? string.Empty },
+                    new() { Name = "Membership", Label = "Membership", Type = FormFieldType.Text, Value = Model.Membership ?? string.Empty },
+                    new() { Name = "IATA", Label = "IATA", Type = FormFieldType.Text, Value = Model.IATA ?? string.Empty }
+                }
+            }
+        },
+        FooterActions = new List<FormCardAction>
+        {
+            new() { Title = "Save", Type = FormCardActionType.Submit, CssClass = "btn-primary" },
+            new() { Title = "Cancel", Type = FormCardActionType.Link, Url = "/Agent/Index", CssClass = "btn-outline-secondary" }
+        }
+    };
 }
 
 @if (Model.HasNoLinkedAgent)
@@ -29,121 +116,5 @@ else
         <div class="alert alert-danger" role="alert">@Model.OutcomeError</div>
     }
 
-    <form method="post" class="card shadow-sm">
-        <div class="card-body">
-            <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="Companyname">Company name</label>
-                <input class="form-control" asp-for="Companyname" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="Description">Description</label>
-                <input class="form-control" asp-for="Description" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="Street1">Address line 1</label>
-                <input class="form-control" asp-for="Street1" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="Street2">Address line 2</label>
-                <input class="form-control" asp-for="Street2" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="Area">Area</label>
-                <input class="form-control" asp-for="Area" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="City">City</label>
-                <input class="form-control" asp-for="City" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="Pincode">Pincode</label>
-                <input class="form-control" asp-for="Pincode" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="Phoneno">Phone</label>
-                <input class="form-control" asp-for="Phoneno" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="Faxno">Fax</label>
-                <input class="form-control" asp-for="Faxno" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="Emailid">Email</label>
-                <input class="form-control" asp-for="Emailid" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="Smsno">SMS number</label>
-                <input class="form-control" asp-for="Smsno" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="Directorname">Director name</label>
-                <input class="form-control" asp-for="Directorname" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="DirectorPH">Director phone</label>
-                <input class="form-control" asp-for="DirectorPH" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="AcMgrPH">Accounts manager phone</label>
-                <input class="form-control" asp-for="AcMgrPH" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="VisaInchargeName">Visa in-charge name</label>
-                <input class="form-control" asp-for="VisaInchargeName" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="VisaInchargePH">Visa in-charge phone</label>
-                <input class="form-control" asp-for="VisaInchargePH" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="Acno">Account no.</label>
-                <input class="form-control" asp-for="Acno" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="Payment">Payment</label>
-                <input class="form-control" asp-for="Payment" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="TAAI">TAAI</label>
-                <input class="form-control" asp-for="TAAI" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="TAFI">TAFI</label>
-                <input class="form-control" asp-for="TAFI" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="Membership">Membership</label>
-                <input class="form-control" asp-for="Membership" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" asp-for="IATA">IATA</label>
-                <input class="form-control" asp-for="IATA" />
-            </div>
-
-            <button type="submit" class="btn btn-primary">Save</button>
-        </div>
-    </form>
+    <partial name="~/Components/_FormCard.cshtml" model="formCard" />
 }

@@ -1,60 +1,44 @@
 @page
 @model VisaFusion.Web.Areas.Admin.Pages.Users.CreateModel
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "New user";
     ViewData["UseSidebar"] = true;
+
+    var formCard = new FormCardModel
+    {
+        Id = "user-create-form",
+        Title = "New user",
+        CardClass = "shadow-sm",
+        Form = new FormCardForm
+        {
+            Id = "user-create-form",
+            Method = "post",
+            AntiForgeryToken = Html.AntiForgeryToken()
+        },
+        Sections = new List<FormCardSection>
+        {
+            new()
+            {
+                Title = "Account",
+                Fields = new List<FormField>
+                {
+                    new() { Name = "Username", Label = "Login username", Type = FormFieldType.Text, Value = Model.Username ?? string.Empty, Required = true },
+                    new() { Name = "Password", Label = "Initial password", Type = FormFieldType.Password, Value = string.Empty, Required = true },
+                    new() { Name = "Email", Label = "Email", Type = FormFieldType.Email, Value = Model.Email ?? string.Empty },
+                    new() { Name = "Role", Label = "Role", Type = FormFieldType.Select, Value = Model.Role ?? string.Empty, Required = true,
+                        Options = Model.AllowedRoles.Select(r => new FormFieldOption { Value = r, Text = r }).ToList() },
+                    new() { Name = "AgentId", Label = "Agent ID", Type = FormFieldType.Number, Value = Model.AgentId?.ToString() ?? string.Empty,
+                        HelpText = "Required when the role is agt." }
+                }
+            }
+        },
+        FooterActions = new List<FormCardAction>
+        {
+            new() { Title = "Create user", Type = FormCardActionType.Submit, CssClass = "btn-primary" },
+            new() { Title = "Cancel", Type = FormCardActionType.Link, Url = "/Admin/Users/List", CssClass = "btn-outline-secondary" }
+        }
+    };
 }
 
-<form method="post">
-    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-
-    <div class="card shadow-sm mb-4">
-        <div class="card-header"><h2 class="h5 card-title mb-0">Login</h2></div>
-        <div class="card-body">
-            <div class="mb-3">
-                <label class="form-label" asp-for="Username">Login username</label>
-                <input class="form-control" asp-for="Username" autocomplete="off" />
-                <span asp-validation-for="Username" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
-                <label class="form-label" asp-for="Password">Initial password</label>
-                <input class="form-control" asp-for="Password" type="password" autocomplete="new-password" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-                <small class="text-body-secondary">The password is hashed and never stored in plaintext; hand it to the user out-of-band.</small>
-            </div>
-            <div class="mb-3">
-                <label class="form-label" asp-for="Email">Email</label>
-                <input class="form-control" asp-for="Email" type="email" />
-            </div>
-        </div>
-    </div>
-
-    <div class="card shadow-sm mb-4">
-        <div class="card-header"><h2 class="h5 card-title mb-0">Role</h2></div>
-        <div class="card-body">
-            <div class="mb-3">
-                <label class="form-label" asp-for="Role">Role</label>
-                <select class="form-select" asp-for="Role">
-                    <option value="">Select a role</option>
-                    @foreach (var role in Model.AllowedRoles)
-                    {
-                        <option value="@role">@role</option>
-                    }
-                </select>
-                <span asp-validation-for="Role" class="text-danger"></span>
-                <small class="text-body-secondary">Super-user is not offered here; it is provisioned separately by a super-user.</small>
-            </div>
-            <div class="mb-3">
-                <label class="form-label" asp-for="AgentId">Agent ID</label>
-                <input class="form-control" asp-for="AgentId" type="number" />
-                <span asp-validation-for="AgentId" class="text-danger"></span>
-                <small class="text-body-secondary">Required when the role is <code>agt</code> — links the login to the agent account.</small>
-            </div>
-        </div>
-    </div>
-
-    <p>
-        <button type="submit" class="btn btn-primary">Create user</button>
-        <a class="btn btn-outline-secondary" href="/Admin/Users/List">Cancel</a>
-    </p>
-</form>
+<partial name="~/Components/_FormCard.cshtml" model="formCard" />

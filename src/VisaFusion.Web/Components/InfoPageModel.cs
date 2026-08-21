@@ -46,6 +46,11 @@ public sealed class InfoPageAction
     public string Icon { get; init; } = string.Empty;
     public string CssClass { get; init; } = "btn-primary";
     public string OnClick { get; init; } = string.Empty;
+    /// <summary>
+    /// HTTP method for this action. "get" (default) renders a plain link;
+    /// "post" renders a hidden-form POST with the anti-forgery token.
+    /// </summary>
+    public string Method { get; init; } = "get";
 }
 
 /// <summary>

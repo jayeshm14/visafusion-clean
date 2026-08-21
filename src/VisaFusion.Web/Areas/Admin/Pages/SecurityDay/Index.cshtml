@@ -1,8 +1,58 @@
 @page
 @model VisaFusion.Web.Areas.Admin.Pages.SecurityDay.IndexModel
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Security day";
     ViewData["UseSidebar"] = true;
+
+    var dashboard = new RoleDashboardModel
+    {
+        Title = "Security day",
+        CardClass = "shadow-sm",
+        KpiCards = new List<RoleDashboardKpiCard>
+        {
+            new()
+            {
+                Label = "Status",
+                Value = Model.Today is null ? "Not opened" : (Model.Today.ClosingTime is not null ? "Closed" : "Open"),
+                Icon = Model.Today is null ? "M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm0-2a6 6 0 1 1 0-12 6 6 0 0 1 0 12z" : (Model.Today.ClosingTime is not null ? "M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.018-1.042z" : "M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm0-2a6 6 0 1 1 0-12 6 6 0 0 1 0 12z"),
+                IconColor = Model.Today is null ? "text-secondary" : (Model.Today.ClosingTime is not null ? "text-danger" : "text-success"),
+                ColClass = "col-sm-6 col-xl-3"
+            },
+            new()
+            {
+                Label = "Opened at",
+                Value = Model.Today?.OpeningTime?.ToString("HH:mm") ?? "—",
+                Icon = "M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM8 15.5a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z",
+                IconColor = "text-primary",
+                ColClass = "col-sm-6 col-xl-3"
+            },
+            new()
+            {
+                Label = "Opened by",
+                Value = Model.Today?.OpenedBy ?? "—",
+                Icon = "M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM8 15.5a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z",
+                IconColor = "text-primary",
+                ColClass = "col-sm-6 col-xl-3"
+            },
+            new()
+            {
+                Label = "Closed at",
+                Value = Model.Today?.ClosingTime?.ToString("HH:mm") ?? "—",
+                Icon = "M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM8 15.5a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z",
+                IconColor = "text-primary",
+                ColClass = "col-sm-6 col-xl-3"
+            }
+        },
+        BodyHtml = Model.Today is null
+            ? "<p class=\"text-body-secondary\">Today has not been opened.</p>"
+            : (Model.Today.ClosingTime is not null
+                ? $"<p class=\"mb-0\">Today was opened at <strong>{Model.Today.OpeningTime?.ToString("HH:mm")}</strong> by {Model.Today.OpenedBy} and closed at <strong>{Model.Today.ClosingTime.Value.ToString("HH:mm")}</strong> by {Model.Today.ClosedBy}.</p>"
+                : $"<p class=\"mb-0\">Today is open (opened at <strong>{Model.Today.OpeningTime?.ToString("HH:mm")}</strong> by {Model.Today.OpenedBy}).</p>"),
+        FooterHtml = Model.Today is not null && Model.Today.ClosingTime is null
+            ? "<form method=\"post\" asp-page-handler=\"Close\"><button type=\"submit\" class=\"btn btn-danger\">Close the day</button></form>"
+            : "<form method=\"post\" asp-page-handler=\"Open\"><button type=\"submit\" class=\"btn btn-primary\">Open the day</button></form>"
+    };
 }
 
 @if (!string.IsNullOrWhiteSpace(Model.OutcomeMessage))
@@ -14,42 +64,4 @@
     <div class="alert alert-danger" role="alert">@Model.OutcomeError</div>
 }
 
-<div class="card shadow-sm mb-4">
-    <div class="card-body">
-        @if (Model.Today is null)
-        {
-            <p class="mb-0">Today has not been opened.</p>
-        }
-        else if (Model.Today.ClosingTime is not null)
-        {
-            <p class="mb-0">
-                Today was opened at <strong>@Model.Today.OpeningTime?.ToString("HH:mm")</strong>
-                by @Model.Today.OpenedBy and closed at
-                <strong>@Model.Today.ClosingTime.Value.ToString("HH:mm")</strong>
-                by @Model.Today.ClosedBy.
-            </p>
-        }
-        else
-        {
-            <p class="mb-0">
-                Today is open (opened at <strong>@Model.Today.OpeningTime?.ToString("HH:mm")</strong>
-                by @Model.Today.OpenedBy).
-            </p>
-        }
-    </div>
-</div>
-
-<p>
-    @if (Model.Today is not null && Model.Today.ClosingTime is null)
-    {
-        <form method="post" asp-page-handler="Close" class="d-inline">
-            <button type="submit" class="btn btn-primary">Close the day</button>
-        </form>
-    }
-    else
-    {
-        <form method="post" asp-page-handler="Open" class="d-inline">
-            <button type="submit" class="btn btn-primary">Open the day</button>
-        </form>
-    }
-</p>
+<partial name="~/Components/_RoleDashboard.cshtml" model="dashboard" />

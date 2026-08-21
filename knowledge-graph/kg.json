@@ -2738,14 +2738,26 @@
                       "status":  "Accepted",
                       "provenance":  "adr/ADR-0004.md (2026-08-20)"
                   },
-                  {
-                      "id":  "ADR-0006",
-                      "type":  "ADR",
-                      "label":  "Adopt CoreUI as the Design Reference and Re-Skin the Bespoke vf-* UI",
-                      "status":  "Accepted",
-                      "provenance":  "adr/ADR-0006.md (2026-08-20)"
-                  }
-              ],
+{
+                        "id":  "ADR-0006",
+                        "type":  "ADR",
+                        "label":  "Adopt CoreUI as the Design Reference and Re-Skin the Bespoke vf-* UI",
+                        "status":  "Accepted",
+                        "provenance":  "adr/ADR-0006.md (2026-08-20)"
+                    },
+                    {
+                        "id":  "TEST-FormValidation",
+                        "type":  "Test",
+                        "label":  "FormCard validation tests (server-side .is-invalid + .invalid-feedback)",
+                        "provenance":  "SPEC-0009 Phase 17"
+                    },
+                    {
+                        "id":  "TEST-PublicQueryFormValidation",
+                        "type":  "Test",
+                        "label":  "PublicQueryForm validation tests (server-side .is-invalid + .invalid-feedback)",
+                        "provenance":  "SPEC-0009 Phase 17"
+                    }
+                ],
     "edges":  [
                   {
                       "from":  "PRJ-VisaFusion",
@@ -9401,11 +9413,41 @@
                       "type":  "uses",
                       "provenance":  "adr/ADR-0006.md (2026-08-20)"
                   },
-                  {
-                      "from":  "ADR-0006",
-                      "to":  "SPEC-0009",
-                      "type":  "documented_by",
-                      "provenance":  "adr/ADR-0006.md (2026-08-20)"
-                  }
-              ]
+{
+                        "from":  "ADR-0006",
+                        "to":  "SPEC-0009",
+                        "type":  "documented_by",
+                        "provenance":  "adr/ADR-0006.md (2026-08-20)"
+                    },
+                    {
+                        "from":  "PARTIAL-FormCard",
+                        "to":  "TEST-FormValidation",
+                        "type":  "tested_by",
+                        "provenance":  "SPEC-0009 Phase 17"
+                    },
+                    {
+                        "from":  "PARTIAL-PublicQueryForm",
+                        "to":  "TEST-PublicQueryFormValidation",
+                        "type":  "tested_by",
+                        "provenance":  "SPEC-0009 Phase 17"
+                    },
+                    {
+                        "from":  "VFC-FormCard",
+                        "to":  "TEST-FormValidation",
+                        "type":  "tested_by",
+                        "provenance":  "SPEC-0009 Phase 17"
+                    },
+                    {
+                        "from":  "VFC-PublicQueryForm",
+                        "to":  "TEST-PublicQueryFormValidation",
+                        "type":  "tested_by",
+                        "provenance":  "SPEC-0009 Phase 17"
+                    },
+                    {
+                        "from":  "LAYOUT-Shell",
+                        "to":  "VFC-ToastHost",
+                        "type":  "uses",
+                        "provenance":  "SPEC-0009 Phase 19/20"
+                    }
+                ]
 }

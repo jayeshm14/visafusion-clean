@@ -1,35 +1,30 @@
 @page
 @model VisaFusion.Web.Areas.Public.Pages.DailyUpdateModel
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Daily Updates";
+
+    var dataTable = new DataTableModel
+    {
+        Id = "daily-update-table",
+        AriaLabel = "Daily updates",
+        Columns = new List<DataTableColumn>
+        {
+            new() { Key = "Entrydate", Title = "Date", Width = "140px",
+                Formatter = (v) => v is DateTime dt ? dt.ToString("dd-MMM-yyyy") : (v?.ToString() ?? "—") },
+            new() { Key = "Description", Title = "Update", Width = "auto" }
+        },
+        Rows = Model.Entries.Select(e => new Dictionary<string, object>
+        {
+            ["Entrydate"] = e.Entrydate,
+            ["Description"] = e.Description
+        }).ToList(),
+        ShowPagination = false,
+        EmptyMessage = "No updates found for this month.",
+        Responsive = true
+    };
 }
+
 <h1>Daily Updates</h1>
 
-@if (Model.Entries.Count == 0)
-{
-    <p>No updates found for this month.</p>
-}
-else
-{
-    <div class="card shadow-sm">
-        <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col">Date</th>
-                        <th scope="col">Update</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var entry in Model.Entries)
-                    {
-                        <tr>
-                            <td>@entry.Entrydate.ToString("dd-MMM-yyyy")</td>
-                            <td>@entry.Description</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-}
+<partial name="~/Components/_DataTable.cshtml" model="dataTable" />

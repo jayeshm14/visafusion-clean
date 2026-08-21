@@ -1,15 +1,61 @@
 @page
 @model VisaFusion.Web.Areas.Reporting.Pages.DailyBillModel
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Daily Bill";
     ViewData["UseSidebar"] = true;
+
+    var dataTable = new DataTableModel
+    {
+        Id = "daily-bill-table",
+        AriaLabel = "Daily bill report",
+        Columns = new List<DataTableColumn>
+        {
+            new() { Key = "Refno", Title = "Ref", Width = "80px" },
+            new() { Key = "Invoiceno", Title = "Invoice", Width = "100px" },
+            new() { Key = "Invoicedate", Title = "Date", Width = "120px",
+                Formatter = (v) => v is DateTime dt ? dt.ToString("dd-MMM-yyyy") : (v?.ToString() ?? "—") },
+            new() { Key = "Invtype", Title = "Type", Width = "auto" },
+            new() { Key = "Hotelfee", Title = "Hotel", Width = "120px", CellClass = "text-end",
+                Formatter = (v) => v is decimal d ? d.ToString("0.00") : (v?.ToString() ?? "—") },
+            new() { Key = "Cabfee", Title = "Cab", Width = "120px", CellClass = "text-end",
+                Formatter = (v) => v is decimal d ? d.ToString("0.00") : (v?.ToString() ?? "—") },
+            new() { Key = "Poe", Title = "POE", Width = "120px", CellClass = "text-end",
+                Formatter = (v) => v is decimal d ? d.ToString("0.00") : (v?.ToString() ?? "—") },
+            new() { Key = "Misc", Title = "Misc", Width = "120px", CellClass = "text-end",
+                Formatter = (v) => v is decimal d ? d.ToString("0.00") : (v?.ToString() ?? "—") },
+            new() { Key = "Attestfee", Title = "Attest", Width = "120px", CellClass = "text-end",
+                Formatter = (v) => v is decimal d ? d.ToString("0.00") : (v?.ToString() ?? "—") },
+            new() { Key = "Courierfee", Title = "Courier", Width = "120px", CellClass = "text-end",
+                Formatter = (v) => v is decimal d ? d.ToString("0.00") : (v?.ToString() ?? "—") },
+            new() { Key = "Grandtotal", Title = "Total", Width = "120px", CellClass = "text-end",
+                Formatter = (v) => v is decimal d ? d.ToString("0.00") : (v?.ToString() ?? "—") }
+        },
+        Rows = Model.Rows.Select(r => new Dictionary<string, object>
+        {
+            ["Refno"] = r.Refno ?? 0,
+            ["Invoiceno"] = r.Invoiceno ?? 0,
+            ["Invoicedate"] = r.Invoicedate ?? (object)DBNull.Value,
+            ["Invtype"] = r.Invtype ?? "—",
+            ["Hotelfee"] = r.Hotelfee ?? 0m,
+            ["Cabfee"] = r.Cabfee ?? 0m,
+            ["Poe"] = r.Poe ?? 0m,
+            ["Misc"] = r.Misc ?? 0m,
+            ["Attestfee"] = r.Attestfee ?? 0m,
+            ["Courierfee"] = r.Courierfee ?? 0m,
+            ["Grandtotal"] = r.Grandtotal ?? 0m
+        }).ToList(),
+        ShowPagination = false,
+        EmptyMessage = "No bills in the selected range.",
+        Responsive = true
+    };
 }
 
 <p class="text-body-secondary">Bills for the selected date range (defaults to today).</p>
 
 <div class="card shadow-sm mb-4">
     <div class="card-body">
-        <form method="get" class="row g-3 align-items-end">
+        <form method="get" class="row g-3 align-items-end" novalidate>
             <div class="col-auto">
                 <label for="dateFrom" class="form-label">From</label>
                 <input type="date" id="dateFrom" name="dateFrom" class="form-control"
@@ -18,7 +64,12 @@
             <div class="col-auto">
                 <label for="dateTo" class="form-label">To</label>
                 <input type="date" id="dateTo" name="dateTo" class="form-control"
-                       value="@(Model.Params?.To is { } to ? to.AddDays(-1).ToString("yyyy-MM-dd") : string.Empty)" />
+                       value="@(Model.Params?.To.HasValue == true ? Model.Params!.To.Value.AddDays(-1).ToString("yyyy-MM-dd") : "")" />
+            </div>
+            <div class="col-auto">
+                <label for="agentId" class="form-label">Agent ID (optional)</label>
+                <input type="number" id="agentId" name="agentId" class="form-control"
+                       value="@(Model.Params?.AgentId?.ToString())" />
             </div>
             <div class="col-auto">
                 <button type="submit" class="btn btn-primary">Filter</button>
@@ -32,50 +83,11 @@
     <div class="alert alert-danger" role="alert">@Model.ParamError</div>
 }
 
-@if (Model.Rows.Count == 0)
+<partial name="~/Components/_DataTable.cshtml" model="dataTable" />
+
+@if (Model.Rows.Count > 0)
 {
-    <p>No bills in the selected range.</p>
-}
-else
-{
-    <div class="card shadow-sm">
-        <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col">Ref</th>
-                        <th scope="col">Invoice</th>
-                        <th scope="col">Date</th>
-                        <th scope="col">Type</th>
-                        <th scope="col" class="text-end">Hotel</th>
-                        <th scope="col" class="text-end">Cab</th>
-                        <th scope="col" class="text-end">POE</th>
-                        <th scope="col" class="text-end">Misc</th>
-                        <th scope="col" class="text-end">Attest</th>
-                        <th scope="col" class="text-end">Courier</th>
-                        <th scope="col" class="text-end">Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var row in Model.Rows)
-                    {
-                        <tr>
-                            <td>@row.Refno</td>
-                            <td>@(row.Invoiceno?.ToString() ?? "—")</td>
-                            <td>@(row.Invoicedate?.ToString("dd-MMM-yyyy") ?? "—")</td>
-                            <td>@(string.IsNullOrWhiteSpace(row.Invtype) ? "—" : row.Invtype)</td>
-                            <td class="text-end">@(row.Hotelfee?.ToString("0.00") ?? "—")</td>
-                            <td class="text-end">@(row.Cabfee?.ToString("0.00") ?? "—")</td>
-                            <td class="text-end">@(row.Poe?.ToString("0.00") ?? "—")</td>
-                            <td class="text-end">@(row.Misc?.ToString("0.00") ?? "—")</td>
-                            <td class="text-end">@(row.Attestfee?.ToString("0.00") ?? "—")</td>
-                            <td class="text-end">@(row.Courierfee?.ToString("0.00") ?? "—")</td>
-                            <td class="text-end">@(row.Grandtotal?.ToString("0.00") ?? "—")</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+    <div class="card shadow-sm mt-3">
         <div class="card-footer">
             <p class="mb-0 text-body-secondary"><strong>Grand total:</strong> @(Model.GrandTotal?.ToString("0.00") ?? "—")</p>
         </div>

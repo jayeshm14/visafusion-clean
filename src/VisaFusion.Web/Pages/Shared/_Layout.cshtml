@@ -57,6 +57,9 @@
         @await Html.PartialAsync("_Footer")
     }
 
+    @* ToastHost - Global toast notification container (SPEC-0009 T051) *@
+    <partial name="~/Components/_ToastHost.cshtml" model="new VisaFusion.Web.Components.ToastHostModel()" />
+
     @await RenderSectionAsync("Scripts", required: false)
     <script src="~/lib/coreui/vendors/coreui.bundle.min.js"></script>
     <script src="~/lib/coreui/vendors/simplebar.min.js"></script>

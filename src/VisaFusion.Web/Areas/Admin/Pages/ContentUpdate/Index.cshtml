@@ -1,8 +1,64 @@
 @page
 @model VisaFusion.Web.Areas.Admin.Pages.ContentUpdate.IndexModel
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Daily Updates";
     ViewData["UseSidebar"] = true;
+
+    var createForm = new FormCardModel
+    {
+        Id = "content-create-form",
+        Title = "Record a daily update",
+        CardClass = "shadow-sm mb-4",
+        Form = new FormCardForm
+        {
+            Id = "content-create-form",
+            Method = "post",
+            Action = "?handler=Create",
+            AntiForgeryToken = Html.AntiForgeryToken()
+        },
+        Sections = new List<FormCardSection>
+        {
+            new()
+            {
+                Fields = new List<FormField>
+                {
+                    new() { Name = "entrydate", Label = "Date", Type = FormFieldType.Date, Value = DateTime.Today.ToString("yyyy-MM-dd"), Required = true },
+                    new() { Name = "description", Label = "Message", Type = FormFieldType.TextArea, Value = string.Empty, Required = true, Rows = 5, MaxLength = 8000 }
+                }
+            }
+        },
+        FooterActions = new List<FormCardAction>
+        {
+            new() { Title = "Record", Type = FormCardActionType.Submit, CssClass = "btn-primary" }
+        }
+    };
+
+    var entriesTable = new DataTableModel
+    {
+        Id = "content-table",
+        AriaLabel = "Daily updates",
+        Columns = new List<DataTableColumn>
+        {
+            new() { Key = "Entrydate", Title = "Date", Width = "140px",
+                Formatter = (v) => v is DateTime dt ? dt.ToString("dd-MMM-yyyy") : (v?.ToString() ?? "—") },
+            new() { Key = "Description", Title = "Message", Width = "auto" }
+        },
+        Rows = Model.Entries.Select(e => new Dictionary<string, object>
+        {
+            ["Entrydate"] = e.Entrydate ?? (object)DBNull.Value,
+            ["Description"] = e.Description ?? string.Empty,
+            ["Id"] = e.Id
+        }).ToList(),
+        ShowPagination = false,
+        EmptyMessage = "No daily updates recorded.",
+        Responsive = true,
+        RowActions = new List<DataTableAction>
+        {
+            new() { Name = "Edit", Title = "Edit", UrlTemplate = "?handler=Edit&id={0}", CssClass = "", Method = "post" },
+            new() { Name = "Delete", Title = "Delete", UrlTemplate = "?handler=Delete&id={0}", CssClass = "text-danger", Method = "post" }
+        }
+    };
 }
 
 @if (!string.IsNullOrWhiteSpace(Model.OutcomeMessage))
@@ -14,73 +70,9 @@
     <div class="alert alert-danger" role="alert">@Model.OutcomeError</div>
 }
 
-<div class="card shadow-sm mb-4">
-    <div class="card-header"><h2 class="h5 card-title mb-0">Record a daily update</h2></div>
-    <div class="card-body">
-        <form method="post" asp-page-handler="Create">
-            <div class="mb-3">
-                <label class="form-label" for="entrydate">Date</label>
-                <input type="date" id="entrydate" name="entrydate" required class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
-            </div>
-            <div class="mb-3">
-                <label class="form-label" for="description">Message</label>
-                <textarea id="description" name="description" rows="5" required class="form-control" maxlength="8000"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Record</button>
-        </form>
-    </div>
-</div>
+<partial name="~/Components/_FormCard.cshtml" model="createForm" />
 
 <div class="card shadow-sm mb-4">
-    @if (Model.Entries.Count == 0)
-    {
-        <div class="card-body">
-            <p class="mb-0">No daily updates recorded.</p>
-        </div>
-    }
-    else
-    {
-        <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col">Date</th>
-                        <th scope="col">Message</th>
-                        <th scope="col"><span class="visually-hidden">Actions</span></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var entry in Model.Entries)
-                    {
-                        <tr>
-                            <td>@(entry.Entrydate?.ToString("dd-MMM-yyyy") ?? "—")</td>
-                            <td>@entry.Description</td>
-                            <td>
-                                <details>
-                                    <summary class="btn btn-outline-secondary btn-sm">Edit</summary>
-                                    <form method="post" asp-page-handler="Edit" class="mt-2">
-                                        <input type="hidden" name="id" value="@entry.Id" />
-                                        <div class="mb-3">
-                                            <label class="form-label" for="entrydate-@entry.Id">Date</label>
-                                            <input type="date" id="entrydate-@entry.Id" name="entrydate" required class="form-control"
-                                                   value="@(entry.Entrydate?.ToString("yyyy-MM-dd"))" />
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label" for="description-@entry.Id">Message</label>
-                                            <textarea id="description-@entry.Id" name="description" rows="3" required class="form-control" maxlength="8000">@entry.Description</textarea>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary">Save</button>
-                                    </form>
-                                </details>
-                                <form method="post" asp-page-handler="Delete" class="d-inline">
-                                    <input type="hidden" name="id" value="@entry.Id" />
-                                    <button type="submit" class="btn btn-outline-secondary btn-sm">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
+    <div class="card-header"><h2 class="h5 card-title mb-0">Daily updates</h2></div>
+    <partial name="~/Components/_DataTable.cshtml" model="entriesTable" />
 </div>

@@ -1,5 +1,6 @@
 @page
 @model VisaFusion.Web.Areas.Admin.Pages.Agents.DetailModel
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Agent detail";
     ViewData["UseSidebar"] = true;
@@ -14,110 +15,141 @@
 }
 else
 {
+    var infoPage = new InfoPageModel
+    {
+        Id = "agent-detail",
+        Title = "Agent detail",
+        CardClass = "shadow-sm",
+        Cards = new List<InfoPageCard>
+        {
+            new()
+            {
+                Title = "Status",
+                Content = Model.Agent!.Active == "Y" ? "Active" : "Deactivated",
+                CardClass = Model.Agent!.Active == "Y" ? "border-success" : "border-danger",
+                Actions = new List<InfoPageAction>
+                {
+                    new()
+                    {
+                        Title = Model.Agent!.Active == "Y" ? "Deactivate" : "Reactivate",
+                        Url = Model.Agent!.Active == "Y" ? $"/Admin/Agents/Detail?id={Model.Agent.Id}&handler=Deactivate" : $"/Admin/Agents/Detail?id={Model.Agent.Id}&handler=Reactivate",
+                        CssClass = Model.Agent!.Active == "Y" ? "btn-danger" : "btn-primary",
+                        Method = "post"
+                    }
+                }
+            },
+            new()
+            {
+                Title = "ID",
+                Content = Model.Agent!.Id.ToString()
+            },
+            new()
+            {
+                Title = "Company name",
+                Content = Model.Agent!.Companyname ?? "—"
+            },
+            new()
+            {
+                Title = "Description",
+                Content = Model.Agent!.Description ?? "—"
+            },
+            new()
+            {
+                Title = "Address",
+                Content = $"{Model.Agent!.Street1 ?? "—"}{(string.IsNullOrWhiteSpace(Model.Agent!.Street2) ? "" : ", " + Model.Agent!.Street2)}{(string.IsNullOrWhiteSpace(Model.Agent!.Area) ? "" : ", " + Model.Agent!.Area)}{(string.IsNullOrWhiteSpace(Model.Agent!.City) ? "" : ", " + Model.Agent!.City)}{(string.IsNullOrWhiteSpace(Model.Agent!.Pincode) ? "" : " — " + Model.Agent!.Pincode)}"
+            },
+            new()
+            {
+                Title = "Phone",
+                Content = Model.Agent!.Phoneno ?? "—"
+            },
+            new()
+            {
+                Title = "Fax",
+                Content = Model.Agent!.Faxno ?? "—"
+            },
+            new()
+            {
+                Title = "Email",
+                Content = Model.Agent!.Emailid ?? "—"
+            },
+            new()
+            {
+                Title = "SMS number",
+                Content = Model.Agent!.Smsno ?? "—"
+            },
+            new()
+            {
+                Title = "Director",
+                Content = Model.Agent!.Directorname ?? "—"
+            },
+            new()
+            {
+                Title = "Director phone",
+                Content = Model.Agent!.DirectorPH ?? "—"
+            },
+            new()
+            {
+                Title = "Accounts manager phone",
+                Content = Model.Agent!.AcMgrPH ?? "—"
+            },
+            new()
+            {
+                Title = "Visa in-charge",
+                Content = Model.Agent!.VisaInchargeName ?? "—"
+            },
+            new()
+            {
+                Title = "Visa in-charge phone",
+                Content = Model.Agent!.VisaInchargePH ?? "—"
+            },
+            new()
+            {
+                Title = "Account number",
+                Content = Model.Agent!.Acno ?? "—"
+            },
+            new()
+            {
+                Title = "Payment",
+                Content = Model.Agent!.Payment ?? "—"
+            },
+            new()
+            {
+                Title = "TAAI",
+                Content = Model.Agent!.TAAI ?? "—"
+            },
+            new()
+            {
+                Title = "TAFI",
+                Content = Model.Agent!.TAFI ?? "—"
+            },
+            new()
+            {
+                Title = "Membership",
+                Content = Model.Agent!.Membership ?? "—"
+            },
+            new()
+            {
+                Title = "IATA",
+                Content = Model.Agent!.IATA ?? "—"
+            },
+            new()
+            {
+                Title = "Created",
+                Content = $"{Model.Agent!.Creationdate?.ToString("yyyy-MM-dd") ?? "—"} by {Model.Agent!.Enteredby ?? "—"}"
+            }
+        },
+        Actions = new List<InfoPageAction>
+        {
+            new() { Title = "Back to agents", Url = "/Admin/Agents/List", CssClass = "btn-outline-secondary" },
+            new() { Title = "Edit", Url = $"/Admin/Agents/Edit?id={Model.Agent!.Id}", CssClass = "btn-primary" }
+        }
+    };
+
     @if (Model.OutcomeMessage is not null)
     {
         <div class="alert alert-success" role="alert">@Model.OutcomeMessage</div>
     }
 
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <p>
-                @if (Model.Agent!.Active == "Y")
-                {
-                    <span class="badge text-bg-success">Active</span>
-                }
-                else
-                {
-                    <span class="badge text-bg-danger">Deactivated</span>
-                }
-            </p>
-
-            <dl class="row mb-0">
-                <dt class="col-sm-3">ID</dt>
-                <dd class="col-sm-9">@Model.Agent.Id</dd>
-
-                <dt class="col-sm-3">Company name</dt>
-                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.Companyname) ? "—" : Model.Agent.Companyname)</dd>
-
-                <dt class="col-sm-3">Description</dt>
-                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.Description) ? "—" : Model.Agent.Description)</dd>
-
-                <dt class="col-sm-3">Address</dt>
-                <dd class="col-sm-9">
-                    @(string.IsNullOrWhiteSpace(Model.Agent.Street1) ? "—" : Model.Agent.Street1)
-                    @(string.IsNullOrWhiteSpace(Model.Agent.Street2) ? "" : ", " + Model.Agent.Street2)
-                    @(string.IsNullOrWhiteSpace(Model.Agent.Area) ? "" : ", " + Model.Agent.Area)
-                    @(string.IsNullOrWhiteSpace(Model.Agent.City) ? "" : ", " + Model.Agent.City)
-                    @(string.IsNullOrWhiteSpace(Model.Agent.Pincode) ? "" : " — " + Model.Agent.Pincode)
-                </dd>
-
-                <dt class="col-sm-3">Phone</dt>
-                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.Phoneno) ? "—" : Model.Agent.Phoneno)</dd>
-
-                <dt class="col-sm-3">Fax</dt>
-                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.Faxno) ? "—" : Model.Agent.Faxno)</dd>
-
-                <dt class="col-sm-3">Email</dt>
-                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.Emailid) ? "—" : Model.Agent.Emailid)</dd>
-
-                <dt class="col-sm-3">SMS number</dt>
-                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.Smsno) ? "—" : Model.Agent.Smsno)</dd>
-
-                <dt class="col-sm-3">Director</dt>
-                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.Directorname) ? "—" : Model.Agent.Directorname)</dd>
-
-                <dt class="col-sm-3">Director phone</dt>
-                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.DirectorPH) ? "—" : Model.Agent.DirectorPH)</dd>
-
-                <dt class="col-sm-3">Accounts manager phone</dt>
-                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.AcMgrPH) ? "—" : Model.Agent.AcMgrPH)</dd>
-
-                <dt class="col-sm-3">Visa in-charge</dt>
-                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.VisaInchargeName) ? "—" : Model.Agent.VisaInchargeName)</dd>
-
-                <dt class="col-sm-3">Visa in-charge phone</dt>
-                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.VisaInchargePH) ? "—" : Model.Agent.VisaInchargePH)</dd>
-
-                <dt class="col-sm-3">Account number</dt>
-                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.Acno) ? "—" : Model.Agent.Acno)</dd>
-
-                <dt class="col-sm-3">Payment</dt>
-                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.Payment) ? "—" : Model.Agent.Payment)</dd>
-
-                <dt class="col-sm-3">TAAI</dt>
-                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.TAAI) ? "—" : Model.Agent.TAAI)</dd>
-
-                <dt class="col-sm-3">TAFI</dt>
-                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.TAFI) ? "—" : Model.Agent.TAFI)</dd>
-
-                <dt class="col-sm-3">Membership</dt>
-                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.Membership) ? "—" : Model.Agent.Membership)</dd>
-
-                <dt class="col-sm-3">IATA</dt>
-                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Agent.IATA) ? "—" : Model.Agent.IATA)</dd>
-
-                <dt class="col-sm-3">Created</dt>
-                <dd class="col-sm-9">@(Model.Agent.Creationdate?.ToString("yyyy-MM-dd") ?? "—") by @(string.IsNullOrWhiteSpace(Model.Agent.Enteredby) ? "—" : Model.Agent.Enteredby)</dd>
-            </dl>
-        </div>
-    </div>
-
-    <p>
-        <a class="btn btn-outline-secondary" href="/Admin/Agents/List">Back to agents</a>
-        <a class="btn btn-primary" href="/Admin/Agents/Edit?id=@Model.Agent.Id">Edit</a>
-        @if (Model.Agent.Active == "Y")
-        {
-            <form method="post" asp-page-handler="Deactivate" style="display: inline;">
-                <input type="hidden" asp-for="Id" />
-                <button type="submit" class="btn btn-danger">Deactivate</button>
-            </form>
-        }
-        else
-        {
-            <form method="post" asp-page-handler="Reactivate" style="display: inline;">
-                <input type="hidden" asp-for="Id" />
-                <button type="submit" class="btn btn-primary">Reactivate</button>
-            </form>
-        }
-    </p>
+    <partial name="~/Components/_InfoPage.cshtml" model="infoPage" />
 }

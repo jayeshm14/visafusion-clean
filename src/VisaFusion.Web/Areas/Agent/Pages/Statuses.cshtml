@@ -1,8 +1,35 @@
 @page
 @model VisaFusion.Web.Areas.Agent.Pages.StatusesModel
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Passenger statuses";
     ViewData["UseSidebar"] = true;
+
+    var dataTable = new DataTableModel
+    {
+        Id = "statuses-table",
+        AriaLabel = "Agent passenger statuses",
+        Columns = new List<DataTableColumn>
+        {
+            new() { Key = "Refno", Title = "Ref no.", Width = "120px" },
+            new() { Key = "Paxname", Title = "Passenger", Width = "auto" },
+            new() { Key = "StatusDescription", Title = "Status", Width = "auto" },
+            new() { Key = "Updated", Title = "Updated", Width = "140px",
+                Formatter = (v) => v is DateTime dt ? dt.ToString("yyyy-MM-dd") : (v?.ToString() ?? "—") }
+        },
+        Rows = Model.Result?.Items.Select(s => new Dictionary<string, object>
+        {
+            ["Refno"] = s.Refno,
+            ["Paxname"] = s.Paxname ?? "—",
+            ["StatusDescription"] = s.StatusDescription ?? "—",
+            ["Updated"] = s.Updated ?? (object)DBNull.Value
+        }).ToList() ?? new List<Dictionary<string, object>>(),
+        ShowPagination = false,
+        EmptyMessage = string.IsNullOrWhiteSpace(Model.Q)
+            ? "No passenger statuses found."
+            : "No passenger statuses found. Try a different search term.",
+        Responsive = true
+    };
 }
 
 @if (Model.HasNoLinkedAgent)
@@ -29,38 +56,5 @@ else
         </div>
     </div>
 
-    <div class="card shadow-sm">
-        @if (Model.Result!.Items.Count == 0)
-        {
-            <div class="card-body">
-                <p class="mb-0">No passenger statuses found.@(string.IsNullOrWhiteSpace(Model.Q) ? "" : " Try a different search term.")</p>
-            </div>
-        }
-        else
-        {
-            <div class="table-responsive">
-                <table class="table table-striped table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th scope="col">Ref no.</th>
-                            <th scope="col">Passenger</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Updated</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var status in Model.Result.Items)
-                        {
-                            <tr>
-                                <td>@status.Refno</td>
-                                <td>@(string.IsNullOrWhiteSpace(status.Paxname) ? "—" : status.Paxname)</td>
-                                <td>@(string.IsNullOrWhiteSpace(status.StatusDescription) ? "—" : status.StatusDescription)</td>
-                                <td>@(status.Updated?.ToString("yyyy-MM-dd") ?? "—")</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
-    </div>
+    <partial name="~/Components/_DataTable.cshtml" model="dataTable" />
 }

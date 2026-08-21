@@ -1,8 +1,54 @@
 @page
 @model VisaFusion.Web.Areas.Agent.Pages.StatementModel
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Statement";
     ViewData["UseSidebar"] = true;
+
+    var dataTable = new DataTableModel
+    {
+        Id = "statement-table",
+        AriaLabel = "Agent statement ledger",
+        Columns = new List<DataTableColumn>
+        {
+            new() { Key = "Date", Title = "Date", Width = "120px",
+                Formatter = (v) => v is DateTime dt ? dt.ToString("yyyy-MM-dd") : (v?.ToString() ?? "—") },
+            new() { Key = "TransactionType", Title = "Type", Width = "auto" },
+            new() { Key = "Refno", Title = "Ref no.", Width = "100px" },
+            new() { Key = "Paxname", Title = "Passenger", Width = "auto" },
+            new() { Key = "Voucher", Title = "Voucher", Width = "120px",
+                Template = (v, row) =>
+                {
+                    var reftype = row.ContainsKey("Reftype") ? row["Reftype"]?.ToString() : null;
+                    var invno = row.ContainsKey("Invno") ? row["Invno"]?.ToString() : null;
+                    if (string.IsNullOrWhiteSpace(reftype) && string.IsNullOrWhiteSpace(invno))
+                        return new Microsoft.AspNetCore.Html.HtmlString("—");
+                    return new Microsoft.AspNetCore.Html.HtmlString(
+                        $"{(reftype ?? "—")}{(string.IsNullOrWhiteSpace(invno) ? "" : "/" + invno)}");
+                } },
+            new() { Key = "Debit", Title = "Debit", Width = "120px", CellClass = "text-end",
+                Formatter = (v) => v is decimal d ? d.ToString("N2") : (v?.ToString() ?? "—") },
+            new() { Key = "Credit", Title = "Credit", Width = "120px", CellClass = "text-end",
+                Formatter = (v) => v is decimal d ? d.ToString("N2") : (v?.ToString() ?? "—") },
+            new() { Key = "Balance", Title = "Balance", Width = "120px", CellClass = "text-end",
+                Formatter = (v) => v is decimal d ? d.ToString("N2") : (v?.ToString() ?? "—") }
+        },
+        Rows = Model.Result?.Items.Select(l => new Dictionary<string, object>
+        {
+            ["Date"] = l.Date ?? (object)DBNull.Value,
+            ["TransactionType"] = l.TransactionType ?? "—",
+            ["Refno"] = l.Refno?.ToString() ?? "—",
+            ["Paxname"] = l.Paxname ?? "—",
+            ["Reftype"] = l.Reftype ?? string.Empty,
+            ["Invno"] = l.Invno?.ToString() ?? string.Empty,
+            ["Debit"] = l.Debit ?? (object)DBNull.Value,
+            ["Credit"] = l.Credit ?? (object)DBNull.Value,
+            ["Balance"] = l.Balance ?? (object)DBNull.Value
+        }).ToList() ?? new List<Dictionary<string, object>>(),
+        ShowPagination = false,
+        EmptyMessage = "No ledger entries for this agent.",
+        Responsive = true
+    };
 }
 
 @if (Model.HasNoLinkedAgent)
@@ -14,54 +60,19 @@
 }
 else
 {
-    <div class="card shadow-sm">
-        @if (Model.Result!.Items.Count == 0)
-        {
-            <div class="card-body">
-                <p class="mb-0">No ledger entries for this agent.</p>
+    <partial name="~/Components/_DataTable.cshtml" model="dataTable" />
+
+    @if (Model.Result?.Items.Count > 0)
+    {
+        <div class="card shadow-sm mt-3">
+            <div class="card-footer">
+                <p class="mb-0 text-body-secondary">
+                    <strong>Totals:</strong>
+                    Debit @(Model.Result.TotalDebits?.ToString("N2") ?? "—") |
+                    Credit @(Model.Result.TotalCredits?.ToString("N2") ?? "—") |
+                    Balance @(Model.Result.Balance?.ToString("N2") ?? "—")
+                </p>
             </div>
-        }
-        else
-        {
-            <div class="table-responsive">
-                <table class="table table-striped table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th scope="col">Date</th>
-                            <th scope="col">Type</th>
-                            <th scope="col">Ref no.</th>
-                            <th scope="col">Passenger</th>
-                            <th scope="col">Voucher</th>
-                            <th scope="col" class="text-end">Debit</th>
-                            <th scope="col" class="text-end">Credit</th>
-                            <th scope="col" class="text-end">Balance</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var line in Model.Result.Items)
-                        {
-                            <tr>
-                                <td>@(line.Date?.ToString("yyyy-MM-dd") ?? "—")</td>
-                                <td>@(string.IsNullOrWhiteSpace(line.TransactionType) ? "—" : line.TransactionType)</td>
-                                <td>@(line.Refno?.ToString() ?? "—")</td>
-                                <td>@(string.IsNullOrWhiteSpace(line.Paxname) ? "—" : line.Paxname)</td>
-                                <td>@(string.IsNullOrWhiteSpace(line.Reftype) ? "—" : line.Reftype + (line.Invno.HasValue ? "/" + line.Invno : ""))</td>
-                                <td class="text-end">@(line.Debit?.ToString("N2") ?? "—")</td>
-                                <td class="text-end">@(line.Credit?.ToString("N2") ?? "—")</td>
-                                <td class="text-end">@(line.Balance?.ToString("N2") ?? "—")</td>
-                            </tr>
-                        }
-                    </tbody>
-                    <tfoot>
-                        <tr class="table-light">
-                            <th scope="row" colspan="5">Totals</th>
-                            <td class="text-end">@(Model.Result.TotalDebits?.ToString("N2") ?? "—")</td>
-                            <td class="text-end">@(Model.Result.TotalCredits?.ToString("N2") ?? "—")</td>
-                            <td class="text-end">@(Model.Result.Balance?.ToString("N2") ?? "—")</td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        }
-    </div>
+        </div>
+    }
 }

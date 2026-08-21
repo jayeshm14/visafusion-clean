@@ -10,6 +10,16 @@
     var headerClass = Model.HeaderClass ?? string.Empty;
     var bodyClass = Model.BodyClass ?? string.Empty;
     var footerClass = Model.FooterClass ?? string.Empty;
+
+    // Helper to check if a field has a validation error in ModelState
+    bool HasFieldError(string fieldName) => ViewData.ModelState.TryGetValue(fieldName, out var entry) && entry.Errors.Count > 0;
+    string GetFieldError(string fieldName) => ViewData.ModelState.TryGetValue(fieldName, out var entry) && entry.Errors.Count > 0
+        ? entry.Errors[0].ErrorMessage
+        : string.Empty;
+    bool HasModelError() => ViewData.ModelState.TryGetValue(string.Empty, out var entry) && entry.Errors.Count > 0;
+    string GetModelError() => ViewData.ModelState.TryGetValue(string.Empty, out var entry) && entry.Errors.Count > 0
+        ? entry.Errors[0].ErrorMessage
+        : string.Empty;
 }
 
 @* PublicQueryForm Component - CoreUI Form Pattern *@
@@ -39,12 +49,18 @@
         {
             <form method="@formMethod" action="@formAction" id="@formId" class="@formCssClass" novalidate>
                 @form.AntiForgeryToken
+                @if (HasModelError())
+                {
+                    <div class="alert alert-danger" role="alert">@GetModelError()</div>
+                }
 
                 @foreach (var field in Model.Fields)
                 {
                     var fieldId = $"{formId}-{field.Name}";
                     var isRequired = field.Required;
                     var isDisabled = field.Disabled;
+                    var fieldHasError = HasFieldError(field.Name);
+                    var fieldError = GetFieldError(field.Name);
 
                     if (field.Type == FormFieldType.Hidden)
                     {
@@ -56,8 +72,12 @@
                         @if (field.Type == FormFieldType.Checkbox || field.Type == FormFieldType.Switch)
                         {
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" name="@field.Name" id="@(formId + "-" + field.Name)" value="true" @(field.Value?.ToString() == "true" ? "checked" : "") @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") />
+                                <input class="form-check-input @(fieldHasError ? "is-invalid" : "")" type="checkbox" name="@field.Name" id="@(formId + "-" + field.Name)" value="true" @(field.Value?.ToString() == "true" ? "checked" : "") @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") />
                                 <label class="form-check-label" for="@(formId + "-" + field.Name)">@field.Label</label>
+                                @if (fieldHasError)
+                                {
+                                    <div class="invalid-feedback">@fieldError</div>
+                                }
                             </div>
                         }
                         else if (field.Type == FormFieldType.Select)
@@ -65,7 +85,7 @@
                             @if (useFloatingLabels)
                             {
                                 <div class="form-floating has-validation mb-3">
-                                    <select class="form-select @(field.CssClass ?? "")" name="@field.Name" id="@(formId + "-" + field.Name)" @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") @(field.Multiple ? "multiple" : "")>
+                                    <select class="form-select @(field.CssClass ?? "") @(fieldHasError ? "is-invalid" : "")" name="@field.Name" id="@(formId + "-" + field.Name)" @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") @(field.Multiple ? "multiple" : "")>
                                         @if (!string.IsNullOrEmpty(field.Placeholder))
                                         {
                                             <option value="" disabled selected>@field.Placeholder</option>
@@ -76,7 +96,11 @@
                                         }
                                     </select>
                                     <label for="@(formId + "-" + field.Name)">@field.Label</label>
-                                    @if (field.Required)
+                                    @if (fieldHasError)
+                                    {
+                                        <div class="invalid-feedback">@fieldError</div>
+                                    }
+                                    else if (field.Required)
                                     {
                                         <div class="invalid-feedback">Please select an option.</div>
                                     }
@@ -85,7 +109,7 @@
                             else
                             {
                                 <label for="@(formId + "-" + field.Name)" class="form-label">@field.Label @if (field.Required) { <span class="text-danger">*</span> }</label>
-                                <select class="form-select @(field.CssClass ?? "")" name="@field.Name" id="@(formId + "-" + field.Name)" @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") @(field.Multiple ? "multiple" : "")>
+                                <select class="form-select @(field.CssClass ?? "") @(fieldHasError ? "is-invalid" : "")" name="@field.Name" id="@(formId + "-" + field.Name)" @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") @(field.Multiple ? "multiple" : "")>
                                     @if (!string.IsNullOrEmpty(field.Placeholder))
                                     {
                                         <option value="" disabled selected>@field.Placeholder</option>
@@ -95,7 +119,11 @@
                                         <option value="@option.Value" @(field.Value?.ToString() == option.Value ? "selected" : "")>@option.Text</option>
                                     }
                                 </select>
-                                @if (field.Required)
+                                @if (fieldHasError)
+                                {
+                                    <div class="invalid-feedback">@fieldError</div>
+                                }
+                                else if (field.Required)
                                 {
                                     <div class="invalid-feedback">Please select an option.</div>
                                 }
@@ -106,9 +134,13 @@
                             @if (useFloatingLabels)
                             {
                                 <div class="form-floating has-validation mb-3">
-                                    <textarea class="form-control @(field.CssClass ?? "")" name="@field.Name" id="@(formId + "-" + field.Name)" rows="@(field.Rows ?? 4)" @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") placeholder="@field.Placeholder"></textarea>
+                                    <textarea class="form-control @(field.CssClass ?? "") @(fieldHasError ? "is-invalid" : "")" name="@field.Name" id="@(formId + "-" + field.Name)" rows="@(field.Rows ?? 4)" @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") placeholder="@field.Placeholder"></textarea>
                                     <label for="@(formId + "-" + field.Name)">@field.Label</label>
-                                    @if (field.Required)
+                                    @if (fieldHasError)
+                                    {
+                                        <div class="invalid-feedback">@fieldError</div>
+                                    }
+                                    else if (field.Required)
                                     {
                                         <div class="invalid-feedback">This field is required.</div>
                                     }
@@ -117,8 +149,12 @@
                             else
                             {
                                 <label for="@(formId + "-" + field.Name)" class="form-label">@field.Label @if (field.Required) { <span class="text-danger">*</span> }</label>
-                                <textarea class="form-control @(field.CssClass ?? "")" name="@field.Name" id="@(formId + "-" + field.Name)" rows="@(field.Rows ?? 4)" @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") placeholder="@field.Placeholder"></textarea>
-                                @if (field.Required)
+                                <textarea class="form-control @(field.CssClass ?? "") @(fieldHasError ? "is-invalid" : "")" name="@field.Name" id="@(formId + "-" + field.Name)" rows="@(field.Rows ?? 4)" @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") placeholder="@field.Placeholder"></textarea>
+                                @if (fieldHasError)
+                                {
+                                    <div class="invalid-feedback">@fieldError</div>
+                                }
+                                else if (field.Required)
                                 {
                                     <div class="invalid-feedback">This field is required.</div>
                                 }
@@ -127,9 +163,13 @@
                         else if (useFloatingLabels)
                         {
                             <div class="form-floating has-validation mb-3">
-                                <input type="@(field.InputType ?? "text")" class="form-control @(field.CssClass ?? "")" name="@field.Name" id="@(formId + "-" + field.Name)" value="@field.Value" placeholder="@field.Placeholder" @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") autocomplete="@field.Autocomplete" @(field.MaxLength != null ? $"maxlength=\"{field.MaxLength}\"" : "") />
+                                <input type="@(field.InputType ?? "text")" class="form-control @(field.CssClass ?? "") @(fieldHasError ? "is-invalid" : "")" name="@field.Name" id="@(formId + "-" + field.Name)" value="@field.Value" placeholder="@field.Placeholder" @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") autocomplete="@field.Autocomplete" @(field.MaxLength != null ? $"maxlength=\"{field.MaxLength}\"" : "") />
                                 <label for="@(formId + "-" + field.Name)">@field.Label</label>
-                                @if (field.Required)
+                                @if (fieldHasError)
+                                {
+                                    <div class="invalid-feedback">@fieldError</div>
+                                }
+                                else if (field.Required)
                                 {
                                     <div class="invalid-feedback">This field is required.</div>
                                 }
@@ -138,8 +178,12 @@
                         else
                         {
                             <label for="@(formId + "-" + field.Name)" class="form-label">@field.Label @if (field.Required) { <span class="text-danger">*</span> }</label>
-                            <input type="@(field.InputType ?? "text")" class="form-control @(field.CssClass ?? "")" name="@field.Name" id="@(formId + "-" + field.Name)" value="@field.Value" placeholder="@field.Placeholder" @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") autocomplete="@field.Autocomplete" @(field.MaxLength != null ? $"maxlength=\"{field.MaxLength}\"" : "") />
-                            @if (field.Required)
+                            <input type="@(field.InputType ?? "text")" class="form-control @(field.CssClass ?? "") @(fieldHasError ? "is-invalid" : "")" name="@field.Name" id="@(formId + "-" + field.Name)" value="@field.Value" placeholder="@field.Placeholder" @(isDisabled ? "disabled" : "") @(field.Required ? "required" : "") autocomplete="@field.Autocomplete" @(field.MaxLength != null ? $"maxlength=\"{field.MaxLength}\"" : "") />
+                            @if (fieldHasError)
+                            {
+                                <div class="invalid-feedback">@fieldError</div>
+                            }
+                            else if (field.Required)
                             {
                                 <div class="invalid-feedback">This field is required.</div>
                             }
@@ -188,6 +232,10 @@
 (function() {
     // Form validation styling
     document.querySelectorAll('form').forEach(form => {
+        // If there are server-side validation errors, mark form as validated
+        if (form.querySelector('.is-invalid')) {
+            form.classList.add('was-validated');
+        }
         form.addEventListener('submit', function(e) {
             if (!this.checkValidity()) {
                 e.preventDefault();

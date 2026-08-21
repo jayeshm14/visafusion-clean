@@ -11,6 +11,18 @@
     var bodyClass = Model.BodyClass ?? string.Empty;
     var footerClass = Model.FooterClass ?? string.Empty;
     var form = Model.Form;
+    // Always derive the form ID from the card ID to avoid duplicate HTML IDs.
+    var formId = cardId + "-form";
+
+    // Helper to check if a field has a validation error in ModelState
+    bool HasFieldError(string fieldName) => ViewData.ModelState.TryGetValue(fieldName, out var entry) && entry.Errors.Count > 0;
+    string GetFieldError(string fieldName) => ViewData.ModelState.TryGetValue(fieldName, out var entry) && entry.Errors.Count > 0
+        ? entry.Errors[0].ErrorMessage
+        : string.Empty;
+    bool HasModelError() => ViewData.ModelState.TryGetValue(string.Empty, out var entry) && entry.Errors.Count > 0;
+    string GetModelError() => ViewData.ModelState.TryGetValue(string.Empty, out var entry) && entry.Errors.Count > 0
+        ? entry.Errors[0].ErrorMessage
+        : string.Empty;
 }
 
 @* FormCard Component - CoreUI Card Pattern *@
@@ -49,8 +61,12 @@
     <div class="card-body @bodyClass">
         @if (form != null)
         {
-            <form method="@form.Method" action="@form.Action" id="@(form.Id ?? cardId + "-form")" class="@form.CssClass" novalidate>
+            <form method="@form.Method" action="@form.Action" id="@formId" class="@form.CssClass" novalidate>
                 @form.AntiForgeryToken
+                @if (HasModelError())
+                {
+                    <div class="alert alert-danger" role="alert">@GetModelError()</div>
+                }
                 @foreach (var section in sections)
                 {
                     @if (!string.IsNullOrEmpty(section.Title))
@@ -68,40 +84,54 @@
                                 }
                                 else if (field.Type == FormFieldType.Checkbox || field.Type == FormFieldType.Switch)
                                 {
+                                    var fieldHasError = HasFieldError(field.Name);
+                                    var fieldError = GetFieldError(field.Name);
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" name="@field.Name" id="@(cardId + "-" + field.Name)" value="true" @(field.Value?.ToString() == "true" ? "checked" : "") @(field.Disabled ? "disabled" : "") @(field.Required ? "required" : "") />
+                                        <input class="form-check-input @(fieldHasError ? "is-invalid" : "")" type="checkbox" name="@field.Name" id="@(cardId + "-" + field.Name)" value="true" @(field.Value?.ToString() == "true" ? "checked" : "") @(field.Disabled ? "disabled" : "") @(field.Required ? "required" : "") />
                                         <label class="form-check-label" for="@(cardId + "-" + field.Name)">@field.Label</label>
                                         @if (!string.IsNullOrEmpty(field.HelpText))
                                         {
                                             <div class="form-text">@field.HelpText</div>
                                         }
+                                        @if (fieldHasError)
+                                        {
+                                            <div class="invalid-feedback">@fieldError</div>
+                                        }
                                     </div>
                                 }
                                 else if (field.Type == FormFieldType.Radio)
                                 {
+                                    var fieldHasError = HasFieldError(field.Name);
+                                    var fieldError = GetFieldError(field.Name);
                                     <fieldset class="form-check-group">
                                         <legend class="form-label">@field.Label</legend>
                                         @foreach (var option in field.Options)
                                         {
                                             <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="@field.Name" id="@(cardId + "-" + field.Name + "-" + option.Value)" value="@option.Value" @(field.Value?.ToString() == option.Value ? "checked" : "") @(field.Disabled ? "disabled" : "") @(field.Required ? "required" : "") />
+                                                <input class="form-check-input @(fieldHasError ? "is-invalid" : "")" type="radio" name="@field.Name" id="@(cardId + "-" + field.Name + "-" + option.Value)" value="@option.Value" @(field.Value?.ToString() == option.Value ? "checked" : "") @(field.Disabled ? "disabled" : "") @(field.Required ? "required" : "") />
                                                 <label class="form-check-label" for="@(cardId + "-" + field.Name + "-" + option.Value)">@option.Text</label>
                                             </div>
                                         }
                                         @if (!string.IsNullOrEmpty(field.HelpText))
                                         {
                                             <div class="form-text">@field.HelpText</div>
+                                        }
+                                        @if (fieldHasError)
+                                        {
+                                            <div class="invalid-feedback">@fieldError</div>
                                         }
                                     </fieldset>
                                 }
                                 else if (field.Type == FormFieldType.CheckboxList)
                                 {
+                                    var fieldHasError = HasFieldError(field.Name);
+                                    var fieldError = GetFieldError(field.Name);
                                     <fieldset class="form-check-group">
                                         <legend class="form-label">@field.Label</legend>
                                         @foreach (var option in field.Options)
                                         {
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="@field.Name" id="@(cardId + "-" + field.Name + "-" + option.Value)" value="@option.Value" @(field.SelectedValues?.Contains(option.Value) == true ? "checked" : "") @(field.Disabled ? "disabled" : "") />
+                                                <input class="form-check-input @(fieldHasError ? "is-invalid" : "")" type="checkbox" name="@field.Name" id="@(cardId + "-" + field.Name + "-" + option.Value)" value="@option.Value" @(field.SelectedValues?.Contains(option.Value) == true ? "checked" : "") @(field.Disabled ? "disabled" : "") />
                                                 <label class="form-check-label" for="@(cardId + "-" + field.Name + "-" + option.Value)">@option.Text</label>
                                             </div>
                                         }
@@ -109,12 +139,18 @@
                                         {
                                             <div class="form-text">@field.HelpText</div>
                                         }
+                                        @if (fieldHasError)
+                                        {
+                                            <div class="invalid-feedback">@fieldError</div>
+                                        }
                                     </fieldset>
                                 }
                                 else if (field.Type == FormFieldType.Select)
                                 {
+                                    var fieldHasError = HasFieldError(field.Name);
+                                    var fieldError = GetFieldError(field.Name);
                                     <label for="@(cardId + "-" + field.Name)" class="form-label">@field.Label @if (field.Required) { <span class="text-danger">*</span> }</label>
-                                    <select class="form-select @(field.CssClass ?? "")" name="@field.Name" id="@(cardId + "-" + field.Name)" @(field.Disabled ? "disabled" : "") @(field.Required ? "required" : "") @(field.Multiple ? "multiple" : "")>
+                                    <select class="form-select @(field.CssClass ?? "") @(fieldHasError ? "is-invalid" : "")" name="@field.Name" id="@(cardId + "-" + field.Name)" @(field.Disabled ? "disabled" : "") @(field.Required ? "required" : "") @(field.Multiple ? "multiple" : "")>
                                         @if (!string.IsNullOrEmpty(field.Placeholder))
                                         {
                                             <option value="" disabled selected>@field.Placeholder</option>
@@ -128,33 +164,49 @@
                                     {
                                         <div class="form-text">@field.HelpText</div>
                                     }
-                                    @if (field.Required)
+                                    @if (fieldHasError)
+                                    {
+                                        <div class="invalid-feedback">@fieldError</div>
+                                    }
+                                    else if (field.Required)
                                     {
                                         <div class="invalid-feedback">Please select an option.</div>
                                     }
                                 }
                                 else if (field.Type == FormFieldType.TextArea)
                                 {
+                                    var fieldHasError = HasFieldError(field.Name);
+                                    var fieldError = GetFieldError(field.Name);
                                     <label for="@(cardId + "-" + field.Name)" class="form-label">@field.Label @if (field.Required) { <span class="text-danger">*</span> }</label>
-                                    <textarea class="form-control @(field.CssClass ?? "")" name="@field.Name" id="@(cardId + "-" + field.Name)" rows="@(field.Rows ?? 3)" @(field.Disabled ? "disabled" : "") @(field.Required ? "required" : "") placeholder="@field.Placeholder">@field.Value</textarea>
+                                    <textarea class="form-control @(field.CssClass ?? "") @(fieldHasError ? "is-invalid" : "")" name="@field.Name" id="@(cardId + "-" + field.Name)" rows="@(field.Rows ?? 3)" @(field.Disabled ? "disabled" : "") @(field.Required ? "required" : "") placeholder="@field.Placeholder">@field.Value</textarea>
                                     @if (!string.IsNullOrEmpty(field.HelpText))
                                     {
                                         <div class="form-text">@field.HelpText</div>
                                     }
-                                    @if (field.Required)
+                                    @if (fieldHasError)
+                                    {
+                                        <div class="invalid-feedback">@fieldError</div>
+                                    }
+                                    else if (field.Required)
                                     {
                                         <div class="invalid-feedback">This field is required.</div>
                                     }
                                 }
                                 else if (field.Type == FormFieldType.File)
                                 {
+                                    var fieldHasError = HasFieldError(field.Name);
+                                    var fieldError = GetFieldError(field.Name);
                                     <label for="@(cardId + "-" + field.Name)" class="form-label">@field.Label @if (field.Required) { <span class="text-danger">*</span> }</label>
-                                    <input type="file" class="form-control @(field.CssClass ?? "")" name="@field.Name" id="@(cardId + "-" + field.Name)" @(field.Disabled ? "disabled" : "") @(field.Required ? "required" : "") @(field.Multiple ? "multiple" : "") />
+                                    <input type="file" class="form-control @(field.CssClass ?? "") @(fieldHasError ? "is-invalid" : "")" name="@field.Name" id="@(cardId + "-" + field.Name)" @(field.Disabled ? "disabled" : "") @(field.Required ? "required" : "") @(field.Multiple ? "multiple" : "") />
                                     @if (!string.IsNullOrEmpty(field.HelpText))
                                     {
                                         <div class="form-text">@field.HelpText</div>
                                     }
-                                    @if (field.Required)
+                                    @if (fieldHasError)
+                                    {
+                                        <div class="invalid-feedback">@fieldError</div>
+                                    }
+                                    else if (field.Required)
                                     {
                                         <div class="invalid-feedback">Please select a file.</div>
                                     }
@@ -163,25 +215,39 @@
                                 {
                                     @* Default: text input with floating label support *@
                                     var useFloating = field.UseFloatingLabel || (Model.Form?.UseFloatingLabels ?? false);
+                                    var fieldHasError = HasFieldError(field.Name);
+                                    var fieldError = GetFieldError(field.Name);
                                     if (useFloating)
                                     {
                                         <div class="form-floating">
-                                            <input type="@(field.InputType ?? "text")" class="form-control @(field.CssClass ?? "") @(field.Required ? "is-required" : "")" name="@field.Name" id="@(cardId + "-" + field.Name)" value="@field.Value" @(field.Disabled ? "disabled" : "") @(field.Required ? "required" : "") placeholder="@field.Placeholder" @(field.MaxLength != null ? $"maxlength=\"{field.MaxLength}\"" : "") @(field.Min != null ? $"min=\"{field.Min}\"" : "") @(field.Max != null ? $"max=\"{field.Max}\"" : "") @(field.Step != null ? $"step=\"{field.Step}\"" : "") @(field.Pattern != null ? $"pattern=\"{field.Pattern}\"" : "") />
+                                            <input type="@(field.InputType ?? "text")" class="form-control @(field.CssClass ?? "") @(fieldHasError ? "is-invalid" : "") @(field.Required ? "is-required" : "")" name="@field.Name" id="@(cardId + "-" + field.Name)" value="@field.Value" @(field.Disabled ? "disabled" : "") @(field.Required ? "required" : "") placeholder="@field.Placeholder" @(field.MaxLength != null ? $"maxlength=\"{field.MaxLength}\"" : "") @(field.Min != null ? $"min=\"{field.Min}\"" : "") @(field.Max != null ? $"max=\"{field.Max}\"" : "") @(field.Step != null ? $"step=\"{field.Step}\"" : "") @(field.Pattern != null ? $"pattern=\"{field.Pattern}\"" : "") />
                                             <label for="@(cardId + "-" + field.Name)">@field.Label</label>
+                                            @if (fieldHasError)
+                                            {
+                                                <div class="invalid-feedback">@fieldError</div>
+                                            }
+                                            else if (field.Required)
+                                            {
+                                                <div class="invalid-feedback">This field is required.</div>
+                                            }
                                         </div>
                                     }
                                     else
                                     {
                                         <label for="@(cardId + "-" + field.Name)" class="form-label">@field.Label @if (field.Required) { <span class="text-danger">*</span> }</label>
-                                        <input type="@(field.InputType ?? "text")" class="form-control @(field.CssClass ?? "") @(field.Required ? "is-required" : "")" name="@field.Name" id="@(cardId + "-" + field.Name)" value="@field.Value" @(field.Disabled ? "disabled" : "") @(field.Required ? "required" : "") placeholder="@field.Placeholder" @(field.MaxLength != null ? $"maxlength=\"{field.MaxLength}\"" : "") @(field.Min != null ? $"min=\"{field.Min}\"" : "") @(field.Max != null ? $"max=\"{field.Max}\"" : "") @(field.Step != null ? $"step=\"{field.Step}\"" : "") @(field.Pattern != null ? $"pattern=\"{field.Pattern}\"" : "") />
+                                        <input type="@(field.InputType ?? "text")" class="form-control @(field.CssClass ?? "") @(fieldHasError ? "is-invalid" : "") @(field.Required ? "is-required" : "")" name="@field.Name" id="@(cardId + "-" + field.Name)" value="@field.Value" @(field.Disabled ? "disabled" : "") @(field.Required ? "required" : "") placeholder="@field.Placeholder" @(field.MaxLength != null ? $"maxlength=\"{field.MaxLength}\"" : "") @(field.Min != null ? $"min=\"{field.Min}\"" : "") @(field.Max != null ? $"max=\"{field.Max}\"" : "") @(field.Step != null ? $"step=\"{field.Step}\"" : "") @(field.Pattern != null ? $"pattern=\"{field.Pattern}\"" : "") />
+                                        @if (fieldHasError)
+                                        {
+                                            <div class="invalid-feedback">@fieldError</div>
+                                        }
+                                        else if (field.Required)
+                                        {
+                                            <div class="invalid-feedback">This field is required.</div>
+                                        }
                                     }
                                     @if (!string.IsNullOrEmpty(field.HelpText))
                                     {
                                         <div class="form-text">@field.HelpText</div>
-                                    }
-                                    @if (field.Required)
-                                    {
-                                        <div class="invalid-feedback">This field is required.</div>
                                     }
                                 }
                             </div>
@@ -203,7 +269,7 @@
             {
                 @if (action.Type == FormCardActionType.Submit)
                 {
-                    <button type="submit" form="@(Model.Form?.Id ?? cardId + "-form")" class="btn @(action.CssClass ?? "btn-primary")" @(action.Disabled ? "disabled" : "")>
+                    <button type="submit" form="@formId" class="btn @(action.CssClass ?? "btn-primary")" @(action.Disabled ? "disabled" : "")>
                         @if (!string.IsNullOrEmpty(action.Icon))
                         {
                             <svg class="icon icon-sm me-1" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="@action.Icon"/></svg>
@@ -235,3 +301,19 @@
         </div>
     }
 </div>
+
+@if (form != null)
+{
+    <script>
+    (function() {
+        var form = document.getElementById('@formId');
+        if (!form) return;
+        // Bootstrap 5 hides .invalid-feedback unless a parent has .was-validated
+        // or .needs-validation. Add it when server-side errors are present so
+        // the error messages become visible.
+        if (form.querySelector('.is-invalid')) {
+            form.classList.add('was-validated');
+        }
+    })();
+    </script>
+}

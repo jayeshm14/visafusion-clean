@@ -1,15 +1,40 @@
 @page
 @model VisaFusion.Web.Areas.Reporting.Pages.TodayTransactionModel
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Today Transaction";
     ViewData["UseSidebar"] = true;
-}
 
-<p class="text-body-secondary">Per-reference fee totals for status rows entered in the selected date range (defaults to today).</p>
+    var dataTable = new DataTableModel
+    {
+        Id = "today-transaction-table",
+        AriaLabel = "Today transaction report",
+        Columns = new List<DataTableColumn>
+        {
+            new() { Key = "Refno", Title = "Ref", Width = "80px" },
+            new() { Key = "VisafeeTotal", Title = "Visa fee", Width = "120px", CellClass = "text-end",
+                Formatter = (v) => v is decimal d ? d.ToString("0.00") : (v?.ToString() ?? "—") },
+            new() { Key = "HotelTotal", Title = "Hotel", Width = "120px", CellClass = "text-end",
+                Formatter = (v) => v is int i ? i.ToString() : (v?.ToString() ?? "—") },
+            new() { Key = "CabTotal", Title = "Cab", Width = "120px", CellClass = "text-end",
+                Formatter = (v) => v is int i ? i.ToString() : (v?.ToString() ?? "—") }
+        },
+        Rows = Model.Rows.Select(r => new Dictionary<string, object>
+        {
+            ["Refno"] = r.Refno ?? 0,
+            ["VisafeeTotal"] = r.VisafeeTotal ?? 0m,
+            ["HotelTotal"] = r.HotelTotal ?? 0,
+            ["CabTotal"] = r.CabTotal ?? 0
+        }).ToList(),
+        ShowPagination = false,
+        EmptyMessage = "No transaction entries.",
+        Responsive = true
+    };
+}
 
 <div class="card shadow-sm mb-4">
     <div class="card-body">
-        <form method="get" class="row g-3 align-items-end">
+        <form method="get" class="row g-3 align-items-end" novalidate>
             <div class="col-auto">
                 <label for="dateFrom" class="form-label">From</label>
                 <input type="date" id="dateFrom" name="dateFrom" class="form-control"
@@ -18,7 +43,7 @@
             <div class="col-auto">
                 <label for="dateTo" class="form-label">To</label>
                 <input type="date" id="dateTo" name="dateTo" class="form-control"
-                       value="@(Model.Params?.To is { } to ? to.AddDays(-1).ToString("yyyy-MM-dd") : string.Empty)" />
+                       value="@(Model.Params?.To.HasValue == true ? Model.Params!.To.Value.AddDays(-1).ToString("yyyy-MM-dd") : "")" />
             </div>
             <div class="col-auto">
                 <label for="agentId" class="form-label">Agent ID (optional)</label>
@@ -32,40 +57,11 @@
     </div>
 </div>
 
+<p class="text-body-secondary">One row per reference number entered in the range (defaults to today) with per-refno fee totals.</p>
+
 @if (!string.IsNullOrWhiteSpace(Model.ParamError))
 {
     <div class="alert alert-danger" role="alert">@Model.ParamError</div>
 }
 
-@if (Model.Rows.Count == 0)
-{
-    <p>No transactions in the selected range.</p>
-}
-else
-{
-    <div class="card shadow-sm">
-        <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col">Ref</th>
-                        <th scope="col" class="text-end">Visa fee total</th>
-                        <th scope="col" class="text-end">Hotel total</th>
-                        <th scope="col" class="text-end">Cab total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var row in Model.Rows)
-                    {
-                        <tr>
-                            <td>@row.Refno</td>
-                            <td class="text-end">@(row.VisafeeTotal?.ToString("0.00") ?? "—")</td>
-                            <td class="text-end">@(row.HotelTotal?.ToString("0.00") ?? "—")</td>
-                            <td class="text-end">@(row.CabTotal?.ToString("0.00") ?? "—")</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-}
+<partial name="~/Components/_DataTable.cshtml" model="dataTable" />

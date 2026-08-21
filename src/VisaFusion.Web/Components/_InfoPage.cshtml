@@ -73,13 +73,30 @@
                                         <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
                                             @foreach (var action in card.Actions)
                                             {
-                                                <a class="btn @(action.CssClass ?? "btn-sm btn-outline-primary")" href="@action.Url" @(action.OnClick != null ? $"onclick=\"{action.OnClick}\"" : "")>
-                                                    @if (!string.IsNullOrEmpty(action.Icon))
-                                                    {
-                                                        <svg class="icon icon-sm me-1" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="@action.Icon"/></svg>
-                                                    }
-                                                    @action.Title
-                                                </a>
+                                                var cardIsPost = string.Equals(action.Method, "post", StringComparison.OrdinalIgnoreCase);
+                                                @if (cardIsPost)
+                                                {
+                                                    <form method="post" action="@action.Url" class="d-inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="btn @(action.CssClass ?? "btn-sm btn-outline-primary")">
+                                                            @if (!string.IsNullOrEmpty(action.Icon))
+                                                            {
+                                                                <svg class="icon icon-sm me-1" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="@action.Icon"/></svg>
+                                                            }
+                                                            @action.Title
+                                                        </button>
+                                                    </form>
+                                                }
+                                                else
+                                                {
+                                                    <a class="btn @(action.CssClass ?? "btn-sm btn-outline-primary")" href="@action.Url" @(action.OnClick != null ? $"onclick=\"{action.OnClick}\"" : "")>
+                                                        @if (!string.IsNullOrEmpty(action.Icon))
+                                                        {
+                                                            <svg class="icon icon-sm me-1" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="@action.Icon"/></svg>
+                                                        }
+                                                        @action.Title
+                                                    </a>
+                                                }
                                             }
                                         </div>
                                     }
@@ -133,13 +150,30 @@
                 <div class="d-flex flex-wrap justify-content-end gap-2">
                     @foreach (var action in actions)
                     {
-                        <a class="btn @(action.CssClass ?? "btn-primary")" href="@action.Url" @(action.OnClick != null ? $"onclick=\"{action.OnClick}\"" : "")>
-                            @if (!string.IsNullOrEmpty(action.Icon))
-                            {
-                                <svg class="icon icon-sm me-2" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="@action.Icon"/></svg>
-                            }
-                            @action.Title
-                        </a>
+                        var isPost = string.Equals(action.Method, "post", StringComparison.OrdinalIgnoreCase);
+                        @if (isPost)
+                        {
+                            <form method="post" action="@action.Url" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn @(action.CssClass ?? "btn-primary")">
+                                    @if (!string.IsNullOrEmpty(action.Icon))
+                                    {
+                                        <svg class="icon icon-sm me-2" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="@action.Icon"/></svg>
+                                    }
+                                    @action.Title
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a class="btn @(action.CssClass ?? "btn-primary")" href="@action.Url" @(action.OnClick != null ? $"onclick=\"{action.OnClick}\"" : "")>
+                                @if (!string.IsNullOrEmpty(action.Icon))
+                                {
+                                    <svg class="icon icon-sm me-2" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="@action.Icon"/></svg>
+                                }
+                                @action.Title
+                            </a>
+                        }
                     }
                 </div>
             }

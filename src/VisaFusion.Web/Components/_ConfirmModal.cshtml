@@ -52,7 +52,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn @Model.CancelCssClass" data-coreui-dismiss="modal">@Model.CancelText</button>
-                <button type="button" class="btn @Model.ConfirmCssClass" id="@(modalId + "-confirm")" @(Model.ConfirmOnClick != null ? $"onclick=\"{Model.ConfirmOnClick}\"" : "")>@Model.ConfirmText</button>
+                <button type="button" class="btn @Model.ConfirmCssClass" id="@(modalId + "-confirm")">@Model.ConfirmText</button>
             </div>
         </div>
     </div>

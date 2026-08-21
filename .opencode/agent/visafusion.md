@@ -2,7 +2,7 @@
 description: Drives the VisaFusion legacy-modernization program (Classic ASP VisaEntry to ASP.NET Core). Executes the deterministic pipeline from library/.
 mode: primary
 temperature: 0
-model: opencode/deepseek-v4-flash-free
+model: opencode/mimo-v2.5-free
 ---
 
 You are the **VisaFusion** engineering agent executing the deterministic

@@ -1,8 +1,44 @@
 @page
 @model VisaFusion.Web.Areas.Admin.Pages.Users.ListModel
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Users";
     ViewData["UseSidebar"] = true;
+
+    var dataTable = new DataTableModel
+    {
+        Id = "users-table",
+        AriaLabel = "User list",
+        Columns = new List<DataTableColumn>
+        {
+            new() { Key = "UserName", Title = "Login", Width = "auto" },
+            new() { Key = "Email", Title = "Email", Width = "auto" },
+            new() { Key = "Roles", Title = "Roles", Width = "auto",
+                Formatter = (v) => v is System.Collections.Generic.IReadOnlyList<string> roles ? string.Join(", ", roles) : v?.ToString() ?? "—" },
+            new() { Key = "Active", Title = "Status", Width = "120px",
+                Template = (v, row) =>
+                {
+                    var active = row.ContainsKey("Active") && row["Active"] is bool b && b;
+                    if (active)
+                        return new Microsoft.AspNetCore.Html.HtmlString("<span class=\"badge text-bg-success\">Active</span>");
+                    return new Microsoft.AspNetCore.Html.HtmlString("<span class=\"badge text-bg-danger\">Deactivated</span>");
+                } }
+        },
+        Rows = Model.Users.Select(u => new Dictionary<string, object>
+        {
+            ["UserName"] = u.UserName,
+            ["Email"] = u.Email ?? "—",
+            ["Roles"] = u.Roles,
+            ["Active"] = u.Active
+        }).ToList(),
+        ShowPagination = false,
+        EmptyMessage = "No users found.",
+        Responsive = true,
+        RowActions = new List<DataTableAction>
+        {
+            new() { Name = "Deactivate", Title = "Deactivate", UrlTemplate = "/Admin/Users/List?handler=Deactivate&id={0}", CssClass = "text-danger", Method = "post" }
+        }
+    };
 }
 
 @if (!string.IsNullOrWhiteSpace(Model.OutcomeMessage))
@@ -18,56 +54,4 @@
     <a class="btn btn-primary" href="/Admin/Users/Create">New user</a>
 </p>
 
-<div class="card shadow-sm">
-    @if (Model.Users.Count == 0)
-    {
-        <div class="card-body">
-            <p class="mb-0">No users found.</p>
-        </div>
-    }
-    else
-    {
-        <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col">Login</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Roles</th>
-                        <th scope="col">Status</th>
-                        <th scope="col"><span class="visually-hidden">Actions</span></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var user in Model.Users)
-                    {
-                        <tr>
-                            <td>@user.UserName</td>
-                            <td>@(string.IsNullOrWhiteSpace(user.Email) ? "—" : user.Email)</td>
-                            <td>@string.Join(", ", user.Roles)</td>
-                            <td>
-                                @if (user.Active)
-                                {
-                                    <span class="badge text-bg-success">Active</span>
-                                }
-                                else
-                                {
-                                    <span class="badge text-bg-danger">Deactivated</span>
-                                }
-                            </td>
-                            <td>
-                                @if (user.Active)
-                                {
-                                    <form method="post" asp-page-handler="Deactivate" class="d-inline">
-                                        <input type="hidden" name="id" value="@user.Id" />
-                                        <button type="submit" class="btn btn-outline-secondary btn-sm">Deactivate</button>
-                                    </form>
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
-</div>
+<partial name="~/Components/_DataTable.cshtml" model="dataTable" />
