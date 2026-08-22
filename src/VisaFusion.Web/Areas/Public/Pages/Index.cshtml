@@ -1,19 +1,51 @@
 ﻿@page
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Home";
-}
-<h1>Visa Entry Services</h1>
-<p>Welcome to the visa entry services portal.</p>
 
-<nav>
-    <ul>
-        <li><a href="/public/contact">Contact</a></li>
-        <li><a href="/public/queries">Submit Query</a></li>
-        <li><a href="/public/embassy">Embassy Information</a></li>
-        <li><a href="/public/country">Country Information</a></li>
-        <li><a href="/public/visa">Visa Information</a></li>
-        <li><a href="/public/forms">Forms</a></li>
-        <li><a href="/public/subscribe">Subscribe</a></li>
-        <li><a href="/public/register">Register</a></li>
-    </ul>
-</nav>
+    // Public landing page — SPEC-0009 T086; maps to _PublicLanding component
+    // (COREUI_VISA_FUSION_MAPPING.md). Content preserved from legacy;
+    // CoreUI presentation only.
+    var landing = new PublicLandingModel
+    {
+        Title = "Visa Entry Services",
+        Subtitle = "Your trusted visa processing partner",
+        Hero = new PublicLandingHero
+        {
+            Title = "Welcome to VisaFusion",
+            Subtitle = "Streamlined visa processing for travelers and businesses.",
+            Actions = new List<PublicLandingAction>
+            {
+                new() { Title = "Submit Query", Url = "/Public/Queries", CssClass = "btn-primary btn-lg" },
+                new() { Title = "Register", Url = "/Public/Register", CssClass = "btn-outline-primary btn-lg" }
+            }
+        },
+        Stats = new List<PublicLandingStat>
+        {
+            new() { Label = "Visa Types", Value = "10+" },
+            new() { Label = "Countries", Value = "50+" },
+            new() { Label = "Processing", Value = "Fast" }
+        },
+        Features = new List<PublicLandingFeature>
+        {
+            new() { Title = "Submit Query", Description = "Submit visa-related queries and receive timely responses.", Actions = new List<PublicLandingAction> { new() { Title = "Learn More", Url = "/Public/Queries" } } },
+            new() { Title = "Embassy Information", Description = "Find embassy contact details and operating hours.", Actions = new List<PublicLandingAction> { new() { Title = "Learn More", Url = "/Public/Embassy" } } },
+            new() { Title = "Country Information", Description = "Browse country-specific visa requirements.", Actions = new List<PublicLandingAction> { new() { Title = "Learn More", Url = "/Public/CountryInfo" } } },
+            new() { Title = "Visa Information", Description = "Learn about visa types and application processes.", Actions = new List<PublicLandingAction> { new() { Title = "Learn More", Url = "/Public/VisaInfo" } } },
+            new() { Title = "Daily Updates", Description = "Stay informed with the latest visa service updates.", Actions = new List<PublicLandingAction> { new() { Title = "Learn More", Url = "/Public/DailyUpdate" } } },
+            new() { Title = "Contact Us", Description = "Get in touch with our visa services team.", Actions = new List<PublicLandingAction> { new() { Title = "Learn More", Url = "/Public/Contact" } } }
+        },
+        CallToAction = new PublicLandingCallToAction
+        {
+            Title = "Ready to get started?",
+            Description = "Create an account or submit a query to begin.",
+            Actions = new List<PublicLandingAction>
+            {
+                new() { Title = "Register", Url = "/Public/Register", CssClass = "btn-primary" },
+                new() { Title = "Subscribe", Url = "/Public/Subscribe", CssClass = "btn-outline-secondary" }
+            }
+        }
+    };
+}
+
+<partial name="~/Components/_PublicLanding.cshtml" model="landing" />

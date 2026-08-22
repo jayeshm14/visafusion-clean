@@ -140,7 +140,7 @@ Legend: ✅ accessible · ❌ denied by policy · ⚠️ anonymous (no auth requ
 3. **Billing Index (`/Billing/Index`)** — placeholder, no policy; the
    `BillingOperations` policy exists and gates `/api/v1/billing` and
    `/api/v1/billing/entries` (501 placeholder) but has **no page** (GAP-004).
-4. **Notifications Index (`/Notifications/Index`)** — placeholder, no policy;
+4. **Notifications Index (`/Notifications/Index`)** — re-skinned with `_InfoPage` component (T078), no policy;
    the notifications API is gated by `EntryOperations` (emp/adm/su) but the
    page has no authorization attribute (GAP-004).
 5. **`AgentLedger`** — policy admits agt/emp/adm/su and gates the statement

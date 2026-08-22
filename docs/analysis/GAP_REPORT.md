@@ -39,11 +39,14 @@ Every item below was verified by a tool call this session.
   preserved: page models, data, and server-side pagination unchanged; 8 new
   test suites cover the re-skin (UnitTests 254/254, IntegrationTests 44/44).
 
-## GAP-003 — `README.md` is stale (MEDIUM)
+## GAP-003 — `README.md` is stale (MEDIUM) — RESOLVED 2026-08-22
 
-- `README.md` cites the constitution as **v1.2.0**; the governing document is
-  now **v1.4.1** (amended 2026-08-19). README also lacks the discovery docs
-  and the current migration state. Update required.
+- `README.md` cited the constitution as **v1.2.0**; the governing document is
+  now **v1.4.1** (amended 2026-08-19). README also lacked the UI architecture
+  section.
+- **RESOLVED 2026-08-22** — README updated: constitution version corrected to
+  v1.4.1; UI Architecture section added documenting CoreUI adoption, shell
+  model, components, design tokens, icons, and roles.
 
 ## GAP-004 — Placeholder areas ship with no page models (MEDIUM)
 

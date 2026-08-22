@@ -186,9 +186,8 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
 // coreui.Toast class is available via coreui.bundle.min.js
 // Usage: const toast = new coreui.Toast(document.getElementById('myToast')); toast.show();
 
-// Chart.js initialization moved to page-specific scripts (e.g., Dashboard, Agent Index, Agent Statement, Reporting Index, DailyVisaFee, DailyBill)
-// Per SPEC-0009 §13: charts only on pages that need them.
-// This bundle only provides coreui.ChartJS and coreui.Utils for programmatic use.
+// Chart.js initialization is handled by vf-charts.js (SPEC-0009 T087).
+// This bundle provides coreui.ChartJS and coreui.Utils for programmatic use.
 
 // ==== VENDOR: coreui.bundle.min.js ====
 /*!

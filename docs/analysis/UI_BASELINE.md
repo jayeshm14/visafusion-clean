@@ -38,13 +38,20 @@ Single layout, dual shell driven by `ViewData["UseSidebar"]`:
   design tokens).
 - **Anonymous shell**: top-nav only (public site).
 
-## 4. Static assets (`wwwroot/`)
+## 4. Static assets (`wwwroot/`) — Updated 2026-08-22
 
-- `css/`: `tokens.css`, `theme.css`, `bootstrap-icons.css` — the **entire**
-  new-platform CSS surface.
+- `css/`: `vf-coreui.css` (CoreUI design tokens `--cui-*`),
+  `vf-component-styles.css` (VisaFusion component classes `--vf-*`).
+- `js/`: `vf-coreui.js` (CoreUI JavaScript bundle).
+- `lib/coreui/vendors/`: CoreUI vendor files (coreui.min.css,
+  simplebar.min.css, coreui.bundle.min.js, simplebar.min.js).
+- `icons/cil/`, `icons/cif/`: CoreUI free icon set SVG symbol sprites.
 - `fonts/`: Source Sans 3 (`source-sans-3-*.woff2`).
 - `forms/`: embedded legacy form files (PDF/doc).
 - `images/`, `updateimg/stm31.js` (the only JS file in `wwwroot`).
+
+**Deleted**: `tokens.css`, `theme.css`, `bootstrap-icons.css`, `charts.js`,
+`widgets.js`, `style.scss`, `simplebar.scss` (replaced by CoreUI assets).
 
 ## 5. UI framework reconciliation — RESOLVED (2026-08-20)
 

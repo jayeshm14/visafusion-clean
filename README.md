@@ -4,7 +4,7 @@ Modernization of the legacy Classic ASP VisaEntry application to a
 production-grade ASP.NET Core platform (VisaFusion), governed by a
 deterministic, AI-native engineering environment.
 
-**Constitution**: `.specify/memory/constitution.md` (v1.2.0) — the governing
+**Constitution**: `.specify/memory/constitution.md` (v1.4.1) — the governing
 rules for every engineering activity.
 
 ## Repository Layout
@@ -63,6 +63,27 @@ See `specs/001-ai-environment-validation/quickstart.md` for the full guide.
 The ASP.NET Core solution lives under `src/` (six projects) with tests under
 `tests/`. See `specs/003-target-architecture/` for the full specification,
 plan, contracts, and task list.
+
+## UI Architecture (SPEC-0009 CoreUI)
+
+The UI uses **CoreUI v5.6.0** as the design reference (ADR-0006, GAP-002
+resolved). Key architecture:
+
+- **Shell**: Dual-mode layout (`_Layout.cshtml`) — sidebar for authenticated
+  users, top-nav for anonymous. Navigation centralized via `RoleAwareNavigation`
+  service (8 groups, 24 menus, 9 submenus).
+- **Components**: 14 reusable VisaFusion components (`src/VisaFusion.Web/Components/`)
+  derived from CoreUI primitives — `_AuthCard`, `_DataTable`, `_FormCard`,
+  `_InfoPage`, `_PublicLanding`, `_PublicQueryForm`, `_RoleDashboard`,
+  `_ConfirmModal`, `_ErrorPage`, `_ToastHost`, `_RoleAwareNavigation`,
+  `_DesignTokens`, `_ComponentStyles`, `_IconSet`.
+- **Design tokens**: `--cui-*` CoreUI tokens via `vf-coreui.css`; custom
+  `--vf-*` tokens for component-specific styling via `vf-component-styles.css`.
+- **Icons**: CoreUI free icon set (`cil-*`/`cif-*`) via SVG symbol sprite.
+- **Roles**: 5 roles (Guest, agt, emp, adm, su) with 11 authorization policies.
+  Each role sees a different navigation group and page set.
+
+See `docs/ui/` for the full mapping, matrices, and inventory.
 
 
 ## Documentation Index

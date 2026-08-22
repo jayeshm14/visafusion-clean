@@ -1,7 +1,30 @@
 @page
+@using Microsoft.AspNetCore.Html
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Country Information";
+
+    // CountryInfo page — SPEC-0009 T086; maps to _InfoPage component
+    // (COREUI_VISA_FUSION_MAPPING.md). Content preserved from legacy;
+    // CoreUI presentation only.
+    var info = new InfoPageModel
+    {
+        Title = "Country Information",
+        Subtitle = "Find information about countries and visa requirements.",
+        Sections = new List<InfoPageSection>
+        {
+            new()
+            {
+                Title = "Country-Specific Visa Information",
+                Content = new HtmlString("<p>This page provides country-specific visa information. Browse available countries or submit a query for detailed requirements.</p>")
+            }
+        },
+        Actions = new List<InfoPageAction>
+        {
+            new() { Title = "Submit Query", Url = "/Public/Queries", CssClass = "btn-primary" },
+            new() { Title = "Back to Home", Url = "/Public/Index", CssClass = "btn-outline-secondary" }
+        }
+    };
 }
-<h1>Country Information</h1>
-<p>Find information about countries and visa requirements.</p>
-<p>This page provides country-specific visa information.</p>
+
+<partial name="~/Components/_InfoPage.cshtml" model="info" />

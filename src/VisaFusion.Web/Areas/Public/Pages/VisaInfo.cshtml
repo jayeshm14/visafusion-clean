@@ -1,7 +1,48 @@
 @page
+@using Microsoft.AspNetCore.Html
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Visa Information";
+
+    // VisaInfo page — SPEC-0009 T086; maps to _InfoPage component
+    // (COREUI_VISA_FUSION_MAPPING.md). Content preserved from legacy;
+    // CoreUI presentation only.
+    var info = new InfoPageModel
+    {
+        Title = "Visa Information",
+        Subtitle = "Find information about visa types and application processes.",
+        Sections = new List<InfoPageSection>
+        {
+            new()
+            {
+                Title = "Visa Categories",
+                Content = new HtmlString("<p>This page provides visa category details and application guidelines. Contact our office for specific visa type requirements.</p>")
+            }
+        },
+        AccordionItems = new List<InfoPageAccordionItem>
+        {
+            new()
+            {
+                Title = "Tourist Visa",
+                Content = new HtmlString("<p>For leisure travel and tourism. Requires valid passport, proof of accommodation, and return ticket.</p>")
+            },
+            new()
+            {
+                Title = "Business Visa",
+                Content = new HtmlString("<p>For business meetings, conferences, and commercial activities. Requires invitation letter from host company.</p>")
+            },
+            new()
+            {
+                Title = "Transit Visa",
+                Content = new HtmlString("<p>For passing through the country en route to another destination. Requires proof of onward travel.</p>")
+            }
+        },
+        Actions = new List<InfoPageAction>
+        {
+            new() { Title = "Submit Query", Url = "/Public/Queries", CssClass = "btn-primary" },
+            new() { Title = "Back to Home", Url = "/Public/Index", CssClass = "btn-outline-secondary" }
+        }
+    };
 }
-<h1>Visa Information</h1>
-<p>Find information about visa types and application processes.</p>
-<p>This page provides visa category details and application guidelines.</p>
+
+<partial name="~/Components/_InfoPage.cshtml" model="info" />

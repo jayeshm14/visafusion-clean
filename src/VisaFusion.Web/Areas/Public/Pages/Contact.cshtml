@@ -1,8 +1,37 @@
 @page
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Contact";
+
+    // Contact page — SPEC-0009 T086; maps to _InfoPage component
+    // (COREUI_VISA_FUSION_MAPPING.md). Content preserved from legacy;
+    // CoreUI presentation only.
+    var info = new InfoPageModel
+    {
+        Title = "Contact Us",
+        Subtitle = "Get in touch with our visa entry services team.",
+        Cards = new List<InfoPageCard>
+        {
+            new()
+            {
+                Title = "Email",
+                Content = "<p class=\"mb-0\">info@visaentry.example.com</p>",
+                Icon = "cil-envelope-closed",
+                ColClass = "col-md-6"
+            },
+            new()
+            {
+                Title = "Phone",
+                Content = "<p class=\"mb-0\">+1 (555) 123-4567</p>",
+                Icon = "cil-phone",
+                ColClass = "col-md-6"
+            }
+        },
+        Actions = new List<InfoPageAction>
+        {
+            new() { Title = "Back to Home", Url = "/Public/Index", CssClass = "btn-outline-secondary" }
+        }
+    };
 }
-<h1>Contact Us</h1>
-<p>Get in touch with our visa entry services team.</p>
-<p>Email: info@visaentry.example.com</p>
-<p>Phone: +1 (555) 123-4567</p>
+
+<partial name="~/Components/_InfoPage.cshtml" model="info" />

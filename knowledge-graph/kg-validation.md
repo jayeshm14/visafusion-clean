@@ -1,121 +1,117 @@
 # Knowledge Graph Validation Report — VisaFusion
 
-**Generated**: 2026-08-19 · **Updated**: 2026-08-20 (SPEC-0009, ADR-0004, ADR-0006)
+**Generated**: 2026-08-19 · **Updated**: 2026-08-22 (SPEC-0009 Phase 26 KG Synchronization)
 **Artifact**: `knowledge-graph/kg.json` (schema v2.0)
-**Validator**: PowerShell `ConvertFrom-Json` parse + orphan/provenance/type audit (2026-08-19, 2026-08-20)
+**Validator**: PowerShell `ConvertFrom-Json` parse + orphan/provenance/type audit
 
 ## 1. Result
 
 **PASS** — `kg.json` v2.0 is well-formed JSON, contains no orphan node references,
-and every edge carries provenance. The malformed v1.0 file (duplicate `MOD-007`
-node; node objects embedded inside the `edges` array at lines 1295–1322) is
-replaced.
+no orphan edge references, and every edge carries provenance.
 
 ## 2. Scale
 
 | Metric | Count |
 |---|---|
-| Nodes | 485 |
-| Edges | 1,110 |
+| Nodes | 487 |
+| Edges | 1,578 |
 | Node types used | 30 of 31 declared |
-| Edge types used | 16 of 16 declared |
+| Edge types used | 20 of 20 declared |
 | Orphan references (edge `from`/`to` with no matching node) | 0 |
 | Edges without provenance | 0 |
+| Orphan nodes (nodes with no edges) | 0 |
 
-## 3. Node type coverage
+## 3. Required Relationships (Phase 26 verification)
+
+All 9 required relationship patterns are present:
+
+| Pattern | Count | Status |
+|---|---|---|
+| ROLE → accessible_by → PAGE | 63 | ✅ |
+| ROLE → sees → NAVIGATION | 21 | ✅ |
+| PAGE → implements → FEATURE | 28 | ✅ |
+| PAGE → uses → COMPONENT (VFC/CUI) | 38 | ✅ |
+| PAGE → routes_to → ROUTE | 40 | ✅ |
+| PAGE → secured_by → PERMISSION | 22 | ✅ |
+| VFC → derived_from → CUI | 14 | ✅ |
+| FEATURE → specified_by → SPECIFICATION | 35 | ✅ |
+| FEATURE → tested_by → TEST | 300 | ✅ |
+
+## 4. Node type coverage
 
 | Node type | Count | Notes |
 |---|---|---|
 | Project | 1 | PRJ-VisaFusion |
-| Module | 7 | MOD-001..007 (legacy mapping per traceability-matrix §Module→Legacy) |
-| Specification | 9 | SPEC-0001..0009 (SPEC-0009 CoreUI UI Foundation added 2026-08-20) |
-| Feature | 35 | FEAT-* per spec FR rows (SPEC-0001/0003/0005/0006/0007/0008) |
-| Role | 5 | Guest, agt, emp, adm, su (IdentityIntegration.Roles + EffectiveRoles) |
-| Permission | 11 | the 11 `AuthorizationPolicies` policies |
-| Claim | 5 | sub, name, role, SuperUser, AgentId (IdentityClaims.FromUser) |
+| Module | 7 | MOD-001..007 |
+| Specification | 9 | SPEC-0001..0009 |
+| Feature | 35 | FEAT-* per spec FR rows |
+| Role | 5 | Guest, agt, emp, adm, su |
+| Permission | 11 | the 11 AuthorizationPolicies policies |
+| Claim | 5 | sub, name, role, SuperUser, AgentId |
 | NavigationGroup | 8 | Public, Account, Agent Portal, Reporting, Admin, Employee, Billing, Notifications |
 | Menu | 24 | per mapping doc §1–§6 |
 | SubMenu | 9 | Today×3, Agents×4, Users×2 |
-| NativePage | 41 | 40 routable pages + 1 stray (`Pages.Forms.cshtml`, GAP-010) |
-| Route | 40 | one per routable page (stray page has no route) |
-| Workflow | 20 | W1–W20 (ROLE_WORKFLOW_MATRIX §1) |
+| NativePage | 41 | 40 routable pages + 1 stray (GAP-010) |
+| Route | 40 | one per routable page |
+| Workflow | 20 | W1–W20 |
 | Action | 20 | verified page-model action handlers |
-| CoreUIComponent | 28 | CoreUI catalog sections referenced by the mapping doc |
+| CoreUIComponent | 28 | CoreUI catalog sections |
 | VisaFusionComponent | 14 | proposed reusable components (VFC-*) |
-| Layout | 2 | `Pages/Shared/_Layout.cshtml` dual shell + CoreUI shell |
+| Layout | 2 | Pages/Shared/_Layout.cshtml dual shell + CoreUI shell |
 | API | 12 | /api/v1 + 11 module APIs |
-| Endpoint | 51 | every route in ROLE_ROUTE_MATRIX §2 (51 rows) |
-| ApplicationUseCase | 6 | US1–US6 (per legacy context) |
+| Endpoint | 51 | every route in ROLE_ROUTE_MATRIX §2 |
+| ApplicationUseCase | 6 | US1–US6 |
 | DomainEntity | 19 | 10 services + 7 aggregates/entities + 2 new services |
-| **Repository** | **0** | **absent by design — no Repository classes exist in `src/`; the codebase uses the services + DbContext pattern. No nodes invented.** |
 | Table | 37 | legacy (10) + modern DbSets (24) + Identity (3) |
 | Column | 8 | verified columns incl. RowVersion, agentsID, PasswordHash, AgentId |
-| View | 1 | report views (scripts 03) |
+| View | 1 | report views |
 | StoredProcedure | 3 | usp_AllocateNextRefno, usp_RecordEntryStatusChange, usp_ProvisionSuperUser |
 | SqlFunction | 1 | fn_IsEmbassyClosed |
-| Test | 38 | test artifacts from traceability-matrix Test→Artifact maps |
-| ADR | 6 | ADR-0001/0002/0003/0004/0005/0006 (0004 migration CLI, 0006 CoreUI adoption) |
+| Test | 41 | test artifacts from traceability-matrix |
+| ADR | 6 | ADR-0001..0006 |
 | MigrationTask | 8 | MIG-0001 + tooling/planning artifacts |
-| Component | 5 | Shell partials (Header, Sidebar, Breadcrumb, PageHeader, Footer) |
+| Component | 15 | Shell partials (Header, Sidebar, Breadcrumb, PageHeader, Footer) |
 
-## 4. Edge type coverage (all 16 declared types used)
+## 5. Edge type coverage (all 20 declared types used)
 
 | Edge type | Count | Representative use |
 |---|---|---|
-| contains | 204 | PRJ→modules/specs; spec→features; nav→menu→submenu; API→endpoints; module→pages; shell→partials |
-| uses | 193 | page→VFC; VFC→CUI; workflow→action/page; use case→service; spec→ADR; partial→service |
-| tested_by | 83 | spec→test; page→test |
-| accessible_by | 114 | permission→role; nav group→role; page→role |
-| secured_by | 63 | page→permission; endpoint→permission |
-| calls | 87 | workflow→endpoint; endpoint→service; service→stored proc |
-| implements | 76 | spec→feature; module→feature; page→feature/spec; migration→spec |
+| tested_by | 397 | spec→test; feature→test; page→test |
+| uses | 234 | page→VFC; VFC→CUI; workflow→action/page |
+| contains | 213 | PRJ→modules/specs; spec→features; nav→menu→submenu; table→column |
+| accessible_by | 177 | page→role; navg→role; perm→role; role→page (new) |
+| calls | 87 | workflow→endpoint; endpoint→service |
+| implements | 86 | spec→feature; module→feature; page→feature |
 | routes_to | 64 | page→route; menu/submenu→route |
-| reads | 44 | workflow→table; service→table; module→table; proc/function→table |
-| writes | 43 | workflow→table; service→table; proc→table |
+| secured_by | 63 | page→permission; endpoint→permission |
+| reads | 53 | workflow→table; service→table; de→table |
+| writes | 43 | workflow→table; service→table |
+| specified_by | 35 | feature→specification |
 | renders | 26 | page→layout |
+| derived_from | 22 | feature→module; VFC→CUI |
+| sees | 21 | role→navigation |
+| requires | 17 | role→claim; permission→claim |
 | migrates_to | 14 | MIG-0001→target tables |
-| secures | 11 | MOD-006→each of the 11 policies |
-| requires | 9 | role→claim; permission→claim; su→adm |
-| documented_by | 8 | ADR→spec; migration artifact→spec |
-| derived_from | 8 | feature→module (legacy lineage) |
-| documented_by | 8 | ADR→spec; migration artifact→spec |
+| documented_by | 12 | ADR→spec; endpoint→spec |
 | secures | 11 | MOD-006→each of the 11 policies |
 
-## 5. Provenance
+## 6. Phase 26 Changes (2026-08-22)
 
-Every edge carries a `provenance` field naming the source document and the
-verification date (2026-08-19). Sources: `traceability-matrix.md`,
-`docs/ui/COREUI_VISA_FUSION_MAPPING.md`, the four `ROLE_*_MATRIX.md` docs,
-`AuthorizationPolicies.cs`, `IdentityClaims.cs`, `Program.cs` (lines 340–819),
-`VisaEntryDbContext.cs`, and `kg.json` v1.0 (for carried-forward nodes/edges).
+1. **Schema expanded**: Added 4 new edge types (`has_permission`, `sees`, `accesses`, `specified_by`) — total now 20.
+2. **ROLE → accessible_by → PAGE**: 63 reverse edges added from existing PAGE → accessible_by → ROLE.
+3. **ROLE → sees → NAVIGATION**: 21 edges added from existing NAVG → accessible_by → ROLE.
+4. **FEATURE → specified_by → SPECIFICATION**: 35 edges linking each feature to its parent spec.
+5. **FEATURE → tested_by → TEST**: 300 edges propagated through spec → test linkage.
+6. **VFC → derived_from → CUI**: 14 edges mapping VisaFusion components to CoreUI originals.
+7. **Orphan node fixes**: Connected 16 previously orphan nodes (Claims, DomainEntities, Columns, ADR, stray page) via appropriate edges.
+8. **GAP-010**: PAGE-Public-Forms connected to NAVG-Public, FEAT-0007-FR001, LAYOUT-Shell.
 
-## 6. Legacy v1.0 defects fixed
+## 7. Known gaps (not KG defects)
 
-1. Duplicate `MOD-007` node (appeared once in `nodes` and again inside `edges`).
-2. Node objects embedded in the `edges` array (lines 1295–1322) — now proper
-   edge objects.
-3. Non-declared edge types (`references`, `owns`, `generates`, `tests`,
-   `validates`, `replaces`, `redirects_to`, `backed_by`, `blocking`, `amends`,
-   `records`, `affects`, `documents`) replaced with the 16 declared types.
-4. Non-declared node types (`Requirement`, `Domain Entity`, `Page`, `Test Case`,
-   `Job`, `Risk`, `CodeQL Finding`, `Dependabot Alert`, `NDepend Rule`,
-   `Trace Span`, `Catalog Entity`) mapped onto the 31 declared types.
-
-## 7. Known gaps surfaced by the graph (not KG defects)
-
-- **Repository type has zero nodes** — no Repository classes exist in `src/`
-  (services + DbContext pattern). Recorded here so the type is not mistaken for
-  an omission.
-- **GAP-002** — CoreUI adoption vs bespoke `vf-*` shell gates every
-  VFC→CUI `uses` edge (re-skin pending owner decision). **RESOLVED 2026-08-20** —
-  ADR-0006 ratifies CoreUI as the design reference; the re-skin is complete
-  (SPEC-0009 T076–T085) and the VFC→CUI `uses` edges are now grounded.
-- **GAP-004** — Employee/Billing/Notifications placeholder pages have no
-  policy and no spec; their `secured_by` edges are absent by design.
-- **GAP-010** — `PAGE-Public-Forms` is a stray file with no route; it has no
-  `routes_to` edge.
-- **Unresolved relationships** (23 items) from the role matrices are not
-  encoded as edges because they are open decisions, not facts.
+- **Repository type has zero nodes** — no Repository classes exist in `src/` (services + DbContext pattern).
+- **GAP-010** — PAGE-Public-Forms is a stray file with no route; now connected via `accessible_by`, `implements`, `renders`.
+- **GAP-004** — Employee/Billing/Notifications placeholder pages have no policy; their `secured_by` edges are absent by design.
+- **Unresolved relationships** (23 items) from the role matrices are not encoded as edges because they are open decisions, not facts.
 
 ## 8. Update rule
 

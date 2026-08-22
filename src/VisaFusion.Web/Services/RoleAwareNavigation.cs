@@ -10,7 +10,10 @@ public sealed record NavigationGroup
     public string Id { get; init; } = string.Empty;
     public string Title { get; init; } = string.Empty;
     public string Route { get; init; } = string.Empty;
-    public string Icon { get; init; } = "M3 4.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1 0-1zm0 3h10a.5.5 0 0 1 0-1zm0 3h10a.5.5 0 0 1 0-1z"; // default menu icon
+    /// <summary>
+    /// CoreUI icon name (e.g., "cui-home", "cui-user"). Rendered via SVG use[href] referencing free-symbol-defs.svg.
+    /// </summary>
+    public string Icon { get; init; } = "cui-list"; // default menu icon
     public List<NavigationItem> Children { get; init; } = new();
     public bool IsDivider { get; init; } = false;
     public bool IsTitle { get; init; } = false;
@@ -42,6 +45,9 @@ public sealed record NavigationItem
     public string Id { get; init; } = string.Empty;
     public string Title { get; init; } = string.Empty;
     public string Route { get; init; } = string.Empty;
+    /// <summary>
+    /// CoreUI icon name (e.g., "cui-home", "cui-user"). Empty string means no icon.
+    /// </summary>
     public string Icon { get; init; } = string.Empty;
     public List<NavigationItem> Children { get; init; } = new();
     public string[] AllowedRoles { get; init; } = Array.Empty<string>();
@@ -114,7 +120,7 @@ public sealed class RoleAwareNavigation : IRoleAwareNavigation
                 Id = "public",
                 Title = "Public",
                 Route = "/Public/Index",
-                Icon = "M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 1a5 5 0 1 0 0-10 5 5 0 0 0 0 10z", // globe
+                Icon = "cui-globe-alt",
                 AllowedRoles = new[] { "guest" },
                 Children = new List<NavigationItem>
                 {
@@ -136,7 +142,7 @@ public sealed class RoleAwareNavigation : IRoleAwareNavigation
                 Id = "account",
                 Title = "Account",
                 Route = "/Auth/Login",
-                Icon = "M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 1a5 5 0 1 0 0-10 5 5 0 0 0 0 10z", // person
+                Icon = "cui-user",
                 AllowedRoles = new[] { "agt", "emp", "adm", "su" },
                 Children = new List<NavigationItem>
                 {
@@ -152,7 +158,7 @@ public sealed class RoleAwareNavigation : IRoleAwareNavigation
                 Id = "agent-portal",
                 Title = "Agent Portal",
                 Route = "/Agent/Index",
-                Icon = "M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 1a5 5 0 1 0 0-10 5 5 0 0 0 0 10z", // briefcase
+                Icon = "cui-briefcase",
                 AllowedRoles = new[] { "agt", "emp", "adm", "su" },
                 Children = new List<NavigationItem>
                 {
@@ -170,7 +176,7 @@ public sealed class RoleAwareNavigation : IRoleAwareNavigation
                 Id = "reporting",
                 Title = "Reporting",
                 Route = "/Reporting/Index",
-                Icon = "M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 1a5 5 0 1 0 0-10 5 5 0 0 0 0 10z", // bar-chart
+                Icon = "cui-chart",
                 AllowedRoles = new[] { "emp", "adm", "su" },
                 Children = new List<NavigationItem>
                 {
@@ -210,7 +216,7 @@ public sealed class RoleAwareNavigation : IRoleAwareNavigation
                 Id = "admin",
                 Title = "Admin",
                 Route = "/Admin/Index",
-                Icon = "M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 1a5 5 0 1 0 0-10 5 5 0 0 0 0 10z", // shield
+                Icon = "cui-shield-alt",
                 AllowedRoles = new[] { "adm", "su" },
                 Children = new List<NavigationItem>
                 {
@@ -253,7 +259,7 @@ public sealed class RoleAwareNavigation : IRoleAwareNavigation
                 Id = "employee",
                 Title = "Employee",
                 Route = "/Employee/Index",
-                Icon = "M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 1a5 5 0 1 0 0-10 5 5 0 0 0 0 10z", // person-badge
+                Icon = "cui-user-female",
                 AllowedRoles = new[] { "emp" },
                 Children = new List<NavigationItem>
                 {
@@ -267,7 +273,7 @@ public sealed class RoleAwareNavigation : IRoleAwareNavigation
                 Id = "billing",
                 Title = "Billing",
                 Route = "/Billing/Index",
-                Icon = "M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 1a5 5 0 1 0 0-10 5 5 0 0 0 0 10z", // credit-card
+                Icon = "cui-credit-card",
                 AllowedRoles = new[] { "emp", "adm", "su" },
                 Children = new List<NavigationItem>
                 {
@@ -281,7 +287,7 @@ public sealed class RoleAwareNavigation : IRoleAwareNavigation
                 Id = "notifications",
                 Title = "Notifications",
                 Route = "/Notifications/Index",
-                Icon = "M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 1a5 5 0 1 0 0-10 5 5 0 0 0 0 10z", // bell
+                Icon = "cui-bell",
                 AllowedRoles = new[] { "adm", "su" },
                 Children = new List<NavigationItem>
                 {

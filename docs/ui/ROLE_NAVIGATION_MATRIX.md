@@ -23,12 +23,18 @@ The shell is dual-mode: `useSidebar = ViewData["UseSidebar"] ?? isAuthenticated`
 | Sidebar (`vf-sidebar`) | authenticated | Home (`/`), Change password (`/Auth/ChangePassword`, auth only) + per-page `@section SidebarNav` | topbar shows `name` + first `role` claim |
 | Top-nav (`vf-topnav`) | anonymous | Log in (`/Auth/Login`), Register (`/Auth/Register`) | none |
 
-**Current state**: navigation is **not centralized** — each of the 21 sidebar
-pages renders its own `@section SidebarNav` (verified: Agent ×5, Reporting ×7,
-Admin ×9). The addendum requires a centralized `RoleAwareNavigation` service
-(see §4).
+**Current state**: navigation **is centralized** — the `RoleAwareNavigation`
+service (`src/VisaFusion.Web/Services/RoleAwareNavigation.cs`) defines all 8
+navigation groups, menus, and submenus. The `_Sidebar.cshtml` partial renders
+nav from this service. Per-page `@section SidebarNav` blocks have been removed
+(T079). The shell renders the full menu for each role's visible groups.
 
-## 2. Actual per-page navigation (verified `SidebarNav` blocks)
+## 2. Historical per-page navigation (superseded by §4)
+
+> **Note**: This section documents the pre-centralization state (before T079).
+> Per-page `@section SidebarNav` blocks have been removed. Navigation is now
+> centralized via `RoleAwareNavigation` service (see §4). Retained for
+> historical reference only.
 
 | Navigation Group | Menu (link label) | Submenu | Native page | Route | Rendered by |
 |---|---|---|---|---|---|

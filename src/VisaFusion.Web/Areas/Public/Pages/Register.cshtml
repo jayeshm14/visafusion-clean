@@ -1,23 +1,42 @@
 @page
+@using Microsoft.AspNetCore.Html
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Register";
+
+    // Register page — SPEC-0009 T086; maps to _FormCard component
+    // (COREUI_VISA_FUSION_MAPPING.md). Content preserved from legacy;
+    // CoreUI presentation only.
+    var formCard = new FormCardModel
+    {
+        Id = "register-form",
+        Title = "Register an Account",
+        Subtitle = "Create a new account to access visa services. Registration creates a guest-role account with limited privileges.",
+        Form = new FormCardForm
+        {
+            Id = "register-form",
+            Action = "/Auth/Register",
+            Method = "post",
+            AntiForgeryToken = Html.AntiForgeryToken(),
+        },
+        Sections = new List<FormCardSection>
+        {
+            new()
+            {
+                Fields = new List<FormField>
+                {
+                    new() { Name = "username", Label = "Username", Type = FormFieldType.Text, Required = true },
+                    new() { Name = "email", Label = "Email Address", Type = FormFieldType.Email, Required = true },
+                    new() { Name = "password", Label = "Password", Type = FormFieldType.Password, Required = true, Placeholder = "Minimum 8 characters" }
+                }
+            }
+        },
+        FooterActions = new List<FormCardAction>
+        {
+            new() { Title = "Register", Type = FormCardActionType.Submit, CssClass = "btn-primary" }
+        },
+        BodyContent = new HtmlString("<p class=\"text-body-secondary small mb-0\">By registering, you agree to the terms and conditions. Your account will have the <strong>guest</strong> role, providing access to public services only.</p>")
+    };
 }
-<h1>Register an Account</h1>
-<p>Create a new account to access visa services.</p>
-<p>Registration creates a guest-role account with limited privileges.</p>
-<form method="post" action="/Auth/Register" novalidate>
-    <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username" required class="form-control" />
-    </div>
-    <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" required class="form-control" />
-    </div>
-    <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required class="form-control" minlength="8" />
-    </div>
-    <button type="submit" class="btn btn-primary">Register</button>
-</form>
-<p>By registering, you agree to the terms and conditions. Your account will have the <strong>guest</strong> role, providing access to public services only.</p>
+
+<partial name="~/Components/_FormCard.cshtml" model="formCard" />

@@ -1,13 +1,47 @@
 @page
+@using Microsoft.AspNetCore.Html
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Embassy Information";
+
+    // Embassy page — SPEC-0009 T086; maps to _InfoPage component
+    // (COREUI_VISA_FUSION_MAPPING.md). Content preserved from legacy;
+    // CoreUI presentation only.
+    var info = new InfoPageModel
+    {
+        Title = "Embassy Information",
+        Subtitle = "Find information about embassy services and contact details.",
+        Sections = new List<InfoPageSection>
+        {
+            new()
+            {
+                Title = "Available Services",
+                Content = new HtmlString("<ul><li>Embassy hours of operation</li><li>Contact information</li><li>Appointment scheduling</li><li>Document requirements</li></ul>")
+            }
+        },
+        AccordionItems = new List<InfoPageAccordionItem>
+        {
+            new()
+            {
+                Title = "Embassy Hours of Operation",
+                Content = new HtmlString("<p>Embassies typically operate Monday through Friday, 9:00 AM to 5:00 PM. Hours may vary by location and holiday schedule.</p>")
+            },
+            new()
+            {
+                Title = "Appointment Scheduling",
+                Content = new HtmlString("<p>Contact the embassy directly to schedule an appointment. Walk-in services may be available for urgent matters.</p>")
+            },
+            new()
+            {
+                Title = "Document Requirements",
+                Content = new HtmlString("<p>Required documents vary by visa type. Generally, you will need a valid passport, application form, photographs, and supporting documents.</p>")
+            }
+        },
+        Actions = new List<InfoPageAction>
+        {
+            new() { Title = "Back to Home", Url = "/Public/Index", CssClass = "btn-outline-secondary" }
+        }
+    };
 }
-<h1>Embassy Information</h1>
-<p>Find information about embassy services and contact details.</p>
-<p>This page provides embassy-related information for visa applicants.</p>
-<ul>
-    <li>Embassy hours of operation</li>
-    <li>Contact information</li>
-    <li>Appointment scheduling</li>
-    <li>Document requirements</li>
-</ul>
+
+<partial name="~/Components/_InfoPage.cshtml" model="info" />

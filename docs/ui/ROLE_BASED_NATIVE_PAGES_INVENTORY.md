@@ -147,7 +147,7 @@ functionally complete in the modern app with its CoreUI target applied.
 | `Pages/Shared/_Layout.cshtml` | all pages | — | role-aware shell | Dual shell: sidebar mode for authenticated, top-nav for anonymous (verified lines 16/20/38) | CoreUI Sidebar §1.1, Header §1.2, Footer §1.3, Breadcrumb §1.4 | IMPLEMENTED — CoreUI shell (re-skin complete 2026-08-20, ADR-0006) |
 | `wwwroot/css/tokens.css` | static | — | — | design tokens | Replace with CoreUI `--cui-*` CSS custom properties (DESIGN_SYSTEM §3) | RESOLVED — deleted (T077); `--cui-*` tokens in `wwwroot/css/vf-component-styles.css` |
 | `wwwroot/css/theme.css` (49 verified `vf-*` classes: shell/sidebar/topnav/btn/form/alert/card/table/badge/list/numeric) | static | — | — | bespoke component styles | Map per component to CoreUI equivalents (Buttons §5.1, Forms §6.x, Tables §3.2, Badges §3.6, Alerts §3.5, Cards §3.1) | RESOLVED — deleted (T077); classes mapped to CoreUI equivalents (re-skin T078) |
-| `wwwroot/css/bootstrap-icons.css` | static | — | — | icon source | Replace with CoreUI Icons §8 (`cil-*`/`cif-*` SVGs into `wwwroot/icons`) | RETAINED (icons in use; no CoreUI vendored asset required) |
+| `wwwroot/icons/cil/free-symbol-defs.svg` | static | — | — | icon source | CoreUI `cui-*`/`cif-*` SVGs via `<use href>` pattern | IMPLEMENTED (T053: bootstrap-icons.css removed; icons rendered via `free-symbol-defs.svg`) |
 | `wwwroot/updateimg/**` (legacy) | static | — | — | legacy images served for parity (Phase0E2ETests 200) | No CoreUI equivalent — legacy asset | NOT_REQUIRED |
 
 ## 5. ROLE-BASED NAVIGATION MODEL (addendum §5)

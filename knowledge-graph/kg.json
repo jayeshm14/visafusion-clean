@@ -1,6 +1,6 @@
 ﻿{
     "schema_version":  "2.0",
-    "generated":  "2026-08-19",
+    "generated":  "2026-08-22T16:42:21",
     "source":  [
                    "library/04_AI_Native_Knowledge_Graph.md",
                    "knowledge-graph/traceability-matrix.md",
@@ -64,7 +64,11 @@
                        "migrates_to",
                        "tested_by",
                        "documented_by",
-                       "derived_from"
+                       "derived_from",
+                       "has_permission",
+                       "sees",
+                       "accesses",
+                       "specified_by"
                    ],
     "nodes":  [
                   {
@@ -2469,7 +2473,7 @@
                   {
                       "id":  "VFC-IconSet",
                       "type":  "VisaFusionComponent",
-                      "label":  "IconSet (Bootstrap Icons source)"
+                      "label":  "IconSet (CoreUI cui-*/cif-* SVGs via free-symbol-defs.svg)"
                   },
                   {
                       "id":  "CUI-Sidebar",
@@ -2738,26 +2742,36 @@
                       "status":  "Accepted",
                       "provenance":  "adr/ADR-0004.md (2026-08-20)"
                   },
-{
-                        "id":  "ADR-0006",
-                        "type":  "ADR",
-                        "label":  "Adopt CoreUI as the Design Reference and Re-Skin the Bespoke vf-* UI",
-                        "status":  "Accepted",
-                        "provenance":  "adr/ADR-0006.md (2026-08-20)"
-                    },
-                    {
-                        "id":  "TEST-FormValidation",
-                        "type":  "Test",
-                        "label":  "FormCard validation tests (server-side .is-invalid + .invalid-feedback)",
-                        "provenance":  "SPEC-0009 Phase 17"
-                    },
-                    {
-                        "id":  "TEST-PublicQueryFormValidation",
-                        "type":  "Test",
-                        "label":  "PublicQueryForm validation tests (server-side .is-invalid + .invalid-feedback)",
-                        "provenance":  "SPEC-0009 Phase 17"
-                    }
-                ],
+                  {
+                      "id":  "ADR-0006",
+                      "type":  "ADR",
+                      "label":  "Adopt CoreUI as the Design Reference and Re-Skin the Bespoke vf-* UI",
+                      "status":  "Accepted",
+                      "provenance":  "adr/ADR-0006.md (2026-08-20)"
+                  },
+                  {
+                      "id":  "TEST-FormValidation",
+                      "type":  "Test",
+                      "label":  "FormCard validation tests (server-side .is-invalid + .invalid-feedback)",
+                      "provenance":  "SPEC-0009 Phase 17"
+                  },
+                  {
+                      "id":  "TEST-PublicQueryFormValidation",
+                      "type":  "Test",
+                      "label":  "PublicQueryForm validation tests (server-side .is-invalid + .invalid-feedback)",
+                      "provenance":  "SPEC-0009 Phase 17"
+                  },
+                  {
+                      "id":  "vf-charts.js",
+                      "name":  "vf-charts.js",
+                      "provenance":  [
+                                         "SPEC-0009 T087"
+                                     ],
+                      "description":  "Chart.js initialization script for dashboard canvas elements (SPEC-0009 T087)",
+                      "type":  "File",
+                      "layer":  "ui"
+                  }
+              ],
     "edges":  [
                   {
                       "from":  "PRJ-VisaFusion",
@@ -9413,41 +9427,2843 @@
                       "type":  "uses",
                       "provenance":  "adr/ADR-0006.md (2026-08-20)"
                   },
-{
-                        "from":  "ADR-0006",
-                        "to":  "SPEC-0009",
-                        "type":  "documented_by",
-                        "provenance":  "adr/ADR-0006.md (2026-08-20)"
-                    },
-                    {
-                        "from":  "PARTIAL-FormCard",
-                        "to":  "TEST-FormValidation",
-                        "type":  "tested_by",
-                        "provenance":  "SPEC-0009 Phase 17"
-                    },
-                    {
-                        "from":  "PARTIAL-PublicQueryForm",
-                        "to":  "TEST-PublicQueryFormValidation",
-                        "type":  "tested_by",
-                        "provenance":  "SPEC-0009 Phase 17"
-                    },
-                    {
-                        "from":  "VFC-FormCard",
-                        "to":  "TEST-FormValidation",
-                        "type":  "tested_by",
-                        "provenance":  "SPEC-0009 Phase 17"
-                    },
-                    {
-                        "from":  "VFC-PublicQueryForm",
-                        "to":  "TEST-PublicQueryFormValidation",
-                        "type":  "tested_by",
-                        "provenance":  "SPEC-0009 Phase 17"
-                    },
-                    {
-                        "from":  "LAYOUT-Shell",
-                        "to":  "VFC-ToastHost",
-                        "type":  "uses",
-                        "provenance":  "SPEC-0009 Phase 19/20"
-                    }
-                ]
+                  {
+                      "from":  "ADR-0006",
+                      "to":  "SPEC-0009",
+                      "type":  "documented_by",
+                      "provenance":  "adr/ADR-0006.md (2026-08-20)"
+                  },
+                  {
+                      "from":  "PARTIAL-FormCard",
+                      "to":  "TEST-FormValidation",
+                      "type":  "tested_by",
+                      "provenance":  "SPEC-0009 Phase 17"
+                  },
+                  {
+                      "from":  "PARTIAL-PublicQueryForm",
+                      "to":  "TEST-PublicQueryFormValidation",
+                      "type":  "tested_by",
+                      "provenance":  "SPEC-0009 Phase 17"
+                  },
+                  {
+                      "from":  "VFC-FormCard",
+                      "to":  "TEST-FormValidation",
+                      "type":  "tested_by",
+                      "provenance":  "SPEC-0009 Phase 17"
+                  },
+                  {
+                      "from":  "VFC-PublicQueryForm",
+                      "to":  "TEST-PublicQueryFormValidation",
+                      "type":  "tested_by",
+                      "provenance":  "SPEC-0009 Phase 17"
+                  },
+                  {
+                      "from":  "LAYOUT-Shell",
+                      "to":  "VFC-ToastHost",
+                      "type":  "uses",
+                      "provenance":  "SPEC-0009 Phase 19/20"
+                  },
+                  {
+                      "from":  "ROLE-agt",
+                      "to":  "PAGE-Auth-ChangePassword",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "PAGE-Auth-ChangePassword",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Auth-ChangePassword",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "PAGE-Auth-ChangePassword",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-agt",
+                      "to":  "PAGE-Agent-Index",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "PAGE-Agent-Index",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Agent-Index",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "PAGE-Agent-Index",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-agt",
+                      "to":  "PAGE-Agent-Entries",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "PAGE-Agent-Entries",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Agent-Entries",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "PAGE-Agent-Entries",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-agt",
+                      "to":  "PAGE-Agent-Statuses",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "PAGE-Agent-Statuses",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Agent-Statuses",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "PAGE-Agent-Statuses",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-agt",
+                      "to":  "PAGE-Agent-Statement",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "PAGE-Agent-Statement",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Agent-Statement",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "PAGE-Agent-Statement",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-agt",
+                      "to":  "PAGE-Agent-Account",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "PAGE-Agent-Account",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Agent-Account",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "PAGE-Agent-Account",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "PAGE-Reporting-Index",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Reporting-Index",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "PAGE-Reporting-Index",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "PAGE-Reporting-Pending",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Reporting-Pending",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "PAGE-Reporting-Pending",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "PAGE-Reporting-TodaySubmission",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Reporting-TodaySubmission",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "PAGE-Reporting-TodaySubmission",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "PAGE-Reporting-TodayCollection",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Reporting-TodayCollection",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "PAGE-Reporting-TodayCollection",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "PAGE-Reporting-TodayTransaction",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Reporting-TodayTransaction",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "PAGE-Reporting-TodayTransaction",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "PAGE-Reporting-DailyVisaFee",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Reporting-DailyVisaFee",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "PAGE-Reporting-DailyVisaFee",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "PAGE-Reporting-DailyBill",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Reporting-DailyBill",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "PAGE-Reporting-DailyBill",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Admin-AgentsList",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "PAGE-Admin-AgentsList",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Admin-AgentsCreate",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "PAGE-Admin-AgentsCreate",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Admin-AgentsDetail",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "PAGE-Admin-AgentsDetail",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Admin-AgentsEdit",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "PAGE-Admin-AgentsEdit",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Admin-UsersList",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "PAGE-Admin-UsersList",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Admin-UsersCreate",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "PAGE-Admin-UsersCreate",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Admin-Holidays",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "PAGE-Admin-Holidays",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Admin-ContentUpdate",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "PAGE-Admin-ContentUpdate",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "PAGE-Admin-SecurityDay",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "PAGE-Admin-SecurityDay",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-Guest",
+                      "to":  "NAVG-Public",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-Guest",
+                      "to":  "NAVG-Account",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-agt",
+                      "to":  "NAVG-Account",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "NAVG-Account",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "NAVG-Account",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "NAVG-Account",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-agt",
+                      "to":  "NAVG-AgentPortal",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "NAVG-AgentPortal",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "NAVG-AgentPortal",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "NAVG-AgentPortal",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "NAVG-Reporting",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "NAVG-Reporting",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "NAVG-Reporting",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "NAVG-Admin",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "NAVG-Admin",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "NAVG-Employee",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "NAVG-Billing",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "NAVG-Billing",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "NAVG-Billing",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "NAVG-Notifications",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "NAVG-Notifications",
+                      "type":  "sees",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR001",
+                      "to":  "SPEC-0001",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR002",
+                      "to":  "SPEC-0001",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR003",
+                      "to":  "SPEC-0001",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR004",
+                      "to":  "SPEC-0001",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR005",
+                      "to":  "SPEC-0001",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR006",
+                      "to":  "SPEC-0001",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR007",
+                      "to":  "SPEC-0001",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR008",
+                      "to":  "SPEC-0001",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0003-FR002",
+                      "to":  "SPEC-0003",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0003-FR005",
+                      "to":  "SPEC-0003",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR003",
+                      "to":  "SPEC-0005",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR004",
+                      "to":  "SPEC-0005",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR007",
+                      "to":  "SPEC-0005",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR008",
+                      "to":  "SPEC-0005",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR010",
+                      "to":  "SPEC-0005",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR011",
+                      "to":  "SPEC-0005",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR012",
+                      "to":  "SPEC-0005",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR016",
+                      "to":  "SPEC-0005",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR017",
+                      "to":  "SPEC-0005",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR018",
+                      "to":  "SPEC-0005",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR019",
+                      "to":  "SPEC-0005",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR001",
+                      "to":  "SPEC-0006",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR002",
+                      "to":  "SPEC-0006",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR004",
+                      "to":  "SPEC-0006",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR005",
+                      "to":  "SPEC-0006",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR006",
+                      "to":  "SPEC-0006",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR007",
+                      "to":  "SPEC-0006",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR008",
+                      "to":  "SPEC-0006",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR009",
+                      "to":  "SPEC-0006",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0007-FR001",
+                      "to":  "SPEC-0007",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR001",
+                      "to":  "SPEC-0008",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR002",
+                      "to":  "SPEC-0008",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR003",
+                      "to":  "SPEC-0008",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR004",
+                      "to":  "SPEC-0008",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR005",
+                      "to":  "SPEC-0008",
+                      "type":  "specified_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR001",
+                      "to":  "TEST-AuthLogin",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR002",
+                      "to":  "TEST-AuthLogin",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR003",
+                      "to":  "TEST-AuthLogin",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR004",
+                      "to":  "TEST-AuthLogin",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR005",
+                      "to":  "TEST-AuthLogin",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR006",
+                      "to":  "TEST-AuthLogin",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR007",
+                      "to":  "TEST-AuthLogin",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR008",
+                      "to":  "TEST-AuthLogin",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR001",
+                      "to":  "TEST-Phase0E2E",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR002",
+                      "to":  "TEST-Phase0E2E",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR003",
+                      "to":  "TEST-Phase0E2E",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR004",
+                      "to":  "TEST-Phase0E2E",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR005",
+                      "to":  "TEST-Phase0E2E",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR006",
+                      "to":  "TEST-Phase0E2E",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR007",
+                      "to":  "TEST-Phase0E2E",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0001-FR008",
+                      "to":  "TEST-Phase0E2E",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR003",
+                      "to":  "TEST-AuthLogin",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR004",
+                      "to":  "TEST-AuthLogin",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR007",
+                      "to":  "TEST-AuthLogin",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR008",
+                      "to":  "TEST-AuthLogin",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR010",
+                      "to":  "TEST-AuthLogin",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR011",
+                      "to":  "TEST-AuthLogin",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR012",
+                      "to":  "TEST-AuthLogin",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR016",
+                      "to":  "TEST-AuthLogin",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR017",
+                      "to":  "TEST-AuthLogin",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR018",
+                      "to":  "TEST-AuthLogin",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR019",
+                      "to":  "TEST-AuthLogin",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR003",
+                      "to":  "TEST-WebLoginPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR004",
+                      "to":  "TEST-WebLoginPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR007",
+                      "to":  "TEST-WebLoginPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR008",
+                      "to":  "TEST-WebLoginPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR010",
+                      "to":  "TEST-WebLoginPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR011",
+                      "to":  "TEST-WebLoginPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR012",
+                      "to":  "TEST-WebLoginPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR016",
+                      "to":  "TEST-WebLoginPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR017",
+                      "to":  "TEST-WebLoginPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR018",
+                      "to":  "TEST-WebLoginPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR019",
+                      "to":  "TEST-WebLoginPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR003",
+                      "to":  "TEST-RegisterPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR004",
+                      "to":  "TEST-RegisterPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR007",
+                      "to":  "TEST-RegisterPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR008",
+                      "to":  "TEST-RegisterPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR010",
+                      "to":  "TEST-RegisterPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR011",
+                      "to":  "TEST-RegisterPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR012",
+                      "to":  "TEST-RegisterPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR016",
+                      "to":  "TEST-RegisterPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR017",
+                      "to":  "TEST-RegisterPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR018",
+                      "to":  "TEST-RegisterPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR019",
+                      "to":  "TEST-RegisterPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR003",
+                      "to":  "TEST-RegistrationEscalation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR004",
+                      "to":  "TEST-RegistrationEscalation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR007",
+                      "to":  "TEST-RegistrationEscalation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR008",
+                      "to":  "TEST-RegistrationEscalation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR010",
+                      "to":  "TEST-RegistrationEscalation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR011",
+                      "to":  "TEST-RegistrationEscalation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR012",
+                      "to":  "TEST-RegistrationEscalation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR016",
+                      "to":  "TEST-RegistrationEscalation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR017",
+                      "to":  "TEST-RegistrationEscalation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR018",
+                      "to":  "TEST-RegistrationEscalation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR019",
+                      "to":  "TEST-RegistrationEscalation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR003",
+                      "to":  "TEST-ChangePassword",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR004",
+                      "to":  "TEST-ChangePassword",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR007",
+                      "to":  "TEST-ChangePassword",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR008",
+                      "to":  "TEST-ChangePassword",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR010",
+                      "to":  "TEST-ChangePassword",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR011",
+                      "to":  "TEST-ChangePassword",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR012",
+                      "to":  "TEST-ChangePassword",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR016",
+                      "to":  "TEST-ChangePassword",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR017",
+                      "to":  "TEST-ChangePassword",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR018",
+                      "to":  "TEST-ChangePassword",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR019",
+                      "to":  "TEST-ChangePassword",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR003",
+                      "to":  "TEST-AccessDeniedPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR004",
+                      "to":  "TEST-AccessDeniedPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR007",
+                      "to":  "TEST-AccessDeniedPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR008",
+                      "to":  "TEST-AccessDeniedPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR010",
+                      "to":  "TEST-AccessDeniedPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR011",
+                      "to":  "TEST-AccessDeniedPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR012",
+                      "to":  "TEST-AccessDeniedPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR016",
+                      "to":  "TEST-AccessDeniedPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR017",
+                      "to":  "TEST-AccessDeniedPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR018",
+                      "to":  "TEST-AccessDeniedPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR019",
+                      "to":  "TEST-AccessDeniedPage",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR003",
+                      "to":  "TEST-LogoutApi",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR004",
+                      "to":  "TEST-LogoutApi",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR007",
+                      "to":  "TEST-LogoutApi",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR008",
+                      "to":  "TEST-LogoutApi",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR010",
+                      "to":  "TEST-LogoutApi",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR011",
+                      "to":  "TEST-LogoutApi",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR012",
+                      "to":  "TEST-LogoutApi",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR016",
+                      "to":  "TEST-LogoutApi",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR017",
+                      "to":  "TEST-LogoutApi",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR018",
+                      "to":  "TEST-LogoutApi",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR019",
+                      "to":  "TEST-LogoutApi",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR003",
+                      "to":  "TEST-RateLimit",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR004",
+                      "to":  "TEST-RateLimit",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR007",
+                      "to":  "TEST-RateLimit",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR008",
+                      "to":  "TEST-RateLimit",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR010",
+                      "to":  "TEST-RateLimit",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR011",
+                      "to":  "TEST-RateLimit",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR012",
+                      "to":  "TEST-RateLimit",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR016",
+                      "to":  "TEST-RateLimit",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR017",
+                      "to":  "TEST-RateLimit",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR018",
+                      "to":  "TEST-RateLimit",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR019",
+                      "to":  "TEST-RateLimit",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR003",
+                      "to":  "TEST-AuthorizationDenialLogging",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR004",
+                      "to":  "TEST-AuthorizationDenialLogging",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR007",
+                      "to":  "TEST-AuthorizationDenialLogging",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR008",
+                      "to":  "TEST-AuthorizationDenialLogging",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR010",
+                      "to":  "TEST-AuthorizationDenialLogging",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR011",
+                      "to":  "TEST-AuthorizationDenialLogging",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR012",
+                      "to":  "TEST-AuthorizationDenialLogging",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR016",
+                      "to":  "TEST-AuthorizationDenialLogging",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR017",
+                      "to":  "TEST-AuthorizationDenialLogging",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR018",
+                      "to":  "TEST-AuthorizationDenialLogging",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR019",
+                      "to":  "TEST-AuthorizationDenialLogging",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR003",
+                      "to":  "TEST-SecuredWriteRoutes",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR004",
+                      "to":  "TEST-SecuredWriteRoutes",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR007",
+                      "to":  "TEST-SecuredWriteRoutes",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR008",
+                      "to":  "TEST-SecuredWriteRoutes",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR010",
+                      "to":  "TEST-SecuredWriteRoutes",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR011",
+                      "to":  "TEST-SecuredWriteRoutes",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR012",
+                      "to":  "TEST-SecuredWriteRoutes",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR016",
+                      "to":  "TEST-SecuredWriteRoutes",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR017",
+                      "to":  "TEST-SecuredWriteRoutes",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR018",
+                      "to":  "TEST-SecuredWriteRoutes",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR019",
+                      "to":  "TEST-SecuredWriteRoutes",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR003",
+                      "to":  "TEST-AuthorizationPolicies",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR004",
+                      "to":  "TEST-AuthorizationPolicies",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR007",
+                      "to":  "TEST-AuthorizationPolicies",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR008",
+                      "to":  "TEST-AuthorizationPolicies",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR010",
+                      "to":  "TEST-AuthorizationPolicies",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR011",
+                      "to":  "TEST-AuthorizationPolicies",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR012",
+                      "to":  "TEST-AuthorizationPolicies",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR016",
+                      "to":  "TEST-AuthorizationPolicies",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR017",
+                      "to":  "TEST-AuthorizationPolicies",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR018",
+                      "to":  "TEST-AuthorizationPolicies",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR019",
+                      "to":  "TEST-AuthorizationPolicies",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR003",
+                      "to":  "TEST-BackdoorAndIsolation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR004",
+                      "to":  "TEST-BackdoorAndIsolation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR007",
+                      "to":  "TEST-BackdoorAndIsolation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR008",
+                      "to":  "TEST-BackdoorAndIsolation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR010",
+                      "to":  "TEST-BackdoorAndIsolation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR011",
+                      "to":  "TEST-BackdoorAndIsolation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR012",
+                      "to":  "TEST-BackdoorAndIsolation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR016",
+                      "to":  "TEST-BackdoorAndIsolation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR017",
+                      "to":  "TEST-BackdoorAndIsolation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR018",
+                      "to":  "TEST-BackdoorAndIsolation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR019",
+                      "to":  "TEST-BackdoorAndIsolation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR003",
+                      "to":  "TEST-LegacyUrlRewrite",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR004",
+                      "to":  "TEST-LegacyUrlRewrite",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR007",
+                      "to":  "TEST-LegacyUrlRewrite",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR008",
+                      "to":  "TEST-LegacyUrlRewrite",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR010",
+                      "to":  "TEST-LegacyUrlRewrite",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR011",
+                      "to":  "TEST-LegacyUrlRewrite",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR012",
+                      "to":  "TEST-LegacyUrlRewrite",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR016",
+                      "to":  "TEST-LegacyUrlRewrite",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR017",
+                      "to":  "TEST-LegacyUrlRewrite",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR018",
+                      "to":  "TEST-LegacyUrlRewrite",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR019",
+                      "to":  "TEST-LegacyUrlRewrite",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR003",
+                      "to":  "TEST-IdentityImport",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR004",
+                      "to":  "TEST-IdentityImport",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR007",
+                      "to":  "TEST-IdentityImport",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR008",
+                      "to":  "TEST-IdentityImport",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR010",
+                      "to":  "TEST-IdentityImport",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR011",
+                      "to":  "TEST-IdentityImport",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR012",
+                      "to":  "TEST-IdentityImport",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR016",
+                      "to":  "TEST-IdentityImport",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR017",
+                      "to":  "TEST-IdentityImport",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR018",
+                      "to":  "TEST-IdentityImport",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR019",
+                      "to":  "TEST-IdentityImport",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR003",
+                      "to":  "TEST-IdentityLockout",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR004",
+                      "to":  "TEST-IdentityLockout",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR007",
+                      "to":  "TEST-IdentityLockout",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR008",
+                      "to":  "TEST-IdentityLockout",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR010",
+                      "to":  "TEST-IdentityLockout",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR011",
+                      "to":  "TEST-IdentityLockout",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR012",
+                      "to":  "TEST-IdentityLockout",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR016",
+                      "to":  "TEST-IdentityLockout",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR017",
+                      "to":  "TEST-IdentityLockout",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR018",
+                      "to":  "TEST-IdentityLockout",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR019",
+                      "to":  "TEST-IdentityLockout",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR003",
+                      "to":  "TEST-NoStringConcatSql",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR004",
+                      "to":  "TEST-NoStringConcatSql",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR007",
+                      "to":  "TEST-NoStringConcatSql",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR008",
+                      "to":  "TEST-NoStringConcatSql",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR010",
+                      "to":  "TEST-NoStringConcatSql",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR011",
+                      "to":  "TEST-NoStringConcatSql",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR012",
+                      "to":  "TEST-NoStringConcatSql",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR016",
+                      "to":  "TEST-NoStringConcatSql",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR017",
+                      "to":  "TEST-NoStringConcatSql",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR018",
+                      "to":  "TEST-NoStringConcatSql",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR019",
+                      "to":  "TEST-NoStringConcatSql",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR003",
+                      "to":  "TEST-SecurityGateIntegration",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR004",
+                      "to":  "TEST-SecurityGateIntegration",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR007",
+                      "to":  "TEST-SecurityGateIntegration",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR008",
+                      "to":  "TEST-SecurityGateIntegration",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR010",
+                      "to":  "TEST-SecurityGateIntegration",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR011",
+                      "to":  "TEST-SecurityGateIntegration",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR012",
+                      "to":  "TEST-SecurityGateIntegration",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR016",
+                      "to":  "TEST-SecurityGateIntegration",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR017",
+                      "to":  "TEST-SecurityGateIntegration",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR018",
+                      "to":  "TEST-SecurityGateIntegration",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR019",
+                      "to":  "TEST-SecurityGateIntegration",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR003",
+                      "to":  "TEST-SecuritySpotCheck",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR004",
+                      "to":  "TEST-SecuritySpotCheck",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR007",
+                      "to":  "TEST-SecuritySpotCheck",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR008",
+                      "to":  "TEST-SecuritySpotCheck",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR010",
+                      "to":  "TEST-SecuritySpotCheck",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR011",
+                      "to":  "TEST-SecuritySpotCheck",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR012",
+                      "to":  "TEST-SecuritySpotCheck",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR016",
+                      "to":  "TEST-SecuritySpotCheck",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR017",
+                      "to":  "TEST-SecuritySpotCheck",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR018",
+                      "to":  "TEST-SecuritySpotCheck",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0005-FR019",
+                      "to":  "TEST-SecuritySpotCheck",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR001",
+                      "to":  "TEST-EntryAggregate",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR002",
+                      "to":  "TEST-EntryAggregate",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR004",
+                      "to":  "TEST-EntryAggregate",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR005",
+                      "to":  "TEST-EntryAggregate",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR006",
+                      "to":  "TEST-EntryAggregate",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR007",
+                      "to":  "TEST-EntryAggregate",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR008",
+                      "to":  "TEST-EntryAggregate",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR009",
+                      "to":  "TEST-EntryAggregate",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR001",
+                      "to":  "TEST-RefnoAllocation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR002",
+                      "to":  "TEST-RefnoAllocation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR004",
+                      "to":  "TEST-RefnoAllocation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR005",
+                      "to":  "TEST-RefnoAllocation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR006",
+                      "to":  "TEST-RefnoAllocation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR007",
+                      "to":  "TEST-RefnoAllocation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR008",
+                      "to":  "TEST-RefnoAllocation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR009",
+                      "to":  "TEST-RefnoAllocation",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR001",
+                      "to":  "TEST-StatusChange",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR002",
+                      "to":  "TEST-StatusChange",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR004",
+                      "to":  "TEST-StatusChange",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR005",
+                      "to":  "TEST-StatusChange",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR006",
+                      "to":  "TEST-StatusChange",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR007",
+                      "to":  "TEST-StatusChange",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR008",
+                      "to":  "TEST-StatusChange",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR009",
+                      "to":  "TEST-StatusChange",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR001",
+                      "to":  "TEST-HolidayService",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR002",
+                      "to":  "TEST-HolidayService",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR004",
+                      "to":  "TEST-HolidayService",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR005",
+                      "to":  "TEST-HolidayService",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR006",
+                      "to":  "TEST-HolidayService",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR007",
+                      "to":  "TEST-HolidayService",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR008",
+                      "to":  "TEST-HolidayService",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR009",
+                      "to":  "TEST-HolidayService",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR001",
+                      "to":  "TEST-SuperUserProvisioning",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR002",
+                      "to":  "TEST-SuperUserProvisioning",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR004",
+                      "to":  "TEST-SuperUserProvisioning",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR005",
+                      "to":  "TEST-SuperUserProvisioning",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR006",
+                      "to":  "TEST-SuperUserProvisioning",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR007",
+                      "to":  "TEST-SuperUserProvisioning",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR008",
+                      "to":  "TEST-SuperUserProvisioning",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR009",
+                      "to":  "TEST-SuperUserProvisioning",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR001",
+                      "to":  "TEST-EntriesRbac",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR002",
+                      "to":  "TEST-EntriesRbac",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR004",
+                      "to":  "TEST-EntriesRbac",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR005",
+                      "to":  "TEST-EntriesRbac",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR006",
+                      "to":  "TEST-EntriesRbac",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR007",
+                      "to":  "TEST-EntriesRbac",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR008",
+                      "to":  "TEST-EntriesRbac",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR009",
+                      "to":  "TEST-EntriesRbac",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR001",
+                      "to":  "TEST-EntriesConcurrency",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR002",
+                      "to":  "TEST-EntriesConcurrency",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR004",
+                      "to":  "TEST-EntriesConcurrency",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR005",
+                      "to":  "TEST-EntriesConcurrency",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR006",
+                      "to":  "TEST-EntriesConcurrency",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR007",
+                      "to":  "TEST-EntriesConcurrency",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR008",
+                      "to":  "TEST-EntriesConcurrency",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR009",
+                      "to":  "TEST-EntriesConcurrency",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR001",
+                      "to":  "TEST-EntriesError",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR002",
+                      "to":  "TEST-EntriesError",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR004",
+                      "to":  "TEST-EntriesError",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR005",
+                      "to":  "TEST-EntriesError",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR006",
+                      "to":  "TEST-EntriesError",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR007",
+                      "to":  "TEST-EntriesError",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR008",
+                      "to":  "TEST-EntriesError",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0006-FR009",
+                      "to":  "TEST-EntriesError",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0007-FR001",
+                      "to":  "TEST-Area",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0007-FR001",
+                      "to":  "TEST-Phase0E2E",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR001",
+                      "to":  "TEST-ContentCms",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR002",
+                      "to":  "TEST-ContentCms",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR003",
+                      "to":  "TEST-ContentCms",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR004",
+                      "to":  "TEST-ContentCms",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR005",
+                      "to":  "TEST-ContentCms",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR001",
+                      "to":  "TEST-Report",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR002",
+                      "to":  "TEST-Report",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR003",
+                      "to":  "TEST-Report",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR004",
+                      "to":  "TEST-Report",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR005",
+                      "to":  "TEST-Report",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR001",
+                      "to":  "TEST-Queries",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR002",
+                      "to":  "TEST-Queries",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR003",
+                      "to":  "TEST-Queries",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR004",
+                      "to":  "TEST-Queries",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR005",
+                      "to":  "TEST-Queries",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR001",
+                      "to":  "TEST-NotificationsEndpoint",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR002",
+                      "to":  "TEST-NotificationsEndpoint",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR003",
+                      "to":  "TEST-NotificationsEndpoint",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR004",
+                      "to":  "TEST-NotificationsEndpoint",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "FEAT-0008-FR005",
+                      "to":  "TEST-NotificationsEndpoint",
+                      "type":  "tested_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "VFC-AuthCard",
+                      "to":  "CUI-Cards",
+                      "type":  "derived_from",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "VFC-FormCard",
+                      "to":  "CUI-Cards",
+                      "type":  "derived_from",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "VFC-ComponentStyles",
+                      "to":  "CUI-Cards",
+                      "type":  "derived_from",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "VFC-ToastHost",
+                      "to":  "CUI-Toasts",
+                      "type":  "derived_from",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "VFC-InfoPage",
+                      "to":  "CUI-Cards",
+                      "type":  "derived_from",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "VFC-PublicQueryForm",
+                      "to":  "CUI-FormControl",
+                      "type":  "derived_from",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "VFC-RoleAwareNavigation",
+                      "to":  "CUI-Sidebar",
+                      "type":  "derived_from",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "VFC-PublicLanding",
+                      "to":  "CUI-Cards",
+                      "type":  "derived_from",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "VFC-RoleDashboard",
+                      "to":  "CUI-Cards",
+                      "type":  "derived_from",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "VFC-DesignTokens",
+                      "to":  "CUI-Buttons",
+                      "type":  "derived_from",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "VFC-DataTable",
+                      "to":  "CUI-Tables",
+                      "type":  "derived_from",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "VFC-ErrorPage",
+                      "to":  "CUI-Alerts",
+                      "type":  "derived_from",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "VFC-ConfirmModal",
+                      "to":  "CUI-Modals",
+                      "type":  "derived_from",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "VFC-IconSet",
+                      "to":  "CUI-Icons",
+                      "type":  "derived_from",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-agt",
+                      "to":  "CLAIM-sub",
+                      "type":  "requires",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-agt",
+                      "to":  "CLAIM-name",
+                      "type":  "requires",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "CLAIM-sub",
+                      "type":  "requires",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-emp",
+                      "to":  "CLAIM-name",
+                      "type":  "requires",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "CLAIM-sub",
+                      "type":  "requires",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-adm",
+                      "to":  "CLAIM-name",
+                      "type":  "requires",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "CLAIM-sub",
+                      "type":  "requires",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ROLE-su",
+                      "to":  "CLAIM-name",
+                      "type":  "requires",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "ADR-0002",
+                      "to":  "SPEC-0009",
+                      "type":  "documented_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "DE-Entry",
+                      "to":  "TBL-Mainentry",
+                      "type":  "reads",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "DE-Entry",
+                      "to":  "TBL-EntryPassengers",
+                      "type":  "reads",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "DE-Agent",
+                      "to":  "TBL-Agents",
+                      "type":  "reads",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "DE-Invoice",
+                      "to":  "TBL-Invoices",
+                      "type":  "reads",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "DE-SecurityDay",
+                      "to":  "TBL-SecurityDays",
+                      "type":  "reads",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "DE-Holiday",
+                      "to":  "TBL-Holidays",
+                      "type":  "reads",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "DE-Holiday",
+                      "to":  "TBL-WeeklyOffs",
+                      "type":  "reads",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "DE-SharedRuleService",
+                      "to":  "TBL-Statuses",
+                      "type":  "reads",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "DE-SharedRuleService",
+                      "to":  "TBL-Mainentry",
+                      "type":  "reads",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "TBL-Mainentry",
+                      "to":  "COL-Mainentry-refno",
+                      "type":  "contains",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "TBL-Mainentry",
+                      "to":  "COL-Mainentry-agent",
+                      "type":  "contains",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "TBL-Mainentry",
+                      "to":  "COL-Mainentry-entrytype",
+                      "type":  "contains",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "TBL-EntryPassengers",
+                      "to":  "COL-Entry-RowVersion",
+                      "type":  "contains",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "TBL-Agents",
+                      "to":  "COL-Agents-agentsID",
+                      "type":  "contains",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "TBL-Invoices",
+                      "to":  "COL-Invoice-Invoiceno",
+                      "type":  "contains",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "TBL-AspNetUsers",
+                      "to":  "COL-AspNetUsers-PasswordHash",
+                      "type":  "contains",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "TBL-AspNetUsers",
+                      "to":  "COL-AspNetUsers-AgentId",
+                      "type":  "contains",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "EP-Health",
+                      "to":  "SPEC-0009",
+                      "type":  "documented_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "PAGE-Public-Forms",
+                      "to":  "NAVG-Public",
+                      "type":  "accessible_by",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "PAGE-Public-Forms",
+                      "to":  "FEAT-0007-FR001",
+                      "type":  "implements",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "from":  "PAGE-Public-Forms",
+                      "to":  "LAYOUT-Shell",
+                      "type":  "renders",
+                      "provenance":  "kg-sync-2026-08-22"
+                  },
+                  {
+                      "provenance":  [
+                                         "SPEC-0009 T087"
+                                     ],
+                      "target":  "VisaFusion.Web",
+                      "source":  "vf-charts.js",
+                      "type":  "part_of"
+                  },
+                  {
+                      "provenance":  [
+                                         "SPEC-0009 T087"
+                                     ],
+                      "target":  "CoreUI",
+                      "source":  "vf-charts.js",
+                      "type":  "derived_from"
+                  },
+                  {
+                      "provenance":  [
+                                         "SPEC-0009 T087"
+                                     ],
+                      "target":  "_RoleDashboard.cshtml",
+                      "source":  "vf-charts.js",
+                      "type":  "implements"
+                  }
+              ]
 }

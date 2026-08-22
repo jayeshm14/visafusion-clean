@@ -1,13 +1,38 @@
 @page
+@using VisaFusion.Web.Components
 @{
     ViewData["Title"] = "Subscribe";
+
+    // Subscribe page — SPEC-0009 T086; maps to _FormCard component
+    // (COREUI_VISA_FUSION_MAPPING.md). Content preserved from legacy;
+    // CoreUI presentation only.
+    var formCard = new FormCardModel
+    {
+        Id = "subscribe-form",
+        Title = "Subscribe",
+        Subtitle = "Subscribe to receive updates and notifications about visa services.",
+        Form = new FormCardForm
+        {
+            Id = "subscribe-form",
+            Action = "/api/v1/public/subscribe",
+            Method = "post",
+            AntiForgeryToken = Html.AntiForgeryToken(),
+        },
+        Sections = new List<FormCardSection>
+        {
+            new()
+            {
+                Fields = new List<FormField>
+                {
+                    new() { Name = "email", Label = "Email Address", Type = FormFieldType.Email, Required = true, ColClass = "col-md-8" }
+                }
+            }
+        },
+        FooterActions = new List<FormCardAction>
+        {
+            new() { Title = "Subscribe", Type = FormCardActionType.Submit, CssClass = "btn-primary" }
+        }
+    };
 }
-<h1>Subscribe</h1>
-<p>Subscribe to receive updates and notifications about visa services.</p>
-<form>
-    <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" required class="form-control" />
-    </div>
-    <button type="submit" class="btn btn-primary">Subscribe</button>
-</form>
+
+<partial name="~/Components/_FormCard.cshtml" model="formCard" />

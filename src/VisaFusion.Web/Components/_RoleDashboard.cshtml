@@ -87,13 +87,16 @@
                 </div>
             }
 
-            @* Charts Row (canvas containers; chart.js wiring is Phase 15 / T039) *@
+            @* Charts Row — SPEC-0009 T087: chart.js canvas containers *@
             @if (charts.Any())
             {
                 <div class="row g-4 mb-4">
                     @foreach (var chart in charts)
                     {
                         var colClass = chart.ColClass ?? "col-lg-6";
+                        var chartId = chart.Id ?? "chart-" + charts.IndexOf(chart);
+                        var chartDataJson = System.Text.Json.JsonSerializer.Serialize(chart.Data);
+                        var chartOptionsJson = System.Text.Json.JsonSerializer.Serialize(chart.Options);
                         <div class="@colClass">
                             <div class="card chart-card h-100 @chart.CardClass">
                                 <div class="card-header">
@@ -101,7 +104,10 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="chart-wrapper" style="height: @(chart.Height)px; position: relative;">
-                                        <canvas id="@(chart.Id ?? "chart-" + charts.IndexOf(chart))" data-chart-type="@chart.Type"></canvas>
+                                        <canvas id="@chartId"
+                                                data-chart-type="@chart.Type"
+                                                data-chart-data="@chartDataJson"
+                                                data-chart-options="@chartOptionsJson"></canvas>
                                     </div>
                                 </div>
                             </div>
